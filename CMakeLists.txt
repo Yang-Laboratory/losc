@@ -29,4 +29,18 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# build google test library
+#add_subdirectory(googletest)
+if(IS_DIRECTORY $ENV{HOME}/local/googletest)
+    message(STATUS "found googletest source folder.")
+    add_subdirectory($ENV{HOME}/local/googletest $ENV{HOME}/local/googletest/build)
+else()
+    message(FATAL_ERROR "googletest source folder not found.
+        Run `git clone https://github.com/google/googletest.git` under path `$ENV{HOME}/local/`")
+endif()
+
+# build matrix library
 add_subdirectory(matrix)
+
+# build localization library
+add_subdirectory(localization)
