@@ -1,0 +1,8 @@
+# build dir and files.
+*build*/
+
+# vscode
+*.vscode/
+
+# googletest
+googletest/
