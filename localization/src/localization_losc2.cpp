@@ -5,12 +5,16 @@
 #include <algorithm>
 #include <random>
 
-
 namespace localization {
 
-static void js_one_pair_opt(size_t i, size_t j, double para_c, double para_gamma,
-                            vector<Matrix *> dipole_lo, Matrix *hamiltonian_lo,
-                            double *theta_val, double *delta_val)
+/**
+ * Get the optimized rotation angle value for one pair of orbitals.
+ */
+static void js_optimize_one_pair(const size_t i, const size_t j,
+                                 const double para_c, const double para_gamma,
+                                 vector<SharedMatrix> dipole_lo,
+                                 SharedMatrix hamiltonian_lo,
+                                 double &theta_val, double &delta_val)
 {
     // Spacial part: constant x1 and x2.
     double x1 = 0.0;
@@ -53,15 +57,18 @@ static void js_one_pair_opt(size_t i, size_t j, double para_c, double para_gamma
     // as that will cause derivative discontinuity for numerical dU/dP.
     if (theta > 3. * M_PI / 8.) theta -= M_PI / 2.;
     if (theta < -3. * M_PI / 8.) theta += M_PI / 2.;
-    *theta_val = theta;
+    theta_val = theta;
     double delta = a1 * cos(4 * theta) + a2 * sin(4 * theta) - a1;
-    *delta_val = delta; // unit in bohr^2.
+    delta_val = delta; // unit in bohr^2.
 }
 
-static void js_rotate_one_pair(size_t i, size_t j, double theta,
-                               Matrix *u_matrix,
-                               vector<Matrix *> &dipole_lo,
-                               Matrix *hamiltonian_lo)
+/**
+ * Apply rotation to the pair of orbitals.
+ */
+static void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
+                               SharedMatrix u_matrix,
+                               vector<SharedMatrix> dipole_lo,
+                               SharedMatrix hamiltonian_lo)
 {
     double costheta = cos(theta);
     double sintheta = sin(theta);
@@ -92,91 +99,91 @@ static void js_rotate_one_pair(size_t i, size_t j, double theta,
                         &costheta, &sintheta);
 }
 
-/**
- * Create a localized orbital coefficient matrix that expanded on atomic basis set
- * based on the input localization data.
- *
- * @ param[in] input_data: the input data for localization. On exit, the input_data.u_matrix
- *  is updated with final U matrix.
- * @ return Matrix: the LO coefficient matrix on atomic basis.
- */
-Matrix *LocalizerLosc2(LocalizerLosc2InputData &input_data)
+Losc2Localizer::Losc2Localizer(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis,
+                               shared_ptr<const HamiltonianAOMatrix> H_ao,
+                               vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao)
+    : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
-    const size_t nlmo = input_data.nlmo;
-    const size_t nbasis = input_data.nbasis;
-    const Matrix *lo_basis_coef = input_data.lo_basis_coef;
-    const Matrix *hamiltonian_ao = input_data.hamiltonian_ao;
-    vector<const Matrix *> &dipole_ao = input_data.dipole_ao;
-    Matrix *u_matrix = input_data.u_matrix;
+    if (! H_ao_->is_square() && H_ao_->row() != nbasis_) {
+        std::cout << "Dimension error: Hamiltonian under AO.\n";
+        std::exit(EXIT_FAILURE);
+    }
 
+    if (Dipole_ao_.size() != 3) {
+        std::cout << "Dipole size error!\n";
+        std::exit(EXIT_FAILURE);
+        for (size_t i = 0; i < 3; ++i) {
+            if (! Dipole_ao_[i]->is_square() && Dipole_ao_[i]->row() != nbasis_) {
+                std::cout << "Dimension error: Dipole under AO in xyz = " << i << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
+        }
+    }
+}
+
+/**
+ * Do localization and compute the LO coefficient matrix under AO.
+ */
+void Losc2Localizer::compute()
+{
     // calculate dipole on LO initial guess.
     // D_lo = U * C_lo_basis * D_ao * C_lo_basis^T * U^T
-    vector<Matrix *> dipole_lo = {nullptr, nullptr, nullptr};
+    vector<SharedMatrix> D_lo;
     for (size_t xyz = 0; xyz < 3; xyz++) {
-        dipole_lo[xyz] = new Matrix(nlmo, nlmo);
-        Matrix *CDC = new Matrix(nlmo, nlmo);
-        matrix::mult_dgemm_ABAT(*lo_basis_coef, *dipole_ao[xyz], *CDC);
-        matrix::mult_dgemm_ABAT(*u_matrix, *CDC, *dipole_lo[xyz]);
-        delete CDC;
+        D_lo.push_back(std::make_shared<Matrix> (nlo_, nlo_));
+        SharedMatrix CDC = std::make_shared<Matrix> (nlo_, nlo_);
+        matrix::mult_dgemm_ABAT(*C_lo_basis_, *Dipole_ao_[xyz], *CDC);
+        matrix::mult_dgemm_ABAT(*U_, *CDC, *D_lo[xyz]);
     }
 
     // calculate Hamiltonian matrix on LO initial guess.
     // H_lo = U * C_lo_basis * H_ao * C_lo_basis^T * U^T
-    Matrix *hamiltonian_lo = new Matrix(nlmo, nlmo);
-    hamiltonian_lo = new Matrix(nlmo, nlmo);
-    Matrix *CHC = new Matrix(nlmo, nlmo);
-    matrix::mult_dgemm_ABAT(*lo_basis_coef, *hamiltonian_ao, *CHC);
-    matrix::mult_dgemm_ABAT(*u_matrix, *CHC, *hamiltonian_lo);
-    delete CHC;
+    SharedMatrix H_lo = std::make_shared<Matrix> (nlo_, nlo_);
+    SharedMatrix CHC = std::make_shared<Matrix> (nlo_, nlo_);
+    matrix::mult_dgemm_ABAT(*C_lo_basis_, *H_ao_, *CHC);
+    matrix::mult_dgemm_ABAT(*U_, *CHC, *H_lo);
+    CHC.reset();
 
     // using jacobi sweep for localization.
     std::mt19937 g(0);
     size_t iter = 0;
     double cycle_delta = 10000.0;
-    while (iter < input_data.js_max_iter && fabs(cycle_delta) > input_data.js_tol) {
+    while (iter < js_max_iter_ && fabs(cycle_delta) > js_tol_) {
         cycle_delta = 0.0;
         vector<size_t> order;
-        for (size_t i = 0; i < nlmo; i++)
+        for (size_t i = 0; i < nlo_; ++i)
             order.push_back(i);
 
         /* random permutation */
-        if (input_data.use_js_random_permutation) {
+        if (js_random_permutation_) {
             std::shuffle(order.begin(), order.end(), g);
         }
 
         /* orbital pair rotation */
-        for (size_t ni = 0; ni < nlmo; ni++) {
+        for (size_t ni = 0; ni < nlo_; ++ni) {
             size_t i = order[ni];
-            for (size_t nj = 0; nj < ni; nj++) {
+            for (size_t nj = 0; nj < ni; ++nj) {
                 size_t j = order[nj];
                 double delta = 0.0;
                 double theta = 0.0;
                 // get the optimized rotation angle.
                 //JS_pair_operator(JS_pair_optimize, pArgs, is, i, j, JS_constant, &theta, &delta);
-                js_one_pair_opt(i, j, input_data.para_c, input_data.para_gamma,
-                                dipole_lo, hamiltonian_lo,
-                                &theta, &delta);
+                js_optimize_one_pair(i, j, para_c_, para_gamma_,
+                                     D_lo, H_lo, theta, delta);
                 // apply rotation to related matrix.
-                js_rotate_one_pair(i, j, theta, u_matrix, dipole_lo, hamiltonian_lo);
+                js_rotate_one_pair(i, j, theta, U_, D_lo, H_lo);
                 cycle_delta += delta;
             }
         }
         iter++;
     }
-    if (iter >= input_data.js_max_iter && fabs(cycle_delta) > input_data.js_tol) {
+    if (iter >= js_max_iter_ && fabs(cycle_delta) > js_tol_) {
         std::cout << "Warning: localization is not convergened.\n";
     }
 
-    for (size_t xyz = 0; xyz < 3; xyz++) {
-        delete dipole_lo[xyz];
-    }
-    delete hamiltonian_lo;
-
-    // create LO coefficient matrix.
-    Matrix *lo_coef = new Matrix(nlmo, nbasis);
-    matrix::mult_dgemm(1.0, *u_matrix, "N", *lo_basis_coef, "N",
-                       0.0, *lo_coef);
-    return lo_coef;
+    // calculate the LO coefficient matrix.
+    C_lo_ = std::make_shared<LOCoefficientMatrix> (nlo_, nlo_);
+    matrix::mult_dgemm(1.0, *U_, "N", *C_lo_basis_, "N", 0.0, *C_lo_);
 }
 
 }

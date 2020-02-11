@@ -1,119 +1,128 @@
 /**
  * file: localization.h
  */
-#ifndef _LOCALIZATION_LOCALIZATION_H_
-#define _LOCALIZATION_LOCALIZATION_H_
+#ifndef _LOSC_LOCALIZATION_H_
+#define _LOSC_LOCALIZATION_H_
 
 #include <matrix/matrix.h>
 #include <vector>
 #include <iostream>
 #include <cstddef>
+#include <memory>
 
 namespace localization {
 
 using matrix::Matrix;
 using std::vector;
+using std::shared_ptr;
 
-/**
- * Losc2 localization data interface.
- *
- * Prepare all the data specified in this struct before
- * calling Losc2 localization function, localization::LocalizerLosc2(),
- * to create the localization orbital coefficient matrix.
- *
- * Note: All the matrices are treated as general matrix.
- */
-struct LocalizerLosc2InputData
-{
+using SharedConstMatrix = shared_ptr<const Matrix>;
+using SharedMatrix = shared_ptr<Matrix>;
+using UniqueConstMatrix = std::unique_ptr<const Matrix>;
+using UniqueMatrix = std::unique_ptr<Matrix>;
+
+class LOCoefficientMatrix : public Matrix { using Matrix::Matrix;};
+class LOBasisCoefficientMatrix : public Matrix { using Matrix::Matrix;};
+class HamiltonianAOMatrix : public Matrix { using Matrix::Matrix;};
+class DipoleAOMatrix : public Matrix { using Matrix::Matrix;};
+class LocalizationUMatrix: public Matrix { using Matrix::Matrix;};
+
+enum PrintLevel {
+    kPrintLevelNo,
+    kPrintLevelNormal,
+    kPrintLevelDebug1,
+    kPrintLevelDebug2,
+};
+
+class LocalizerBase {
+    protected:
+    size_t nlo_;    // number of LO.
+    size_t nbasis_; // number of AO basis.
+
+    enum PrintLevel print_level_ = kPrintLevelNo;
+
     /**
-     * The number of localized orbitals.
-     * Default is 0.
+     * LO coefficient matrix under AO.
+     * Dimension: nlo x nbasis.
      */
-    size_t nlmo = 0;
+    shared_ptr<LOCoefficientMatrix> C_lo_;
 
     /**
-     * The number of atomic basis set.
-     * Default is 0.
+     * Unitary matrix that transfer LO basis coefficient matrix into LO coefficient matrix.
+     * Dimension: nlo x nlo.
+     * phi_i = \sum_j U_{ij} psi_j, where phi_i is the i-th LO and psi_j is the j-th LO basis.
      */
-    size_t nbasis = 0;
+    shared_ptr<LocalizationUMatrix> U_;
 
     /**
-     * If or not to use the random permutation in Jacobi-Sweep
-     * algorithm for localization. Default is true.
+     * LO basis coefficient matrix under AO.
+     * Dimension: nlo x nbasis.
      */
-    bool use_js_random_permutation = true;
+    shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis_;
+
+    public:
+    LocalizerBase(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis)
+        : nlo_{C_lo_basis->row()}, nbasis_{C_lo_basis->col()},
+        print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
+    {
+        U_ = std::make_shared<LocalizationUMatrix> (nlo_, nlo_);
+        for (size_t i = 0; i < nlo_; ++i) {
+            (*U_)(i, i) = 1.0;
+        }
+    }
 
     /**
-     * The maximum iteration number for Jacobi-Sweep
-     * algorithm. Default is 1000.
+     * get the LO coefficient matrix.
      */
-    size_t js_max_iter = 1000;
+    shared_ptr<const LOCoefficientMatrix> get_lo() { return C_lo_; }
 
     /**
-     * Jacobi-Sweep localization convergence tolerance.
-     * Default is 1e-10.
+     * Set up the initial U matrix.
      */
-    double js_tol = 1e-10;
+    void set_initial_u_matrix(shared_ptr<LocalizationUMatrix> U)
+    {
+        if (! U->is_square() && U->row() != nlo_) {
+            std::cout << "Dimension error: set U matrix.\n";
+            std::exit(EXIT_FAILURE);
+        }
+        U_ = U;
+    }
 
     /**
-     * Losc2 localization parameter C.
-     * Default is 1000, that is the default value for Losc2.
+     * Set up the print level.
      */
-    double para_c = 1000;
+    void set_print(enum PrintLevel level) {print_level_ = level;}
 
     /**
-     * Losc2 localization parameter gamma.
-     * Default is 0.78, that is the optimized value for Losc2.
-     */
-    double para_gamma = 0.78;
-
-    /**
-     * u_matrix points to a unitary matrix, dimension (nlmo, nlmo), that
-     * transfers the localized orbital (LO) basis to localized orbital.
+     * do localization and compute the LO coefficient matrix.
      *
-     * Each row of the matrix refers to one LO that expanded on the LO basis.
-     * Default u_matrix is a null pointer.
+     * Calling this function will calculate the `C_lo_` and `U_`.
      */
-    Matrix *u_matrix = nullptr;
-
-    /**
-     * lo_basis_coef points to a matrix, dimension (nlmo, nbasis), that refers
-     * to the LO basis coefficient matrix expanded on atomic basis set.
-     *
-     * Each row of the matrix refers to one LO basis that expanded on the atomic basis.
-     * Default is a null pointer.
-     */
-    const Matrix *lo_basis_coef = nullptr;
-
-    /**
-     * hamiltonian_ao points to a matrix, dimension (nbasis, nbasis),
-     * that is the Hamiltonian matrix under atomic basis used in the Losc2 localization.
-     *
-     * Default is a null pointer.
-     */
-    const Matrix *hamiltonian_ao = nullptr;
-
-    /**
-     * dipole_ao is a vector of matrix pointer.
-     * The x, y and z component of the dipole matrix pointer are stored in order in the vector.
-     * The dimension of each dipole component matrix is (nbasis, nbasis).
-     *
-     * Default all the dipole matrix pointers are null pointer.
-     */
-    vector<const Matrix *> dipole_ao = {nullptr, nullptr, nullptr};
+    virtual void compute() = 0;
 };
 
 /**
- * Create a localized orbital coefficient matrix that expanded on atomic basis set
- * based on the input localization data.
- *
- * @ param[in] input_data: the input data for localization. On exit, the input_data.u_matrix
- *  is updated with final U matrix.
- * @ return Matrix: the LO coefficient matrix on atomic basis.
+ * Losc2 Localization
  */
-Matrix *LocalizerLosc2(LocalizerLosc2InputData &input_data);
+class Losc2Localizer : public LocalizerBase {
+    private:
+    shared_ptr<const HamiltonianAOMatrix> H_ao_;
+    vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao_;
 
+    bool js_random_permutation_ = true;
+    size_t js_max_iter_ = 1000;
+    double js_tol_ = 1e-10;
+    double para_c_ = 1000;
+    double para_gamma_ = 0.78;
+
+    public:
+    Losc2Localizer(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis,
+                   shared_ptr<const HamiltonianAOMatrix> H_ao,
+                   vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao);
+
+    void compute() override;
+};
 
 }
 
-#endif
+#endif //_LOSC_LOCALIZATION_H_
