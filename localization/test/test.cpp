@@ -185,5 +185,6 @@ INSTANTIATE_TEST_SUITE_P(
     Localizationtest,
     LocalizationTest,
     ::testing::Values(
-            "H2_1.0", "H2_10", "H2+_10")
+            "H2_1.0", "H2_10", "H2+_10",
+            "H2O")
 );

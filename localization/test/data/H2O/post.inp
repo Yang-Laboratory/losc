@@ -1,0 +1,32 @@
+$qm
+xyz    H2O.xyz
+spin   2
+charge 0
+mult   1
+method dft
+xcfunc b3lyp
+guess  atom
+iter        300
+dentol      1.0E-004
+etol        1.0E-008
+print       1
+diis        12  0.30
+basis    H H.6-31G
+basis    O O.6-31G
+dolosc
+end
+
+$setlosc
+post
+losc_2_2
+localize window all
+write dipole_ao dipole_ao.bin
+write dfa_h dfa_h.bin
+write dfa_co_coef lo_basis.bin
+write lo_coef lo.bin
+write ao_overlap ao_overlap.bin
+localize monitor_cost_func
+print 5
+end
+
+$doqm
