@@ -99,9 +99,9 @@ static void js_rotate_one_pair(const size_t i, const size_t j, const double thet
                         &costheta, &sintheta);
 }
 
-Losc2Localizer::Losc2Localizer(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis,
-                               shared_ptr<const HamiltonianAOMatrix> H_ao,
-                               vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao)
+Losc2Localizer::Losc2Localizer(SharedMatrix C_lo_basis,
+                               SharedMatrix H_ao,
+                               vector<SharedMatrix> Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
     if (! H_ao_->is_square() && H_ao_->row() != nbasis_) {
@@ -182,7 +182,7 @@ void Losc2Localizer::compute()
     }
 
     // calculate the LO coefficient matrix.
-    C_lo_ = std::make_shared<LOCoefficientMatrix> (nlo_, nlo_);
+    C_lo_ = std::make_shared<Matrix> (nlo_, nlo_);
     matrix::mult_dgemm(1.0, *U_, "N", *C_lo_basis_, "N", 0.0, *C_lo_);
 }
 

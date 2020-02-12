@@ -16,16 +16,7 @@ using matrix::Matrix;
 using std::vector;
 using std::shared_ptr;
 
-using SharedConstMatrix = shared_ptr<const Matrix>;
 using SharedMatrix = shared_ptr<Matrix>;
-using UniqueConstMatrix = std::unique_ptr<const Matrix>;
-using UniqueMatrix = std::unique_ptr<Matrix>;
-
-class LOCoefficientMatrix : public Matrix { using Matrix::Matrix;};
-class LOBasisCoefficientMatrix : public Matrix { using Matrix::Matrix;};
-class HamiltonianAOMatrix : public Matrix { using Matrix::Matrix;};
-class DipoleAOMatrix : public Matrix { using Matrix::Matrix;};
-class LocalizationUMatrix: public Matrix { using Matrix::Matrix;};
 
 enum PrintLevel {
     kPrintLevelNo,
@@ -45,27 +36,27 @@ class LocalizerBase {
      * LO coefficient matrix under AO.
      * Dimension: nlo x nbasis.
      */
-    shared_ptr<LOCoefficientMatrix> C_lo_;
+    SharedMatrix C_lo_;
 
     /**
      * Unitary matrix that transfer LO basis coefficient matrix into LO coefficient matrix.
      * Dimension: nlo x nlo.
      * phi_i = \sum_j U_{ij} psi_j, where phi_i is the i-th LO and psi_j is the j-th LO basis.
      */
-    shared_ptr<LocalizationUMatrix> U_;
+    SharedMatrix U_;
 
     /**
      * LO basis coefficient matrix under AO.
      * Dimension: nlo x nbasis.
      */
-    shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis_;
+    SharedMatrix C_lo_basis_;
 
     public:
-    LocalizerBase(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis)
+    LocalizerBase(SharedMatrix C_lo_basis)
         : nlo_{C_lo_basis->row()}, nbasis_{C_lo_basis->col()},
         print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
     {
-        U_ = std::make_shared<LocalizationUMatrix> (nlo_, nlo_);
+        U_ = std::make_shared<Matrix> (nlo_, nlo_);
         for (size_t i = 0; i < nlo_; ++i) {
             (*U_)(i, i) = 1.0;
         }
@@ -74,12 +65,12 @@ class LocalizerBase {
     /**
      * get the LO coefficient matrix.
      */
-    shared_ptr<const LOCoefficientMatrix> get_lo() { return C_lo_; }
+    SharedMatrix get_lo() { return C_lo_; }
 
     /**
      * Set up the initial U matrix.
      */
-    void set_initial_u_matrix(shared_ptr<LocalizationUMatrix> U)
+    void set_initial_u_matrix(SharedMatrix U)
     {
         if (! U->is_square() && U->row() != nlo_) {
             std::cout << "Dimension error: set U matrix.\n";
@@ -106,8 +97,8 @@ class LocalizerBase {
  */
 class Losc2Localizer : public LocalizerBase {
     private:
-    shared_ptr<const HamiltonianAOMatrix> H_ao_;
-    vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao_;
+    SharedMatrix H_ao_;
+    vector<SharedMatrix> Dipole_ao_;
 
     bool js_random_permutation_ = true;
     size_t js_max_iter_ = 1000;
@@ -116,9 +107,11 @@ class Losc2Localizer : public LocalizerBase {
     double para_gamma_ = 0.78;
 
     public:
-    Losc2Localizer(shared_ptr<const LOBasisCoefficientMatrix> C_lo_basis,
-                   shared_ptr<const HamiltonianAOMatrix> H_ao,
-                   vector<shared_ptr<const DipoleAOMatrix>> Dipole_ao);
+    Losc2Localizer(SharedMatrix C_lo_basis, SharedMatrix H_ao, vector<SharedMatrix> Dipole_ao);
+
+    void set_tolerance(double tol) {js_tol_ = tol;}
+    void set_max_iteration(size_t max_iter) {js_max_iter_ = max_iter;}
+    void set_random_permutation(bool true_or_false) {js_random_permutation_ = true_or_false;}
 
     void compute() override;
 };
