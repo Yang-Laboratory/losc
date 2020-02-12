@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstddef>
 #include <memory>
+#include <string>
 
 namespace localization {
 
@@ -68,6 +69,11 @@ class LocalizerBase {
     SharedMatrix get_lo() { return C_lo_; }
 
     /**
+     * get the U matrix.
+     */
+    SharedMatrix get_u() { return U_; }
+
+    /**
      * Set up the initial U matrix.
      */
     void set_initial_u_matrix(SharedMatrix U)
@@ -105,6 +111,8 @@ class Losc2Localizer : public LocalizerBase {
     double js_tol_ = 1e-10;
     double para_c_ = 1000;
     double para_gamma_ = 0.78;
+
+    void message(std::string t, ...);
 
     public:
     Losc2Localizer(SharedMatrix C_lo_basis, SharedMatrix H_ao, vector<SharedMatrix> Dipole_ao);

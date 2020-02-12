@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <random>
+#include <stdarg.h>
 
 namespace localization {
 
@@ -121,6 +122,16 @@ Losc2Localizer::Losc2Localizer(SharedMatrix C_lo_basis,
     }
 }
 
+void Losc2Localizer::message(std::string t, ...)
+{
+    if (print_level_ >= kPrintLevelNormal) {
+        va_list args;
+        va_start(args, t.c_str());
+        vfprintf(stdout, t.c_str(), args);
+        va_end(args);
+    }
+}
+
 /**
  * Do localization and compute the LO coefficient matrix under AO.
  */
@@ -177,6 +188,8 @@ void Losc2Localizer::compute()
         }
         iter++;
     }
+
+    message("Localization final iteration = %zu.\n", iter);
     if (iter >= js_max_iter_ && fabs(cycle_delta) > js_tol_) {
         std::cout << "Warning: localization is not convergened.\n";
     }

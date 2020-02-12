@@ -6,3 +6,6 @@
 
 # googletest
 googletest/
+
+# test data output file
+*/test/data/**/*.out
