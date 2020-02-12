@@ -110,7 +110,7 @@ class Losc2Localizer : public LocalizerBase {
     size_t js_max_iter_ = 1000;
     double js_tol_ = 1e-10;
     double para_c_ = 1000;
-    double para_gamma_ = 0.78;
+    double para_gamma_ = 0.707;
 
     void message(std::string t, ...);
 
