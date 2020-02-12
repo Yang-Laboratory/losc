@@ -21,6 +21,14 @@ set(project_name losc)
 
 project(${project_name} C CXX)
 
+file(GLOB Headers
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB Sources
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+
 enable_testing()
 
 # C/C++ standard setting
@@ -44,3 +52,13 @@ add_subdirectory(matrix)
 
 # build localization library
 add_subdirectory(localization)
+
+add_library(
+    ${project_name} SHARED
+    ${Sources}
+    ${Headers})
+
+target_link_libraries(
+    ${project_name}
+    PUBLIC
+    localization)
