@@ -25,6 +25,12 @@ class CurvatureV1 : public CurvatureBase {
     size_t nlo_;
     size_t nbasis_;
     size_t nfitbasis_;
+    size_t npts_;
+
+    double para_cx_ = 0.930526;
+    double para_exf_ = 1.2378;
+    double para_alpha_ = 0.0;
+    double para_beta_ = 0.0;
 
     /**
      * LO coefficient matrix under AO.
@@ -46,13 +52,28 @@ class CurvatureV1 : public CurvatureBase {
      */
     SharedMatrix df_Vpq_inverse_;
 
+    /**
+     * AO basis value on grid.
+     * dimension: [npts, nbasis].
+     */
+    SharedMatrix grid_basis_value_;
+
+    /**
+     * grid weight.
+     * dimension: npts.
+     */
+    const vector<double> &grid_weight_;
+
     SharedMatrix kappa_J_;
     SharedMatrix kappa_xc_;
 
     void compute_kappa_J();
 
+    void compute_kappa_xc();
+
     public:
-    CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse);
+    CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+                SharedMatrix grid_basis_value, const vector<double> &grid_weight);
     virtual void compute() override;
 };
 

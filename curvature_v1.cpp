@@ -5,9 +5,18 @@
 
 namespace losc {
 
-CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse)
-    : C_lo_{C_lo}, df_pmn_{df_pmn}, df_Vpq_inverse_{df_Vpq_inverse},
-    nlo_{C_lo_->row()}, nbasis_{C_lo_->col()}, nfitbasis_{df_Vpq_inverse_->row()}
+CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+                         SharedMatrix grid_basis_value, const vector<double> &grid_weight)
+    :
+    npts_{grid_weight.size()},
+    nlo_{C_lo->row()},
+    nbasis_{C_lo->col()},
+    nfitbasis_{df_Vpq_inverse->row()},
+    C_lo_{C_lo},
+    df_pmn_{df_pmn},
+    df_Vpq_inverse_{df_Vpq_inverse},
+    grid_basis_value_{grid_basis_value},
+    grid_weight_{grid_weight}
 {
     if (df_pmn_->col() != nbasis_ * (nbasis_ + 1) / 2) {
         printf("Dimension error: df_mnp matrix.\n");
@@ -15,6 +24,10 @@ CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df
     }
     if (!df_Vpq_inverse_->is_square()) {
         printf("Dimension error: df_Vpq_inverse matrix.\n");
+        std::exit(EXIT_FAILURE);
+    }
+    if (npts_ != grid_basis_value_->row() || nbasis_ != grid_basis_value_->col()) {
+        printf("Dimension error: grid_basis_value matrix.\n");
         std::exit(EXIT_FAILURE);
     }
 }
@@ -61,6 +74,54 @@ void CurvatureV1::compute_kappa_J()
     SharedMatrix V_pii = std::make_shared<Matrix> (nfitbasis_, nlo_);
     matrix::mult_dgemm(1.0, *df_Vpq_inverse_, "N", *df_pii, "N", 0.0, *V_pii);
     matrix::mult_dgemm(1.0, *df_pii, "T", *V_pii, "N", 0.0, *kappa_J_);
+}
+
+void CurvatureV1::compute_kappa_xc()
+{
+    kappa_xc_ = std::make_shared<Matrix> (nlo_, nlo_);
+
+    SharedMatrix LO_grid_val = std::make_shared<Matrix> (npts_, nlo_);
+    matrix::mult_dgemm(1.0, *grid_basis_value_, "N", *C_lo_, "T", 0.0, *LO_grid_val);
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic)
+#endif
+    for (size_t i = 0 ; i < LO_grid_val->size(); ++i) {
+        LO_grid_val->data()[i] *= LO_grid_val->data()[i];
+        LO_grid_val->data()[i] = std::pow(LO_grid_val->data()[i], 2.0/3.0);
+    }
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic)
+#endif
+    for (size_t i = 0; i < nlo_; ++i) {
+        for (size_t j = 0; j <= i; ++j) {
+            for (size_t ip = 0; ip < npts_; ++ip) {
+                const double pi = (*LO_grid_val)(ip, i);
+                const double pj = (*LO_grid_val)(ip, j);
+                (*kappa_xc_)(i, j) += grid_weight_[ip] * pi * pj;
+            }
+        }
+    }
+    kappa_xc_->to_symmetric("L");
+}
+
+void CurvatureV1::compute()
+{
+    compute_kappa_J();
+    compute_kappa_xc();
+
+    kappa_ = std::make_shared<Matrix> (nlo_, nlo_);
+
+    // combine J and xc
+    const double xc_factor = - para_exf_ * para_cx_ * 2.0 / 3.0 * (1.0 - para_alpha_);
+    const double j_factor = 1.0 - para_alpha_ - para_beta_;
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic)
+#endif
+    for (size_t i = 0; i < kappa_->size(); ++i) {
+        kappa_->data()[i] = j_factor * kappa_J_->data()[i] + xc_factor * kappa_xc_->data()[i];
+    }
 }
 
 }
