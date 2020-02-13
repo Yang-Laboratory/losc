@@ -6,9 +6,9 @@
 namespace losc {
 
 CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                         SharedMatrix grid_basis_value, const vector<double> &grid_weight)
+                         SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
     :
-    npts_{grid_weight.size()},
+    npts_{grid_weight->size()},
     nlo_{C_lo->row()},
     nbasis_{C_lo->col()},
     nfitbasis_{df_Vpq_inverse->row()},
@@ -99,7 +99,7 @@ void CurvatureV1::compute_kappa_xc()
             for (size_t ip = 0; ip < npts_; ++ip) {
                 const double pi = (*LO_grid_val)(ip, i);
                 const double pj = (*LO_grid_val)(ip, j);
-                (*kappa_xc_)(i, j) += grid_weight_[ip] * pi * pj;
+                (*kappa_xc_)(i, j) += (*grid_weight_)[ip] * pi * pj;
             }
         }
     }
