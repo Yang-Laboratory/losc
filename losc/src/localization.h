@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 
-namespace localization {
+namespace losc {
 
 using matrix::Matrix;
 using std::vector;

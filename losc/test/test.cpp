@@ -6,7 +6,7 @@
 #include <string>
 #include <cmath>
 
-#include "../src/localization.h"
+#include <losc/localization.h>
 
 using std::vector;
 using std::shared_ptr;
@@ -117,9 +117,9 @@ TEST_P(LocalizationTest, H2)
 
     for (int is = 0; is < 2; is++) {
         // do localization.
-        localization::Losc2Localizer localizer(C_lo_basis[is], H_ao[is], D_ao);
+        losc::Losc2Localizer localizer(C_lo_basis[is], H_ao[is], D_ao);
         localizer.set_random_permutation(false);
-        //localizer.set_print(localization::kPrintLevelNormal);
+        //localizer.set_print(losc::kPrintLevelNormal);
         localizer.compute();
         SharedMatrix C_lo_calc = localizer.get_lo();
 

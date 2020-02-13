@@ -6,7 +6,7 @@
 #include <random>
 #include <stdarg.h>
 
-namespace localization {
+namespace losc {
 
 /**
  * Get the optimized rotation angle value for one pair of orbitals.
