@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(project_name localization_test)
+set(project_name losc_test)
 project(${project_name} C CXX)
 
 file(GLOB Sources
@@ -17,7 +17,7 @@ add_executable(
 
 target_link_libraries(
     ${project_name} PUBLIC
-    localization
+    losc
     gtest_main)
 
 add_test(

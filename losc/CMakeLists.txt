@@ -22,7 +22,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(project_name localization)
+set(project_name losc)
 project(${project_name} C CXX)
 
 enable_testing()
