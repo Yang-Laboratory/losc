@@ -12,11 +12,18 @@ using matrix::Matrix;
 using SharedMatrix = std::shared_ptr<Matrix>;
 using SharedDoubleVector = std::shared_ptr<vector<double>>;
 
+enum DFAType {
+    GGA,
+    B3LYP,
+};
+
 class CurvatureBase {
     protected:
     SharedMatrix kappa_;
+    DFAType dfa_type_;
 
     public:
+    CurvatureBase(DFAType dfa) : dfa_type_{dfa} {}
     virtual void compute() = 0;
     SharedMatrix get_curvature() {return kappa_;}
 };
@@ -73,7 +80,7 @@ class CurvatureV1 : public CurvatureBase {
     void compute_kappa_xc();
 
     public:
-    CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+    CurvatureV1(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
                 SharedMatrix grid_basis_value, SharedDoubleVector grid_weight);
     virtual void compute() override;
 };
@@ -126,7 +133,7 @@ class CurvatureV2 : public CurvatureBase {
 
 
     public:
-    CurvatureV2(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+    CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
                 SharedMatrix grid_basis_value, SharedDoubleVector grid_weight);
 
     virtual void compute() override;

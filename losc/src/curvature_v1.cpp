@@ -5,9 +5,9 @@
 
 namespace losc {
 
-CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+CurvatureV1::CurvatureV1(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
                          SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
-    :
+    : CurvatureBase(dfa),
     npts_{grid_weight->size()},
     nlo_{C_lo->row()},
     nbasis_{C_lo->col()},
@@ -30,6 +30,22 @@ CurvatureV1::CurvatureV1(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df
         printf("Dimension error: grid_basis_value matrix.\n");
         std::exit(EXIT_FAILURE);
     }
+
+    switch (dfa) {
+        case losc::GGA : {
+            para_alpha_ = para_beta_ = 0.0;
+            break;
+        }
+        case losc::B3LYP : {
+            para_alpha_ = 0.2;
+            para_beta_ = 0.0;
+            break;
+        }
+        default: {
+            printf("DFA choice not support!\n");
+            std::exit(EXIT_FAILURE);
+        }
+    }
 }
 
 void CurvatureV1::compute_kappa_J()
@@ -39,7 +55,7 @@ void CurvatureV1::compute_kappa_J()
     // m, n: AO basis index.
 
     // (p|ii): [nfitbasis, nlo].
-    SharedMatrix df_pii = std::make_shared<Matrix> (nlo_, nfitbasis_);
+    SharedMatrix df_pii = std::make_shared<Matrix> (nfitbasis_, nlo_);
     for (size_t p = 0; p < nfitbasis_; ++p) {
         // at each p: (p|mn).
         // dimension: nbasis x nbasis.
@@ -122,6 +138,9 @@ void CurvatureV1::compute()
     for (size_t i = 0; i < kappa_->size(); ++i) {
         kappa_->data()[i] = j_factor * kappa_J_->data()[i] + xc_factor * kappa_xc_->data()[i];
     }
+
+    kappa_J_.reset();
+    kappa_xc_.reset();
 }
 
 }

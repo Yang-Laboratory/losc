@@ -3,9 +3,10 @@
 
 namespace losc {
 
-CurvatureV2::CurvatureV2(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
+CurvatureV2::CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
                          SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
     :
+    CurvatureBase(dfa),
     npts_{grid_weight->size()},
     nlo_{C_lo->row()},
     nbasis_{C_lo->col()},
@@ -27,6 +28,24 @@ CurvatureV2::CurvatureV2(SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df
     if (npts_ != grid_basis_value_->row() || nbasis_ != grid_basis_value_->col()) {
         printf("Dimension error: grid_basis_value matrix.\n");
         std::exit(EXIT_FAILURE);
+    }
+
+    switch (dfa) {
+        case losc::GGA : {
+            para_alpha_ = para_beta_ = 0.0;
+            dfa_type_ = GGA;
+            break;
+        }
+        case losc::B3LYP : {
+            para_alpha_ = 0.2;
+            para_beta_ = 0.0;
+            dfa_type_ = B3LYP;
+            break;
+        }
+        default: {
+            printf("DFA choice not support!\n");
+            std::exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -55,7 +74,7 @@ void CurvatureV2::compute()
         // has dimension of (size, nlo).
         auto grid_lo_block = std::make_shared<Matrix>(size, nlo_);
         auto grid_basis_block =
-            std::make_shared<Matrix>(size, nlo_,
+            std::make_shared<Matrix>(size, nbasis_,
                                      grid_basis_value_->data() + n * block_size * nbasis_,
                                      matrix::Matrix::kShallowCopy);
         matrix::mult_dgemm(1.0, *grid_basis_block, "N", *C_lo_, "T", 0.0, *grid_lo_block);
@@ -73,9 +92,10 @@ void CurvatureV2::compute()
             }
         }
     }
+    S_lo->to_symmetric("L");
 
     // build the curvature version 1.
-    CurvatureV1 kappa1_man(C_lo_, df_pmn_, df_Vpq_inverse_, grid_basis_value_, grid_weight_);
+    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_, grid_basis_value_, grid_weight_);
     kappa1_man.compute();
     auto kappa1 = kappa1_man.get_curvature();
 
@@ -98,6 +118,7 @@ void CurvatureV2::compute()
             (*kappa2)(i, j) = erf(f) * sqrt(fabs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
         }
     }
+    kappa2->to_symmetric("L");
     kappa_ = kappa2;
 }
 
