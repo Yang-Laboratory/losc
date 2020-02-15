@@ -49,7 +49,7 @@ class LocalizerBase {
     SharedMatrix C_lo_basis_;
 
     public:
-    LocalizerBase(SharedMatrix C_lo_basis)
+    LocalizerBase(const SharedMatrix& C_lo_basis)
         : nlo_{C_lo_basis->row()}, nbasis_{C_lo_basis->col()},
         print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
     {
@@ -63,17 +63,17 @@ class LocalizerBase {
     /**
      * get the U matrix.
      */
-    SharedMatrix get_u() { return U_; }
+    SharedMatrix get_u() const { return U_; }
 
     /**
      * Set up the initial U matrix.
      */
-    void set_initial_u_matrix(SharedMatrix U)
+    void set_initial_u_matrix(const SharedMatrix& U)
     {
         if (U) {
             throw exception::LoscException("invalid U matrix: input U matrix is null.");
         }
-        if (! U->is_square() && U->row() != nlo_) {
+        if (!U->is_square() && U->row() != nlo_) {
             throw exception::DimensionError(*U, nlo_, nlo_, "wrong dimension for localization U matrix.");
         }
         U_ = U;
@@ -107,10 +107,10 @@ class Losc2Localizer : public LocalizerBase {
     double para_c_ = 1000;
     double para_gamma_ = 0.707;
 
-    void message(std::string t, ...);
+    void message(std::string t, ...) const;
 
     public:
-    Losc2Localizer(SharedMatrix C_lo_basis, SharedMatrix H_ao, vector<SharedMatrix> Dipole_ao);
+    Losc2Localizer(const SharedMatrix& C_lo_basis, const SharedMatrix& H_ao, const vector<SharedMatrix>& Dipole_ao);
 
     void set_tolerance(double tol) {js_tol_ = tol;}
     void set_max_iteration(size_t max_iter) {js_max_iter_ = max_iter;}

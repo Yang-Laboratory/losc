@@ -17,8 +17,8 @@ namespace losc {
  */
 static void js_optimize_one_pair(const size_t i, const size_t j,
                                  const double para_c, const double para_gamma,
-                                 vector<SharedMatrix> dipole_lo,
-                                 SharedMatrix hamiltonian_lo,
+                                 const vector<SharedMatrix>& dipole_lo,
+                                 const SharedMatrix& hamiltonian_lo,
                                  double &theta_val, double &delta_val)
 {
     // Spacial part: constant x1 and x2.
@@ -71,9 +71,9 @@ static void js_optimize_one_pair(const size_t i, const size_t j,
  * Apply rotation to the pair of orbitals.
  */
 static void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
-                               SharedMatrix u_matrix,
-                               vector<SharedMatrix> dipole_lo,
-                               SharedMatrix hamiltonian_lo)
+                               const SharedMatrix& u_matrix,
+                               const vector<SharedMatrix>& dipole_lo,
+                               const SharedMatrix& hamiltonian_lo)
 {
     double costheta = cos(theta);
     double sintheta = sin(theta);
@@ -104,9 +104,9 @@ static void js_rotate_one_pair(const size_t i, const size_t j, const double thet
                         &costheta, &sintheta);
 }
 
-Losc2Localizer::Losc2Localizer(SharedMatrix C_lo_basis,
-                               SharedMatrix H_ao,
-                               vector<SharedMatrix> Dipole_ao)
+Losc2Localizer::Losc2Localizer(const SharedMatrix& C_lo_basis,
+                               const SharedMatrix& H_ao,
+                               const vector<SharedMatrix>& Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
     if (! H_ao_->is_square() && H_ao_->row() != nbasis_) {
@@ -125,7 +125,7 @@ Losc2Localizer::Losc2Localizer(SharedMatrix C_lo_basis,
     }
 }
 
-void Losc2Localizer::message(std::string t, ...)
+void Losc2Localizer::message(std::string t, ...) const
 {
     if (print_level_ >= kPrintLevelNormal) {
         va_list args;

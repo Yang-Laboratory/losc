@@ -5,8 +5,9 @@ namespace losc {
 
 using exception::DimensionError;
 
-CurvatureBase::CurvatureBase(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                             SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
+CurvatureBase::CurvatureBase(enum DFAType dfa, const SharedMatrix& C_lo, const SharedMatrix& df_pmn,
+                             const SharedMatrix& df_Vpq_inverse, const SharedMatrix& grid_basis_value,
+                             const SharedDoubleVector& grid_weight)
     : dfa_type_{dfa},
     npts_{grid_weight->size()},
     nlo_{C_lo->row()},

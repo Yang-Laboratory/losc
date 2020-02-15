@@ -63,8 +63,9 @@ class CurvatureBase {
     SharedDoubleVector grid_weight_;
 
     public:
-    CurvatureBase(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                  SharedMatrix grid_basis_value, SharedDoubleVector grid_weight);
+    CurvatureBase(enum DFAType dfa, const SharedMatrix& C_lo, const SharedMatrix& df_pmn,
+                  const SharedMatrix& df_Vpq_inverse, const SharedMatrix& grid_basis_value,
+                  const SharedDoubleVector& grid_weight);
 
     virtual SharedMatrix compute() = 0;
 };
@@ -79,8 +80,9 @@ class CurvatureV1 : public CurvatureBase
     SharedMatrix compute_kappa_xc();
 
     public:
-    CurvatureV1(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
+    CurvatureV1(enum DFAType dfa, const SharedMatrix& C_lo, const SharedMatrix& df_pmn,
+                const SharedMatrix& df_Vpq_inverse, const SharedMatrix& grid_basis_value,
+                const SharedDoubleVector& grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value, grid_weight) {}
 
     virtual SharedMatrix compute() override;
@@ -94,8 +96,9 @@ class CurvatureV2 : public CurvatureBase
     double para_exf_ = 1.2378;
 
     public:
-    CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
+    CurvatureV2(enum DFAType dfa, const SharedMatrix& C_lo, const SharedMatrix& df_pmn,
+                const SharedMatrix& df_Vpq_inverse, const SharedMatrix& grid_basis_value,
+                const SharedDoubleVector& grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value, grid_weight) {}
 
     virtual SharedMatrix compute() override;
