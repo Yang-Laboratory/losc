@@ -92,7 +92,7 @@ SharedMatrix CurvatureV1::compute()
 
     // combine J and xc
     auto kappa = std::make_shared<Matrix> (nlo_, nlo_);
-    const double xc_factor = - para_exf_ * para_cx_ * 2.0 / 3.0 * (1.0 - para_alpha_);
+    const double xc_factor = - para_tau_ * para_cx_ * 2.0 / 3.0 * (1.0 - para_alpha_);
     const double j_factor = 1.0 - para_alpha_ - para_beta_;
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)

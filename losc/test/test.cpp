@@ -117,7 +117,7 @@ TEST_P(LocalizationTest, H2)
 
     for (int is = 0; is < 2; is++) {
         // do localization.
-        losc::Losc2Localizer localizer(C_lo_basis[is], H_ao[is], D_ao);
+        losc::LoscLocalizerV2 localizer(C_lo_basis[is], H_ao[is], D_ao);
         localizer.set_random_permutation(false);
         //localizer.set_print(losc::kPrintLevelNormal);
         auto C_lo_calc = localizer.compute();

@@ -12,7 +12,7 @@ using std::vector;
 using SharedMatrix = std::shared_ptr<Matrix>;
 
 /**
- * Calculate losc correcting Hamiltonian under AO basis.
+ * Calculate Losc correcting Hamiltonian under AO basis.
  *
  * The Losc correcting Hamiltonian is constructed with LO frozen. The formula is
  * expressed as Eq. S25 in the supporting information of the original Losc paper
@@ -23,7 +23,7 @@ using SharedMatrix = std::shared_ptr<Matrix>;
  * @ param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
  * @ param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
  * @ return: the Losc correcting Hamiltonian with dimension [nbasis, nbasis].
-*
+ *
  * Note:
  * 1. Make sure all the matrices have the same spin, if that is the case.
  */

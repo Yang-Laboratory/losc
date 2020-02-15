@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cmath>
 #include <algorithm>
 #include <random>
@@ -104,7 +103,7 @@ static void js_rotate_one_pair(const size_t i, const size_t j, const double thet
                         &costheta, &sintheta);
 }
 
-Losc2Localizer::Losc2Localizer(const SharedMatrix& C_lo_basis,
+LoscLocalizerV2::LoscLocalizerV2(const SharedMatrix& C_lo_basis,
                                const SharedMatrix& H_ao,
                                const vector<SharedMatrix>& Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
@@ -125,7 +124,7 @@ Losc2Localizer::Losc2Localizer(const SharedMatrix& C_lo_basis,
     }
 }
 
-void Losc2Localizer::message(std::string t, ...) const
+void LoscLocalizerV2::message(std::string t, ...) const
 {
     if (print_level_ >= kPrintLevelNormal) {
         va_list args;
@@ -138,7 +137,7 @@ void Losc2Localizer::message(std::string t, ...) const
 /**
  * Do localization and compute the LO coefficient matrix under AO.
  */
-SharedMatrix Losc2Localizer::compute()
+SharedMatrix LoscLocalizerV2::compute()
 {
     // calculate dipole on LO initial guess.
     // D_lo = U * C_lo_basis * D_ao * C_lo_basis^T * U^T

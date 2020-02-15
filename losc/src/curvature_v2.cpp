@@ -68,7 +68,7 @@ SharedMatrix CurvatureV2::compute()
             const double S_ij = (*S_lo)(i, j);
             const double K1_ij = (*kappa1)(i, j);
             const double K1_jj = (*kappa1)(j, j);
-            const double f = para_tau_ * S_ij;
+            const double f = para_zeta_ * S_ij;
             (*kappa2)(i, j) = erf(f) * sqrt(fabs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
         }
     }

@@ -21,11 +21,11 @@ using SharedMatrix = std::shared_ptr<Matrix>;
  * the same spin. In matrix form, local occupation matrix $L$ is expressed as
  * $L = C_{LO} * S * D * S * C_{LO}^T$.
  *
- * @ param [in] C_lo: LO coefficient matrix which can be generated from `losc::LocalizerBase`.
- * @ param [in] S: atomic orbital (basis) overlap matrix. It is a full matrix with
- *      dimension (nbasis, nbasis).
- * @ param [in] D: spin density matrix under AO. It is a full matrix with dimension (nbasis, nbasis).
- * @ return L: the local occupation matrix.
+ * @ param [in] C_lo: LO coefficient matrix with dimension [nlo, nbasis],
+ *   which can be generated from `losc::LocalizerBase::compute()`.
+ * @ param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
+ * @ param [in] D: spin density matrix under AO with dimension [nbasis, nbasis].
+ * @ return : the local occupation matrix with dimension [nlo, nlo].
  */
 inline SharedMatrix local_occupation_matrix(const Matrix& C_lo, const Matrix& S, const Matrix& D)
 {
