@@ -57,26 +57,49 @@ SharedMatrix CurvatureV1::compute_kappa_xc()
 {
     auto kappa_xc = std::make_shared<Matrix> (nlo_, nlo_);
 
-    SharedMatrix LO_grid_val = std::make_shared<Matrix> (npts_, nlo_);
-    matrix::mult_dgemm(1.0, *grid_basis_value_, "N", *C_lo_, "T", 0.0, *LO_grid_val);
-
-#ifdef _OPENMP
-#pragma omp parallel for schedule(dynamic)
-#endif
-    for (size_t i = 0 ; i < LO_grid_val->size(); ++i) {
-        LO_grid_val->data()[i] *= LO_grid_val->data()[i];
-        LO_grid_val->data()[i] = std::pow(LO_grid_val->data()[i], 2.0/3.0);
+    // The LO grid value matrix has dimension of (npts, nlo), which could be very large.
+    // To limit the memory usage on LO grid value, we build it by
+    // blocks. For now we limit the memory usage to be 1GB.
+    const size_t block_size = 1000ULL * 1000ULL * 1000ULL / sizeof(double) / nlo_;
+    size_t nBLK = npts_ / block_size;
+    const size_t res = npts_ % block_size;
+    if (res != 0) {
+        nBLK += 1;
     }
-
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
-    for (size_t i = 0; i < nlo_; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            for (size_t ip = 0; ip < npts_; ++ip) {
-                const double pi = (*LO_grid_val)(ip, i);
-                const double pj = (*LO_grid_val)(ip, j);
-                (*kappa_xc)(i, j) += (*grid_weight_)[ip] * pi * pj;
+    // loop over all the blocks of grid.
+    for (size_t n = 0; n < nBLK; ++n) {
+        size_t size = block_size;
+        if (n == nBLK - 1 && res != 0)
+            size = res;
+        // calculate LO grid value for each block, which
+        // has dimension of (size, nlo).
+        auto grid_lo_block = std::make_shared<Matrix>(size, nlo_);
+        auto grid_basis_block =
+            std::make_shared<Matrix>(size, nbasis_,
+                                     grid_basis_value_->data() + n * block_size * nbasis_,
+                                     matrix::Matrix::kShallowCopy);
+        matrix::mult_dgemm(1.0, *grid_basis_block, "N", *C_lo_, "T", 0.0, *grid_lo_block);
+        grid_basis_block.reset();
+
+        // calculate LO grid value to the power of 2/3.
+        for (size_t i = 0 ; i < grid_lo_block->size(); ++i) {
+            grid_lo_block->data()[i] *= grid_lo_block->data()[i];
+            grid_lo_block->data()[i] = std::pow(grid_lo_block->data()[i], 2.0/3.0);
+        }
+
+        // sum over current block contribution to kappa xc.
+        const double *wt = grid_weight_->data() + n * block_size;
+        for (size_t ip = 0; ip < size; ++ip) {
+            const double wt_value = wt[ip];
+            for (size_t i = 0; i < nlo_; ++i) {
+                for (size_t j = 0; j <= i; ++j) {
+                    const double pi = (*grid_lo_block)(ip, i);
+                    const double pj = (*grid_lo_block)(ip, j);
+                    (*kappa_xc)(i, j) += (*grid_weight_)[ip] * pi * pj;
+                }
             }
         }
     }

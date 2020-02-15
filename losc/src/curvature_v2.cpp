@@ -35,7 +35,8 @@ SharedMatrix CurvatureV2::compute()
                                      matrix::Matrix::kShallowCopy);
         matrix::mult_dgemm(1.0, *grid_basis_block, "N", *C_lo_, "T", 0.0, *grid_lo_block);
         grid_basis_block.reset();
-        // sum over current block for the LO overlap.
+
+        // sum over current block contribution to the LO overlap.
         const double *wt = grid_weight_->data() + n * block_size;
         for (size_t ip = 0; ip < size; ++ip) {
             const double wt_value = wt[ip];
