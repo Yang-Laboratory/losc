@@ -1,10 +1,14 @@
-#include "localization.h"
-#include <matrix/matrix.h>
 #include <cassert>
 #include <cmath>
 #include <algorithm>
 #include <random>
 #include <stdarg.h>
+#include <vector>
+#include <string>
+#include <matrix/matrix.h>
+
+#include "localization.h"
+#include "exception.h"
 
 namespace losc {
 
@@ -106,17 +110,16 @@ Losc2Localizer::Losc2Localizer(SharedMatrix C_lo_basis,
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
     if (! H_ao_->is_square() && H_ao_->row() != nbasis_) {
-        std::cout << "Dimension error: Hamiltonian under AO.\n";
-        std::exit(EXIT_FAILURE);
+        throw exception::DimensionError(*H_ao, nbasis_, nbasis_, "wrong dimension for DFA Hamiltonian matrix under AO.");
     }
 
     if (Dipole_ao_.size() != 3) {
-        std::cout << "Dipole size error!\n";
-        std::exit(EXIT_FAILURE);
+        throw exception::DimensionError("No enough dipole matrices under AO is given: x, y and z components are needed.");
+        vector<std::string> xyz_name = {"x", "y", "z"};
         for (size_t i = 0; i < 3; ++i) {
             if (! Dipole_ao_[i]->is_square() && Dipole_ao_[i]->row() != nbasis_) {
-                std::cout << "Dimension error: Dipole under AO in xyz = " << i << std::endl;
-                std::exit(EXIT_FAILURE);
+                std::string msg = "wrong dimension for dipole matrix under AO for " + xyz_name[i] + "component.";
+                throw exception::DimensionError(*Dipole_ao[i], nbasis_, nbasis_, msg);
             }
         }
     }

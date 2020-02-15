@@ -1,5 +1,7 @@
-#include "curvature.h"
 #include <cmath>
+
+#include "curvature.h"
+#include "exception.h"
 
 namespace losc {
 
@@ -10,7 +12,7 @@ CurvatureV2::CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pm
     npts_{grid_weight->size()},
     nlo_{C_lo->row()},
     nbasis_{C_lo->col()},
-    nfitbasis_{df_Vpq_inverse->row()},
+    nfitbasis_{df_pmn->row()},
     C_lo_{C_lo},
     df_pmn_{df_pmn},
     df_Vpq_inverse_{df_Vpq_inverse},
@@ -18,16 +20,13 @@ CurvatureV2::CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pm
     grid_weight_{grid_weight}
 {
     if (df_pmn_->col() != nbasis_ * (nbasis_ + 1) / 2) {
-        printf("Dimension error: df_mnp matrix.\n");
-        std::exit(EXIT_FAILURE);
+        throw exception::DimensionError(*df_pmn_, nfitbasis_, nbasis_, "wrong dimension for density fitting three-body integral matrix <p|mn>.");
     }
-    if (!df_Vpq_inverse_->is_square()) {
-        printf("Dimension error: df_Vpq_inverse matrix.\n");
-        std::exit(EXIT_FAILURE);
+    if (!df_Vpq_inverse_->is_square() || df_Vpq_inverse_->row() != nfitbasis_) {
+        throw exception::DimensionError(*df_Vpq_inverse_, nfitbasis_, nfitbasis_, "wrong dimension for density fitting Vpq inverse matrix.");
     }
     if (npts_ != grid_basis_value_->row() || nbasis_ != grid_basis_value_->col()) {
-        printf("Dimension error: grid_basis_value matrix.\n");
-        std::exit(EXIT_FAILURE);
+        throw exception::DimensionError(*grid_basis_value_, npts_, nbasis_, "wrong dimension for grid value of AO basis.");
     }
 
     switch (dfa) {
@@ -43,8 +42,7 @@ CurvatureV2::CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pm
             break;
         }
         default: {
-            printf("DFA choice not support!\n");
-            std::exit(EXIT_FAILURE);
+            throw exception::LoscException("Unknown DFA choice.");
         }
     }
 }

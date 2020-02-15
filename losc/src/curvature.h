@@ -1,9 +1,9 @@
 #ifndef _LOSC_CURVATURE_H_
 #define _LOSC_CURVATURE_H_
 
-#include <matrix/matrix.h>
 #include <memory>
 #include <vector>
+#include <matrix/matrix.h>
 
 namespace losc {
 

@@ -4,12 +4,14 @@
 #ifndef _LOSC_LOCALIZATION_H_
 #define _LOSC_LOCALIZATION_H_
 
-#include <matrix/matrix.h>
 #include <vector>
 #include <iostream>
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <matrix/matrix.h>
+
+#include "exception.h"
 
 namespace losc {
 
@@ -57,6 +59,9 @@ class LocalizerBase {
         : nlo_{C_lo_basis->row()}, nbasis_{C_lo_basis->col()},
         print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
     {
+        if (nlo_ > nbasis_) {
+            throw exception::DimensionError("wrong dimension for LO coefficient matrix: number of LO is larger than the number of AO.");
+        }
         U_ = std::make_shared<Matrix> (nlo_, nlo_);
         for (size_t i = 0; i < nlo_; ++i) {
             (*U_)(i, i) = 1.0;
@@ -79,8 +84,7 @@ class LocalizerBase {
     void set_initial_u_matrix(SharedMatrix U)
     {
         if (! U->is_square() && U->row() != nlo_) {
-            std::cout << "Dimension error: set U matrix.\n";
-            std::exit(EXIT_FAILURE);
+            throw exception::DimensionError(*U, nlo_, nlo_, "wrong dimension for localization U matrix.");
         }
         U_ = U;
     }

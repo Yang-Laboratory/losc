@@ -4,6 +4,8 @@
 #include <matrix/matrix.h>
 #include <memory>
 
+#include "exception.h"
+
 namespace losc {
 
 using matrix::Matrix;
@@ -25,14 +27,25 @@ using SharedMatrix = std::shared_ptr<Matrix>;
  * @ param [in] D: spin density matrix under AO. It is a full matrix with dimension (nbasis, nbasis).
  * @ return L: the local occupation matrix.
  */
-inline SharedMatrix local_occupation_matrix(SharedMatrix C_lo, SharedMatrix S, SharedMatrix D)
+inline SharedMatrix local_occupation_matrix(const Matrix& C_lo, const Matrix& S, const Matrix& D)
 {
-    size_t nlo = C_lo->row();
-    size_t nbasis = C_lo->col();
+    size_t nlo = C_lo.row();
+    size_t nbasis = C_lo.col();
+
+    if (nlo > nbasis) {
+        throw exception::DimensionError("wrong dimension for LO coefficient matrix: number of LO is larger than the number of AO.");
+    }
+    if (!S.is_square() || nbasis != S.row()) {
+        throw exception::DimensionError(S, nbasis, nbasis, "wrong dimension for AO overlap matrix.");
+    }
+    if (!D.is_square() || nbasis != D.row()) {
+        throw exception::DimensionError(D, nbasis, nbasis, "wrong dimension for density matrix.");
+    }
+
     Matrix SDS(nbasis, nbasis);
     SharedMatrix L = std::make_shared<Matrix> (nlo, nlo);
-    matrix::mult_dgemm_ABAT(*S, *D, SDS);
-    matrix::mult_dgemm_ABAT(*C_lo, SDS, *L);
+    matrix::mult_dgemm_ABAT(S, D, SDS);
+    matrix::mult_dgemm_ABAT(C_lo, SDS, *L);
     return L;
 }
 
