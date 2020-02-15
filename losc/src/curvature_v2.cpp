@@ -5,48 +5,6 @@
 
 namespace losc {
 
-CurvatureV2::CurvatureV2(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                         SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
-    :
-    CurvatureBase(dfa),
-    npts_{grid_weight->size()},
-    nlo_{C_lo->row()},
-    nbasis_{C_lo->col()},
-    nfitbasis_{df_pmn->row()},
-    C_lo_{C_lo},
-    df_pmn_{df_pmn},
-    df_Vpq_inverse_{df_Vpq_inverse},
-    grid_basis_value_{grid_basis_value},
-    grid_weight_{grid_weight}
-{
-    if (df_pmn_->col() != nbasis_ * (nbasis_ + 1) / 2) {
-        throw exception::DimensionError(*df_pmn_, nfitbasis_, nbasis_, "wrong dimension for density fitting three-body integral matrix <p|mn>.");
-    }
-    if (!df_Vpq_inverse_->is_square() || df_Vpq_inverse_->row() != nfitbasis_) {
-        throw exception::DimensionError(*df_Vpq_inverse_, nfitbasis_, nfitbasis_, "wrong dimension for density fitting Vpq inverse matrix.");
-    }
-    if (npts_ != grid_basis_value_->row() || nbasis_ != grid_basis_value_->col()) {
-        throw exception::DimensionError(*grid_basis_value_, npts_, nbasis_, "wrong dimension for grid value of AO basis.");
-    }
-
-    switch (dfa) {
-        case losc::GGA : {
-            para_alpha_ = para_beta_ = 0.0;
-            dfa_type_ = GGA;
-            break;
-        }
-        case losc::B3LYP : {
-            para_alpha_ = 0.2;
-            para_beta_ = 0.0;
-            dfa_type_ = B3LYP;
-            break;
-        }
-        default: {
-            throw exception::LoscException("Unknown DFA choice.");
-        }
-    }
-}
-
 void CurvatureV2::compute()
 {
     // construct absolute overlap under LO.
@@ -96,7 +54,6 @@ void CurvatureV2::compute()
     CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_, grid_basis_value_, grid_weight_);
     kappa1_man.compute();
     auto kappa1 = kappa1_man.get_curvature();
-
 
     // build LOSC2 kappa matrix:
     // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau * S[ij]) * K][ij]

@@ -7,46 +7,7 @@
 
 namespace losc {
 
-CurvatureV1::CurvatureV1(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
-                         SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
-    : CurvatureBase(dfa),
-    npts_{grid_weight->size()},
-    nlo_{C_lo->row()},
-    nbasis_{C_lo->col()},
-    nfitbasis_{df_pmn->row()},
-    C_lo_{C_lo},
-    df_pmn_{df_pmn},
-    df_Vpq_inverse_{df_Vpq_inverse},
-    grid_basis_value_{grid_basis_value},
-    grid_weight_{grid_weight}
-{
-    if (df_pmn_->col() != nbasis_ * (nbasis_ + 1) / 2) {
-        throw exception::DimensionError(*df_pmn_, nfitbasis_, nbasis_, "wrong dimension for density fitting three-body integral matrix <p|mn>.");
-    }
-    if (!df_Vpq_inverse_->is_square() || df_Vpq_inverse_->row() != nfitbasis_) {
-        throw exception::DimensionError(*df_Vpq_inverse_, nfitbasis_, nfitbasis_, "wrong dimension for density fitting Vpq inverse matrix.");
-    }
-    if (npts_ != grid_basis_value_->row() || nbasis_ != grid_basis_value_->col()) {
-        throw exception::DimensionError(*grid_basis_value_, npts_, nbasis_, "wrong dimension for grid value of AO basis.");
-    }
-
-    switch (dfa) {
-        case losc::GGA : {
-            para_alpha_ = para_beta_ = 0.0;
-            break;
-        }
-        case losc::B3LYP : {
-            para_alpha_ = 0.2;
-            para_beta_ = 0.0;
-            break;
-        }
-        default: {
-            throw exception::LoscException("Unknown DFA choice.");
-        }
-    }
-}
-
-void CurvatureV1::compute_kappa_J()
+SharedMatrix CurvatureV1::compute_kappa_J()
 {
     // i, j: LO index.
     // p, q: fitbasis index.
@@ -84,15 +45,17 @@ void CurvatureV1::compute_kappa_J()
 
     // kappa_J_ij = \sum_{pq} (\rho_i | p) V^{-1}_{pq} (q | \rho_j)
     // kappa_J = df_pii^T * V^{-1} * df_pii.
-    kappa_J_ = std::make_shared<Matrix> (nlo_, nlo_);
+    auto kappa_J = std::make_shared<Matrix> (nlo_, nlo_);
     SharedMatrix V_pii = std::make_shared<Matrix> (nfitbasis_, nlo_);
     matrix::mult_dgemm(1.0, *df_Vpq_inverse_, "N", *df_pii, "N", 0.0, *V_pii);
-    matrix::mult_dgemm(1.0, *df_pii, "T", *V_pii, "N", 0.0, *kappa_J_);
+    matrix::mult_dgemm(1.0, *df_pii, "T", *V_pii, "N", 0.0, *kappa_J);
+
+    return kappa_J;
 }
 
-void CurvatureV1::compute_kappa_xc()
+SharedMatrix CurvatureV1::compute_kappa_xc()
 {
-    kappa_xc_ = std::make_shared<Matrix> (nlo_, nlo_);
+    auto kappa_xc = std::make_shared<Matrix> (nlo_, nlo_);
 
     SharedMatrix LO_grid_val = std::make_shared<Matrix> (npts_, nlo_);
     matrix::mult_dgemm(1.0, *grid_basis_value_, "N", *C_lo_, "T", 0.0, *LO_grid_val);
@@ -113,32 +76,30 @@ void CurvatureV1::compute_kappa_xc()
             for (size_t ip = 0; ip < npts_; ++ip) {
                 const double pi = (*LO_grid_val)(ip, i);
                 const double pj = (*LO_grid_val)(ip, j);
-                (*kappa_xc_)(i, j) += (*grid_weight_)[ip] * pi * pj;
+                (*kappa_xc)(i, j) += (*grid_weight_)[ip] * pi * pj;
             }
         }
     }
-    kappa_xc_->to_symmetric("L");
+    kappa_xc->to_symmetric("L");
+
+    return kappa_xc;
 }
 
 void CurvatureV1::compute()
 {
-    compute_kappa_J();
-    compute_kappa_xc();
-
-    kappa_ = std::make_shared<Matrix> (nlo_, nlo_);
+    SharedMatrix kappa_J = compute_kappa_J();
+    SharedMatrix kappa_xc = compute_kappa_xc();
 
     // combine J and xc
+    kappa_ = std::make_shared<Matrix> (nlo_, nlo_);
     const double xc_factor = - para_exf_ * para_cx_ * 2.0 / 3.0 * (1.0 - para_alpha_);
     const double j_factor = 1.0 - para_alpha_ - para_beta_;
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
     for (size_t i = 0; i < kappa_->size(); ++i) {
-        kappa_->data()[i] = j_factor * kappa_J_->data()[i] + xc_factor * kappa_xc_->data()[i];
+        kappa_->data()[i] = j_factor * kappa_J->data()[i] + xc_factor * kappa_xc->data()[i];
     }
-
-    kappa_J_.reset();
-    kappa_xc_.reset();
 }
 
 }
