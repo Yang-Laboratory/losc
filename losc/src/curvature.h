@@ -20,7 +20,6 @@ enum DFAType {
 
 class CurvatureBase {
     protected:
-    SharedMatrix kappa_;
     DFAType dfa_type_;
 
     size_t nlo_;
@@ -67,8 +66,7 @@ class CurvatureBase {
     CurvatureBase(enum DFAType dfa, SharedMatrix C_lo, SharedMatrix df_pmn, SharedMatrix df_Vpq_inverse,
                   SharedMatrix grid_basis_value, SharedDoubleVector grid_weight);
 
-    virtual void compute() = 0;
-    SharedMatrix get_curvature() {return kappa_;}
+    virtual SharedMatrix compute() = 0;
 };
 
 class CurvatureV1 : public CurvatureBase
@@ -85,7 +83,7 @@ class CurvatureV1 : public CurvatureBase
                 SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value, grid_weight) {}
 
-    virtual void compute() override;
+    virtual SharedMatrix compute() override;
 };
 
 class CurvatureV2 : public CurvatureBase
@@ -100,7 +98,7 @@ class CurvatureV2 : public CurvatureBase
                 SharedMatrix grid_basis_value, SharedDoubleVector grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value, grid_weight) {}
 
-    virtual void compute() override;
+    virtual SharedMatrix compute() override;
 };
 
 }

@@ -5,7 +5,7 @@
 
 namespace losc {
 
-void CurvatureV2::compute()
+SharedMatrix CurvatureV2::compute()
 {
     // construct absolute overlap under LO.
     auto S_lo = std::make_shared<Matrix>(nlo_, nlo_);
@@ -52,8 +52,7 @@ void CurvatureV2::compute()
 
     // build the curvature version 1.
     CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_, grid_basis_value_, grid_weight_);
-    kappa1_man.compute();
-    auto kappa1 = kappa1_man.get_curvature();
+    auto kappa1 = kappa1_man.compute();
 
     // build LOSC2 kappa matrix:
     // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau * S[ij]) * K][ij]
@@ -74,7 +73,8 @@ void CurvatureV2::compute()
         }
     }
     kappa2->to_symmetric("L");
-    kappa_ = kappa2;
+
+    return kappa2;
 }
 
 

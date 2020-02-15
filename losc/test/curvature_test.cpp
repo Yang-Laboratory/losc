@@ -69,8 +69,7 @@ TEST_P(CurvatureTest, test)
     for (int is = 0; is < 2; is++) {
         // compute curvature matrix.
         losc::CurvatureV2 kappa_man(losc::B3LYP, C_lo[is], df_pmn[0], df_Vpq_inverse[0], grid_basis_value[0], grid_weight);
-        kappa_man.compute();
-        auto kappa_calc = kappa_man.get_curvature();
+        auto kappa_calc = kappa_man.compute();
 
         // verify the results.
         bool status = kappa_calc->is_equal_to(*kappa_ref[is], 1e-8);

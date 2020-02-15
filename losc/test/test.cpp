@@ -120,8 +120,7 @@ TEST_P(LocalizationTest, H2)
         losc::Losc2Localizer localizer(C_lo_basis[is], H_ao[is], D_ao);
         localizer.set_random_permutation(false);
         //localizer.set_print(losc::kPrintLevelNormal);
-        localizer.compute();
-        SharedMatrix C_lo_calc = localizer.get_lo();
+        auto C_lo_calc = localizer.compute();
 
         // verify the correctness of calculated LO coefficient matrix.
         bool is_equal = C_lo_calc->is_equal_to(*C_lo_ref[is], 1e-8);

@@ -36,12 +36,6 @@ class LocalizerBase {
     enum PrintLevel print_level_ = kPrintLevelNo;
 
     /**
-     * LO coefficient matrix under AO.
-     * Dimension: nlo x nbasis.
-     */
-    SharedMatrix C_lo_;
-
-    /**
      * Unitary matrix that transfer LO basis coefficient matrix into LO coefficient matrix.
      * Dimension: nlo x nlo.
      * phi_i = \sum_j U_{ij} psi_j, where phi_i is the i-th LO and psi_j is the j-th LO basis.
@@ -63,15 +57,8 @@ class LocalizerBase {
             throw exception::DimensionError("wrong dimension for LO coefficient matrix: number of LO is larger than the number of AO.");
         }
         U_ = std::make_shared<Matrix> (nlo_, nlo_);
-        for (size_t i = 0; i < nlo_; ++i) {
-            (*U_)(i, i) = 1.0;
-        }
+        U_->set_identity();
     }
-
-    /**
-     * get the LO coefficient matrix.
-     */
-    SharedMatrix get_lo() { return C_lo_; }
 
     /**
      * get the U matrix.
@@ -83,6 +70,9 @@ class LocalizerBase {
      */
     void set_initial_u_matrix(SharedMatrix U)
     {
+        if (U) {
+            throw exception::LoscException("invalid U matrix: input U matrix is null.");
+        }
         if (! U->is_square() && U->row() != nlo_) {
             throw exception::DimensionError(*U, nlo_, nlo_, "wrong dimension for localization U matrix.");
         }
@@ -98,8 +88,9 @@ class LocalizerBase {
      * do localization and compute the LO coefficient matrix.
      *
      * Calling this function will calculate the `C_lo_` and `U_`.
+     * @ return: LO coefficient matrix under AO with dimension [nlo, nbasis].
      */
-    virtual void compute() = 0;
+    virtual SharedMatrix compute() = 0;
 };
 
 /**
@@ -125,7 +116,7 @@ class Losc2Localizer : public LocalizerBase {
     void set_max_iteration(size_t max_iter) {js_max_iter_ = max_iter;}
     void set_random_permutation(bool true_or_false) {js_random_permutation_ = true_or_false;}
 
-    void compute() override;
+    SharedMatrix compute() override;
 };
 
 }

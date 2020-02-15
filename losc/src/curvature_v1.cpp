@@ -85,21 +85,23 @@ SharedMatrix CurvatureV1::compute_kappa_xc()
     return kappa_xc;
 }
 
-void CurvatureV1::compute()
+SharedMatrix CurvatureV1::compute()
 {
     SharedMatrix kappa_J = compute_kappa_J();
     SharedMatrix kappa_xc = compute_kappa_xc();
 
     // combine J and xc
-    kappa_ = std::make_shared<Matrix> (nlo_, nlo_);
+    auto kappa = std::make_shared<Matrix> (nlo_, nlo_);
     const double xc_factor = - para_exf_ * para_cx_ * 2.0 / 3.0 * (1.0 - para_alpha_);
     const double j_factor = 1.0 - para_alpha_ - para_beta_;
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
-    for (size_t i = 0; i < kappa_->size(); ++i) {
-        kappa_->data()[i] = j_factor * kappa_J->data()[i] + xc_factor * kappa_xc->data()[i];
+    for (size_t i = 0; i < kappa->size(); ++i) {
+        kappa->data()[i] = j_factor * kappa_J->data()[i] + xc_factor * kappa_xc->data()[i];
     }
+
+    return kappa;
 }
 
 }

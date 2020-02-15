@@ -138,7 +138,7 @@ void Losc2Localizer::message(std::string t, ...)
 /**
  * Do localization and compute the LO coefficient matrix under AO.
  */
-void Losc2Localizer::compute()
+SharedMatrix Losc2Localizer::compute()
 {
     // calculate dipole on LO initial guess.
     // D_lo = U * C_lo_basis * D_ao * C_lo_basis^T * U^T
@@ -198,8 +198,10 @@ void Losc2Localizer::compute()
     }
 
     // calculate the LO coefficient matrix.
-    C_lo_ = std::make_shared<Matrix> (nlo_, nlo_);
-    matrix::mult_dgemm(1.0, *U_, "N", *C_lo_basis_, "N", 0.0, *C_lo_);
+    auto C_lo = std::make_shared<Matrix> (nlo_, nlo_);
+    matrix::mult_dgemm(1.0, *U_, "N", *C_lo_basis_, "N", 0.0, *C_lo);
+
+    return C_lo;
 }
 
 }
