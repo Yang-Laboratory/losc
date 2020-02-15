@@ -9,15 +9,16 @@
 namespace losc {
 
 /**
- * calculate losc correction to Hamiltonian.
+ * Calculate losc correcting Hamiltonian under AO basis.
  *
+ * In matrix expression:
  * H_eff = S * C^T  * A * C * S:
  * S: AO overlap matrix.
  * C: LO coef matrix.
  * A: A_ij = \delta_{ij} 1/2 K_ii - K_ij \lambda_ij, K is kappa, \lambda is local occ.
  */
-SharedMatrix losc_hamiltonian_matrix(const Matrix &S, const Matrix &C_lo, const Matrix &Curvature,
-                                     const Matrix &LocalOcc)
+SharedMatrix losc_hamiltonian_correction(const Matrix &S, const Matrix &C_lo,
+                                         const Matrix &Curvature, const Matrix &LocalOcc)
 {
     const size_t nlo = C_lo.row();
     const size_t nbasis = C_lo.col();
@@ -58,9 +59,9 @@ SharedMatrix losc_hamiltonian_matrix(const Matrix &S, const Matrix &C_lo, const 
 }
 
 /**
- * calculate losc correction to total energy.
+ * Calculate Losc correction to total energy.
  */
-double losc_energy(const Matrix &Curvature, const Matrix &LocalOcc)
+double losc_total_energy_correction(const Matrix &Curvature, const Matrix &LocalOcc)
 {
     const size_t nlo = Curvature.row();
 
@@ -82,20 +83,16 @@ double losc_energy(const Matrix &Curvature, const Matrix &LocalOcc)
 }
 
 /**
- * calculate losc correction to orbital energy with direct correction.
+ * Calculate Losc correction to orbital energy with direct correction.
  */
-vector<double> losc_orbital_energy_direct_correction(const Matrix &S, const Matrix &C_co,
-                                                     const Matrix &C_lo, const Matrix &Curvature,
-                                                     const Matrix &LocalOcc)
+vector<double> losc_orbital_energy_correction(const Matrix &S, const Matrix &C_co,
+                                              const Matrix &C_lo, const Matrix &Curvature,
+                                              const Matrix &LocalOcc)
 {
     // V_ij = <LO_i|CO_j> = C_LO x S x C_CO. If the LOs are expanded under COs,
     // the V matrix is the localization U matrix. Otherwise, V matrix has to be
     // calculated and used to construct the direct orbital energy correction.
     // Here, to make code more general, V matrix is always calculated and used.
-
-    // !!!!!!
-    // make sure dimension match between C_lo and C_co.
-
     const size_t nlo = C_lo.row();
     const size_t nbasis = C_lo.col();
 
@@ -140,10 +137,10 @@ vector<double> losc_orbital_energy_direct_correction(const Matrix &S, const Matr
 }
 
 /**
- * calculate orbital energy by projection.
+ * Calculate Losc corrected orbital energies with projection to CO coefficient.
  */
-vector<double> losc_orbital_energy_by_projection(const Matrix &H_dfa, const Matrix &H_losc,
-                                                 const Matrix &C_co)
+vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa, const Matrix &H_losc,
+                                                           const Matrix &C_co)
 {
     const size_t nlo = C_co.row();
     const size_t nbasis = C_co.col();
@@ -177,15 +174,15 @@ vector<double> losc_orbital_energy_by_projection(const Matrix &H_dfa, const Matr
 }
 
 /**
- * calculate orbital energy by diagnoalization.
+ * Calculate Losc corrected orbital energies by diagonalizing the Losc corrected total Hamiltonian matrix.
  */
-vector<double> losc_orbital_energy_by_diagonalize(const Matrix &Shalf, const Matrix &H_dfa,
-                                                  const Matrix &H_losc)
+vector<double> losc_corrected_orbital_energy_by_diagonalize(const Matrix &H_dfa, const Matrix &H_losc,
+                                                            const Matrix &S_neg_half)
 {
     const size_t nbasis = H_dfa.row();
 
-    if (!Shalf.is_square()) {
-        throw exception::DimensionError(Shalf, nbasis, nbasis, "wrong dimension for S^(-1/2) matrix");
+    if (!S_neg_half.is_square()) {
+        throw exception::DimensionError(S_neg_half, nbasis, nbasis, "wrong dimension for S^(-1/2) matrix");
     }
     if (!H_dfa.is_square() || nbasis != H_dfa.row()) {
         throw exception::DimensionError(H_dfa, nbasis, nbasis, "wrong dimension for DFA Hamiltonian matrix.");
@@ -205,8 +202,8 @@ vector<double> losc_orbital_energy_by_diagonalize(const Matrix &Shalf, const Mat
     try {
         SharedMatrix SH = std::make_shared<Matrix>(nbasis, nbasis);
         SharedMatrix SHS = std::make_shared<Matrix>(nbasis, nbasis);
-        matrix::mult_dgemm(1.0, Shalf, "N", *H_tot, "N", 0.0, *SH);
-        matrix::mult_dgemm(1.0, *SH, "N", Shalf, "N", 0.0, *SHS);
+        matrix::mult_dgemm(1.0, S_neg_half, "N", *H_tot, "N", 0.0, *SH);
+        matrix::mult_dgemm(1.0, *SH, "N", S_neg_half, "N", 0.0, *SHS);
         SH.reset();
         matrix::diagonalize_sym_matrix_dsyev("L", *SHS, eig);
     } catch (matrix::exception::MatrixException& e){
