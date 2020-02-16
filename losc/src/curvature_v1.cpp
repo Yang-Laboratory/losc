@@ -1,8 +1,8 @@
+#include "curvature.h"
+
 #include <cmath>
 #include <cstdlib>
 #include <matrix/matrix.h>
-
-#include "curvature.h"
 #include "exception.h"
 #include "blas_base.h"
 
@@ -128,4 +128,4 @@ SharedMatrix CurvatureV1::compute()
     return kappa;
 }
 
-}
+}   // namespace losc

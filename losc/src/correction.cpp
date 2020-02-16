@@ -1,9 +1,9 @@
+#include "correction.h"
+
 #include <memory>
 #include <vector>
 #include <sstream>
 #include <matrix/matrix.h>
-
-#include "correction.h"
 #include "exception.h"
 #include "blas_base.h"
 

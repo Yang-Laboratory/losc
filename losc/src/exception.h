@@ -1,5 +1,5 @@
-#ifndef _LOSC_EXCEPTION_H_
-#define _LOSC_EXCEPTION_H_
+#ifndef _LOSC_SRC_EXCEPTION_H_
+#define _LOSC_SRC_EXCEPTION_H_
 
 #include <stdexcept>
 #include <string>
@@ -36,8 +36,6 @@ class DimensionError : public LoscException
     DimensionError(const string& msg);
 };
 
-}
-}
-
-
-#endif // _LOSC_EXCEPTION_H_
+}   // namespace losc::exception
+}   // namespace losc
+#endif // _LOSC_SRC_EXCEPTION_H_

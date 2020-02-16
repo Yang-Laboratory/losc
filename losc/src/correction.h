@@ -1,5 +1,5 @@
-#ifndef _LOSC_CORRECTION_H_
-#define _LOSC_CORRECTION_H_
+#ifndef _LOSC_SRC_CORRECTION_H_
+#define _LOSC_SRC_CORRECTION_H_
 
 #include <matrix/matrix.h>
 #include <memory>
@@ -101,6 +101,6 @@ vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa, 
 vector<double> losc_corrected_orbital_energy_by_diagonalize(const Matrix &H_dfa, const Matrix &H_losc,
                                                             const Matrix &S_neg_half);
 
-}
+}   // namespace losc
 
-#endif // _LOSC_CORRECTION_H_
+#endif // _LOSC_SRC_CORRECTION_H_

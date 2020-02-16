@@ -1,8 +1,8 @@
 /**
  * file: localization.h
  */
-#ifndef _LOSC_LOCALIZATION_H_
-#define _LOSC_LOCALIZATION_H_
+#ifndef _LOSC_SRC_LOCALIZATION_H_
+#define _LOSC_SRC_LOCALIZATION_H_
 
 #include <vector>
 #include <iostream>
@@ -10,7 +10,6 @@
 #include <memory>
 #include <string>
 #include <matrix/matrix.h>
-
 #include "exception.h"
 
 namespace losc {
@@ -188,6 +187,5 @@ class LoscLocalizerV2 : public LocalizerBase {
     SharedMatrix compute() override;
 };
 
-}
-
-#endif //_LOSC_LOCALIZATION_H_
+}   // namespace losc
+#endif //_LOSC_SRC_LOCALIZATION_H_

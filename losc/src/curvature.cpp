@@ -1,4 +1,5 @@
 #include "curvature.h"
+
 #include "exception.h"
 
 namespace losc {
@@ -51,4 +52,4 @@ CurvatureBase::CurvatureBase(enum DFAType dfa, const SharedMatrix& C_lo, const S
     }
 }
 
-}
+}   // namespace losc

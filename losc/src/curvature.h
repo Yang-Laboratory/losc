@@ -1,5 +1,5 @@
-#ifndef _LOSC_CURVATURE_H_
-#define _LOSC_CURVATURE_H_
+#ifndef _LOSC_SRC_CURVATURE_H_
+#define _LOSC_SRC_CURVATURE_H_
 
 #include <memory>
 #include <vector>
@@ -177,6 +177,6 @@ class CurvatureV2 : public CurvatureBase
     virtual SharedMatrix compute() override;
 };
 
-}
+}   // namespace losc
 
-#endif // _LOSC_CURVATURE_H_
+#endif // _LOSC_SRC_CURVATURE_H_

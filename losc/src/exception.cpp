@@ -1,6 +1,6 @@
-#include <sstream>  // std::stringstream
-
 #include "exception.h"
+
+#include <sstream>  // std::stringstream
 
 namespace losc {
 namespace exception {
@@ -24,7 +24,5 @@ DimensionError::DimensionError(const string& msg) : LoscException("Dimension err
     msg_ << "Description: " << msg << std::endl;
 }
 
-
-
-}
-}
+}   // namespace losc::exception
+}   // namespace losc

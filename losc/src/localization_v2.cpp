@@ -1,3 +1,5 @@
+#include "localization.h"
+
 #include <cmath>
 #include <algorithm>
 #include <random>
@@ -5,8 +7,6 @@
 #include <vector>
 #include <string>
 #include <matrix/matrix.h>
-
-#include "localization.h"
 #include "exception.h"
 #include "blas_base.h"
 
@@ -204,4 +204,4 @@ SharedMatrix LoscLocalizerV2::compute()
     return C_lo;
 }
 
-}
+}   // namespace losc

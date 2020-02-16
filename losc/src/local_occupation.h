@@ -1,9 +1,8 @@
-#ifndef _LOSC_LOCAL_OCCUPATION_H_
-#define _LOSC_LOCAL_OCCUPATION_H_
+#ifndef _LOSC_SRC_LOCAL_OCCUPATION_H_
+#define _LOSC_SRC_LOCAL_OCCUPATION_H_
 
 #include <matrix/matrix.h>
 #include <memory>
-
 #include "exception.h"
 
 namespace losc {
@@ -49,6 +48,5 @@ inline SharedMatrix local_occupation_matrix(const Matrix& C_lo, const Matrix& S,
     return L;
 }
 
-}
-
-#endif // _LOSC_LOCAL_OCCUPATION_H_
+}   // namespace losc
+#endif // _LOSC_SRC_LOCAL_OCCUPATION_H_

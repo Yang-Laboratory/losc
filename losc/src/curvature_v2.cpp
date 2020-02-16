@@ -1,6 +1,6 @@
-#include <cmath>
-
 #include "curvature.h"
+
+#include <cmath>
 #include "exception.h"
 
 namespace losc {
@@ -78,5 +78,4 @@ SharedMatrix CurvatureV2::compute()
     return kappa2;
 }
 
-
-}
+}   // namespace losc
