@@ -37,18 +37,51 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# build google test library
-#add_subdirectory(googletest)
-if(IS_DIRECTORY $ENV{HOME}/local/googletest)
-    message(STATUS "found googletest source folder.")
-    add_subdirectory($ENV{HOME}/local/googletest $ENV{HOME}/local/googletest/build)
-else()
-    message(FATAL_ERROR "googletest source folder not found.
-        Run `git clone https://github.com/google/googletest.git` under path `$ENV{HOME}/local/`")
+# copied from google-test readme.md. See
+# https://github.com/google/googletest/blob/master/googletest/README.md.
+# {{{
+# Download and unpack googletest at configure time
+configure_file(cmake/cmake_gtest.in ${CMAKE_CURRENT_BINARY_DIR}/download/googletest/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/googletest )
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/googletest )
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
 endif()
 
-# build matrix library
-add_subdirectory(matrix)
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_SOURCE_DIR}/extern/googletest)
+
+# copied from google-test readme.md. See
+# https://github.com/google/googletest/blob/master/googletest/README.md.
+# {{{
+# Download and unpack matrix at configure time
+configure_file(cmake/cmake_matrix.in ${CMAKE_CURRENT_BINARY_DIR}/download/matrix/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/matrix)
+if(result)
+  message(FATAL_ERROR "CMake step for libmatrix failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/matrix)
+if(result)
+  message(FATAL_ERROR "Build step for libmatrix failed: ${result}")
+endif()
+# Add libmatrix directly to our build. This defines the `matrix` targets.
+add_subdirectory(${CMAKE_SOURCE_DIR}/extern/matrix)
 
 # build localization library
 add_subdirectory(losc)

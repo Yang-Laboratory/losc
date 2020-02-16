@@ -10,3 +10,6 @@ googletest/
 # test data output file
 */test/data/**/*.out
 */test/data/**/*.inp
+
+# extern
+extern*/
