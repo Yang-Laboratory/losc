@@ -8,6 +8,7 @@
 
 #include "localization.h"
 #include "exception.h"
+#include "blas_base.h"
 
 namespace losc {
 
@@ -80,26 +81,26 @@ static void js_rotate_one_pair(const size_t i, const size_t j, const double thet
 
     // rotate U matrix
     double *U_Mat = u_matrix->data();
-    matrix::blas::drot_(&nLMO_t, U_Mat + i * nLMO_t, matrix::blas::ione,
-                        U_Mat + j * nLMO_t, matrix::blas::ione,
+    losc::blas::drot_(&nLMO_t, U_Mat + i * nLMO_t, losc::blas::ione,
+                        U_Mat + j * nLMO_t, losc::blas::ione,
                         &costheta, &sintheta);
 
     // rotate Dipole Matrix
     for (int xyz = 0; xyz < 3; ++xyz) {
         double *DMat = dipole_lo[xyz]->data();
-        matrix::blas::drot_(&nLMO_t, DMat + i * nLMO_t, matrix::blas::ione,
-                            DMat + j * nLMO_t, matrix::blas::ione,
+        losc::blas::drot_(&nLMO_t, DMat + i * nLMO_t, losc::blas::ione,
+                            DMat + j * nLMO_t, losc::blas::ione,
                             &costheta, &sintheta);
-        matrix::blas::drot_(&nLMO_t, DMat + i, &nLMO_t, DMat + j, &nLMO_t,
+        losc::blas::drot_(&nLMO_t, DMat + i, &nLMO_t, DMat + j, &nLMO_t,
                             &costheta, &sintheta);
     }
 
     // rotate localization Hamiltonian matrix.
     double *HMat = hamiltonian_lo->data();
-    matrix::blas::drot_(&nLMO_t, HMat + i * nLMO_t, matrix::blas::ione,
-                        HMat + j * nLMO_t, matrix::blas::ione,
+    losc::blas::drot_(&nLMO_t, HMat + i * nLMO_t, losc::blas::ione,
+                        HMat + j * nLMO_t, losc::blas::ione,
                         &costheta, &sintheta);
-    matrix::blas::drot_(&nLMO_t, HMat + i, &nLMO_t, HMat + j, &nLMO_t,
+    losc::blas::drot_(&nLMO_t, HMat + i, &nLMO_t, HMat + j, &nLMO_t,
                         &costheta, &sintheta);
 }
 

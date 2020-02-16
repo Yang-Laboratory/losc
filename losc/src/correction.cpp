@@ -5,6 +5,7 @@
 
 #include "correction.h"
 #include "exception.h"
+#include "blas_base.h"
 
 namespace losc {
 
@@ -165,10 +166,10 @@ vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa, 
     matrix::mult_dgemm(1.0, C_co, "N", H_tot, "N", 0.0, Cco_H);
     int nbasis_t = nbasis;
     for (size_t i = 0; i < nlo; ++i) {
-        eig[i] = matrix::blas::ddot_(&nbasis_t, C_co.data() + i * nbasis,
-                                     matrix::blas::ione,
+        eig[i] = losc::blas::ddot_(&nbasis_t, C_co.data() + i * nbasis,
+                                     losc::blas::ione,
                                      Cco_H.data() + i * nbasis,
-                                     matrix::blas::ione);
+                                     losc::blas::ione);
     }
     return eig;
 }

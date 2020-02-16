@@ -4,6 +4,7 @@
 
 #include "curvature.h"
 #include "exception.h"
+#include "blas_base.h"
 
 namespace losc {
 
@@ -36,10 +37,10 @@ SharedMatrix CurvatureV1::compute_kappa_J()
         // calculate element (p|ii)
         for (size_t i = 0; i < nlo_; ++i) {
             int nbasis = nbasis_;
-            (*df_pii)(p, i) = matrix::blas::ddot_(&nbasis, df_pmn_p_in.data() + i * nbasis,
-                                                  matrix::blas::ione,
+            (*df_pii)(p, i) = losc::blas::ddot_(&nbasis, df_pmn_p_in.data() + i * nbasis,
+                                                  losc::blas::ione,
                                                   C_lo_->data() + i * nbasis,
-                                                  matrix::blas::ione);
+                                                  losc::blas::ione);
         }
     }
 
