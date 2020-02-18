@@ -1,7 +1,6 @@
 /**
- * file: blas_base.h
- *
- * declearation for blas library.
+ * @file
+ * @brief declearation for blas library.
  */
 #ifndef _LOSC_SRC_BLAS_BASE_H_
 #define _LOSC_SRC_BLAS_BASE_H_
@@ -15,12 +14,14 @@ static int ione[] = {1};
 static double dzero[] = {0.0};
 static double done[] = {1.0};
 
-extern "C" void drot_(const int *N, double *x, const int *incx, double *y, const int *incy,
-                      const double *c, const double *s);
-extern "C" void dcopy_(const int *N, const double *x, const int *incx, double *y, const int *incy);
-extern "C" double ddot_(const int *N, const double *x, const int *incx, const double *y, const int *incy);
+extern "C" void drot_(const int *N, double *x, const int *incx, double *y,
+                      const int *incy, const double *c, const double *s);
+extern "C" void dcopy_(const int *N, const double *x, const int *incx,
+                       double *y, const int *incy);
+extern "C" double ddot_(const int *N, const double *x, const int *incx,
+                        const double *y, const int *incy);
 
-}   // namespace losc::blas
-}   // namespace losc
+} // namespace blas
+} // namespace losc
 
-#endif  // _LOSC_SRC_BLAS_BASE_H_
+#endif // _LOSC_SRC_BLAS_BASE_H_

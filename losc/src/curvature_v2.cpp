@@ -1,7 +1,11 @@
+/**
+ * @file
+ * @brief Losc curvature version 2 implementation.
+ */
 #include "curvature.h"
 
-#include <cmath>
 #include "exception.h"
+#include <cmath>
 
 namespace losc {
 
@@ -9,10 +13,11 @@ SharedMatrix CurvatureV2::compute()
 {
     // construct absolute overlap under LO.
     auto S_lo = std::make_shared<Matrix>(nlo_, nlo_);
-    // The LO grid value matrix has dimension of (npts, nlo), which could be very large.
-    // To limit the memory usage on LO grid value, we build it by
+    // The LO grid value matrix has dimension of (npts, nlo), which could be
+    // very large. To limit the memory usage on LO grid value, we build it by
     // blocks. For now we limit the memory usage to be 1GB.
-    const size_t block_size = 1000ULL * 1000ULL * 1000ULL / sizeof(double) / nlo_;
+    const size_t block_size =
+        1000ULL * 1000ULL * 1000ULL / sizeof(double) / nlo_;
     size_t nBLK = npts_ / block_size;
     const size_t res = npts_ % block_size;
     if (res != 0) {
@@ -29,11 +34,11 @@ SharedMatrix CurvatureV2::compute()
         // calculate LO grid value for each block, which
         // has dimension of (size, nlo).
         auto grid_lo_block = std::make_shared<Matrix>(size, nlo_);
-        auto grid_basis_block =
-            std::make_shared<Matrix>(size, nbasis_,
-                                     grid_basis_value_->data() + n * block_size * nbasis_,
-                                     matrix::Matrix::kShallowCopy);
-        matrix::mult_dgemm(1.0, *grid_basis_block, "N", *C_lo_, "T", 0.0, *grid_lo_block);
+        auto grid_basis_block = std::make_shared<Matrix>(
+            size, nbasis_, grid_basis_value_->data() + n * block_size * nbasis_,
+            matrix::Matrix::kShallowCopy);
+        matrix::mult_dgemm(1.0, *grid_basis_block, "N", *C_lo_, "T", 0.0,
+                           *grid_lo_block);
         grid_basis_block.reset();
 
         // sum over current block contribution to the LO overlap.
@@ -52,11 +57,13 @@ SharedMatrix CurvatureV2::compute()
     S_lo->to_symmetric("L");
 
     // build the curvature version 1.
-    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_, grid_basis_value_, grid_weight_);
+    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_,
+                           grid_basis_value_, grid_weight_);
     auto kappa1 = kappa1_man.compute();
 
     // build LOSC2 kappa matrix:
-    // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau * S[ij]) * K][ij]
+    // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau *
+    // S[ij]) * K][ij]
     using std::erf;
     using std::erfc;
     using std::fabs;
@@ -70,7 +77,8 @@ SharedMatrix CurvatureV2::compute()
             const double K1_ij = (*kappa1)(i, j);
             const double K1_jj = (*kappa1)(j, j);
             const double f = para_zeta_ * S_ij;
-            (*kappa2)(i, j) = erf(f) * sqrt(fabs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
+            (*kappa2)(i, j) =
+                erf(f) * sqrt(fabs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
         }
     }
     kappa2->to_symmetric("L");
@@ -78,4 +86,4 @@ SharedMatrix CurvatureV2::compute()
     return kappa2;
 }
 
-}   // namespace losc
+} // namespace losc
