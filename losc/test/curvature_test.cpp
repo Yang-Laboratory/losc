@@ -43,20 +43,20 @@ TEST_P(CurvatureTest, test)
     // load data.
     string mol = GetParam();
     const char *mol_str = mol.c_str();
-    string lo_ref_path = dir_path + "/./data/" + mol + "/lo.bin";
-    string df_pmn_path = dir_path + "/./data/" + mol + "/df_pmn.bin";
-    string df_Vpq_inv_path = dir_path + "/./data/" + mol + "/df_Vpq_inverse.bin";
-    string grid_basis_value_path = dir_path + "/./data/" + mol + "/grid_basis.bin";
-    string grid_weight_path = dir_path + "/./data/" + mol + "/grid_weight.bin";
-    string kappa_ref_path = dir_path + "/./data/" + mol + "/kappa.bin";
+    string lo_ref_path = dir_path + "/./data/" + mol + "/lo.txt";
+    string df_pmn_path = dir_path + "/./data/" + mol + "/df_pmn.txt";
+    string df_Vpq_inv_path = dir_path + "/./data/" + mol + "/df_Vpq_inverse.txt";
+    string grid_basis_value_path = dir_path + "/./data/" + mol + "/grid_basis.txt";
+    string grid_weight_path = dir_path + "/./data/" + mol + "/grid_weight.txt";
+    string kappa_ref_path = dir_path + "/./data/" + mol + "/kappa.txt";
 
-    C_lo = matrix::read_matrices_from_binary(lo_ref_path);
-    df_pmn = matrix::read_matrices_from_binary(df_pmn_path);
-    df_Vpq_inverse = matrix::read_matrices_from_binary(df_Vpq_inv_path);
-    grid_basis_value = matrix::read_matrices_from_binary(grid_basis_value_path);
-    kappa_ref = matrix::read_matrices_from_binary(kappa_ref_path);
+    C_lo = matrix::read_matrices_from_txt(lo_ref_path);
+    df_pmn = matrix::read_matrices_from_txt(df_pmn_path);
+    df_Vpq_inverse = matrix::read_matrices_from_txt(df_Vpq_inv_path);
+    grid_basis_value = matrix::read_matrices_from_txt(grid_basis_value_path);
+    kappa_ref = matrix::read_matrices_from_txt(kappa_ref_path);
 
-    auto grid_wt = matrix::read_matrices_from_binary(grid_weight_path);
+    auto grid_wt = matrix::read_matrices_from_txt(grid_weight_path);
     const size_t npts = grid_wt[0]->size();
     grid_weight = std::make_shared<vector<double>>(npts);
     for (size_t i = 0; i < npts; ++i) {

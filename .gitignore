@@ -8,8 +8,11 @@
 googletest/
 
 # test data output file
-*/test/data/**/*.out
-*/test/data/**/*.inp
+**/test/data/**/*.xyz
+**/test/data/**/*.bin
+**/test/data/**/*.inp
+**/test/data/**/*.out
+**/test/data/*.sh
 
 # extern
 extern*/
