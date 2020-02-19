@@ -48,7 +48,7 @@ SharedMatrix losc_hamiltonian_correction(const Matrix &S, const Matrix &C_lo,
             LocalOcc, nlo, nlo, "wrong dimension for local occupation matrix.");
     }
 
-    Matrix A(nlo, nbasis);
+    Matrix A(nlo, nlo);
     for (size_t i = 0; i < nlo; ++i) {
         for (size_t j = 0; j <= i; ++j) {
             const double K_ij = Curvature(i, j);
@@ -60,13 +60,12 @@ SharedMatrix losc_hamiltonian_correction(const Matrix &S, const Matrix &C_lo,
             }
         }
     }
+    A.to_symmetric("L");
 
     SharedMatrix H = std::make_shared<Matrix>(nbasis, nbasis);
-    Matrix CS(nlo, nbasis);
-    Matrix ACS(nlo, nbasis);
-    matrix::mult_dgemm(1.0, C_lo, "N", S, "N", 0.0, CS);
-    matrix::mult_dgemm(1.0, A, "N", CS, "N", 0.0, ACS);
-    matrix::mult_dgemm(1.0, CS, "T", ACS, "N", 0.0, *H);
+    Matrix CAC(nbasis, nbasis);
+    matrix::mult_dgemm_ATBA(C_lo, A, CAC);
+    matrix::mult_dgemm_ATBA(S, CAC, *H);
     return H;
 }
 
