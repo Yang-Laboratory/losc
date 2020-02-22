@@ -6,13 +6,12 @@
 
 #include "blas_base.h"
 #include "exception.h"
+#include "matrix.h"
 #include <algorithm>
 #include <cmath>
-#include <matrix/matrix.h>
 #include <random>
 #include <stdarg.h>
 #include <string>
-#include <vector>
 
 namespace losc {
 
@@ -21,8 +20,8 @@ namespace losc {
  */
 static void js_optimize_one_pair(const size_t i, const size_t j,
                                  const double para_c, const double para_gamma,
-                                 const vector<SharedMatrix> &dipole_lo,
-                                 const SharedMatrix &hamiltonian_lo,
+                                 const vector<shared_ptr<Matrix>> &dipole_lo,
+                                 const shared_ptr<Matrix> &hamiltonian_lo,
                                  double &theta_val, double &delta_val)
 {
     // Spacial part: constant x1 and x2.
@@ -77,15 +76,15 @@ static void js_optimize_one_pair(const size_t i, const size_t j,
  * @brief Apply rotation to the pair of orbitals.
  */
 static void js_rotate_one_pair(const size_t i, const size_t j,
-                               const double theta, const SharedMatrix &u_matrix,
-                               const vector<SharedMatrix> &dipole_lo,
-                               const SharedMatrix &hamiltonian_lo)
+                               const double theta,
+                               const shared_ptr<Matrix> &u_matrix,
+                               const vector<shared_ptr<Matrix>> &dipole_lo,
+                               const shared_ptr<Matrix> &hamiltonian_lo)
 {
     double costheta = cos(theta);
     double sintheta = sin(theta);
-    const int nLMO_t = u_matrix->row();
+    const int nLMO_t = u_matrix->rows();
 
-    // rotate U matrix
     double *U_Mat = u_matrix->data();
     losc::blas::drot_(&nLMO_t, U_Mat + i * nLMO_t, losc::blas::ione,
                       U_Mat + j * nLMO_t, losc::blas::ione, &costheta,
@@ -110,12 +109,12 @@ static void js_rotate_one_pair(const size_t i, const size_t j,
                       &sintheta);
 }
 
-LoscLocalizerV2::LoscLocalizerV2(const SharedMatrix &C_lo_basis,
-                                 const SharedMatrix &H_ao,
-                                 const vector<SharedMatrix> &Dipole_ao)
+LoscLocalizerV2::LoscLocalizerV2(const shared_ptr<Matrix> &C_lo_basis,
+                                 const shared_ptr<Matrix> &H_ao,
+                                 const vector<shared_ptr<Matrix>> &Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
-    if (!H_ao_->is_square() && H_ao_->row() != nbasis_) {
+    if (!H_ao_->is_square() && H_ao_->rows() != nbasis_) {
         throw exception::DimensionError(
             *H_ao, nbasis_, nbasis_,
             "wrong dimension for DFA Hamiltonian matrix under AO.");
@@ -128,7 +127,7 @@ LoscLocalizerV2::LoscLocalizerV2(const SharedMatrix &C_lo_basis,
         vector<std::string> xyz_name = {"x", "y", "z"};
         for (size_t i = 0; i < 3; ++i) {
             if (!Dipole_ao_[i]->is_square() &&
-                Dipole_ao_[i]->row() != nbasis_) {
+                Dipole_ao_[i]->rows() != nbasis_) {
                 std::string msg =
                     "wrong dimension for dipole matrix under AO for " +
                     xyz_name[i] + "component.";
@@ -149,31 +148,33 @@ void LoscLocalizerV2::message(std::string t, ...) const
     }
 }
 
-SharedMatrix LoscLocalizerV2::compute()
+shared_ptr<Matrix> LoscLocalizerV2::compute()
 {
+    Matrix &U = *U_;
+    Matrix &C_lo_basis = *C_lo_basis_;
+
     // calculate dipole on LO initial guess.
-    // D_lo = U * C_lo_basis * D_ao * C_lo_basis^T * U^T
-    vector<SharedMatrix> D_lo;
+    // D_lo = U^T * C_lo_basis^T * D_ao * C_lo_basis * U
+    vector<shared_ptr<Matrix>> D_lo;
     for (size_t xyz = 0; xyz < 3; xyz++) {
         D_lo.push_back(std::make_shared<Matrix>(nlo_, nlo_));
-        SharedMatrix CDC = std::make_shared<Matrix>(nlo_, nlo_);
-        matrix::mult_dgemm_ABAT(*C_lo_basis_, *Dipole_ao_[xyz], *CDC);
-        matrix::mult_dgemm_ABAT(*U_, *CDC, *D_lo[xyz]);
+        Matrix &D_ao = *Dipole_ao_[xyz];
+        (*D_lo[xyz]).noalias() =
+            U.transpose() * C_lo_basis.transpose() * D_ao * C_lo_basis * U;
     }
 
     // calculate Hamiltonian matrix on LO initial guess.
-    // H_lo = U * C_lo_basis * H_ao * C_lo_basis^T * U^T
-    SharedMatrix H_lo = std::make_shared<Matrix>(nlo_, nlo_);
-    SharedMatrix CHC = std::make_shared<Matrix>(nlo_, nlo_);
-    matrix::mult_dgemm_ABAT(*C_lo_basis_, *H_ao_, *CHC);
-    matrix::mult_dgemm_ABAT(*U_, *CHC, *H_lo);
-    CHC.reset();
+    // H_lo = U^T * C_lo_basis^T * H_ao * C_lo_basis * U
+    shared_ptr<Matrix> H_lo = std::make_shared<Matrix>(nlo_, nlo_);
+    Matrix &H_ao = *H_ao_;
+    (*H_lo).noalias() =
+        U.transpose() * C_lo_basis.transpose() * H_ao * C_lo_basis * U;
 
     // using jacobi sweep for localization.
     std::mt19937 g(0);
     size_t iter = 0;
     double cycle_delta = 10000.0;
-    while (iter < js_max_iter_ && fabs(cycle_delta) > js_tol_) {
+    while (iter < js_max_iter_ && std::abs(cycle_delta) > js_tol_) {
         cycle_delta = 0.0;
         vector<size_t> order;
         for (size_t i = 0; i < nlo_; ++i)
@@ -201,18 +202,18 @@ SharedMatrix LoscLocalizerV2::compute()
                 cycle_delta += delta;
             }
         }
-        iter++;
+        ++iter;
     }
 
     message("Localization final iteration = %zu.\n", iter);
-    if (iter >= js_max_iter_ && fabs(cycle_delta) > js_tol_) {
+    if (iter >= js_max_iter_ && abs(cycle_delta) > js_tol_) {
         std::cout << "Warning: localization is not convergened.\n";
     }
 
     // calculate the LO coefficient matrix.
+    // C_lo = C_lo_basis * U
     auto C_lo = std::make_shared<Matrix>(nlo_, nlo_);
-    matrix::mult_dgemm(1.0, *U_, "N", *C_lo_basis_, "N", 0.0, *C_lo);
-
+    (*C_lo).noalias() = C_lo_basis * U;
     return C_lo;
 }
 

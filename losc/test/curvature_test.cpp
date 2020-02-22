@@ -1,19 +1,20 @@
 #include <cmath>
 #include <gtest/gtest.h>
-#include <matrix/matrix.h>
 #include <memory>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
 #include <losc/curvature.h>
+#include <losc/losc.h>
+#include "matrix_io.h"
 
-using matrix::Matrix;
+using losc::Matrix;
 using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using SharedMatrix = std::shared_ptr<Matrix>;
+using shared_ptr<Matrix> = std::shared_ptr<Matrix>;
 
 struct CurvatureTest : public ::testing::TestWithParam<string> {
     string file_path;
@@ -40,17 +41,21 @@ TEST_P(CurvatureTest, test)
         dir_path + "/./data/" + mol + "/grid_basis.txt";
     string grid_weight_path = dir_path + "/./data/" + mol + "/grid_weight.txt";
     string kappa_ref_path = dir_path + "/./data/" + mol + "/kappa.txt";
-    auto C_lo = matrix::read_matrices_from_txt(lo_ref_path);
-    auto df_pmn = matrix::read_matrices_from_txt(df_pmn_path);
-    auto df_Vpq_inverse = matrix::read_matrices_from_txt(df_Vpq_inv_path);
+    auto C_lo = test::read_matrices_from_txt(lo_ref_path);
+    auto df_pmn = test::read_matrices_from_txt(df_pmn_path);
+    auto df_Vpq_inverse = test::read_matrices_from_txt(df_Vpq_inv_path);
     auto grid_basis_value =
-        matrix::read_matrices_from_txt(grid_basis_value_path);
-    auto kappa_ref = matrix::read_matrices_from_txt(kappa_ref_path);
-    auto grid_wt = matrix::read_matrices_from_txt(grid_weight_path);
+        test::read_matrices_from_txt(grid_basis_value_path);
+    auto kappa_ref = test::read_matrices_from_txt(kappa_ref_path);
+    auto grid_wt = test::read_matrices_from_txt(grid_weight_path);
     const size_t npts = grid_wt[0]->size();
     auto grid_weight = std::make_shared<vector<double>>(npts);
     for (size_t i = 0; i < npts; ++i) {
         (*grid_weight)[i] = grid_wt[0]->data()[i];
+    }
+
+    for (int is = 0; is < 2; is++) {
+        (*C_lo[is]).transposeInPlace();
     }
 
     for (int is = 0; is < 2; is++) {
@@ -63,7 +68,7 @@ TEST_P(CurvatureTest, test)
         // Test.
         // True consition is that the calculated curvature matrix matches the
         // reference to the 8-th digit.
-        bool status = kappa_calc->is_equal_to(*kappa_ref[is], 1e-8);
+        bool status = kappa_calc->is_cwise_equal(*kappa_ref[is], 1e-8);
         if (!status) {
             std::cout << "Mol: " << mol << std::endl;
             std::cout << "data dir path: " << dir_path << std::endl;

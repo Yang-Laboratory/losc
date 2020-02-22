@@ -5,7 +5,7 @@
 #ifndef _LOSC_SRC_CORRECTION_H_
 #define _LOSC_SRC_CORRECTION_H_
 
-#include <matrix/matrix.h>
+#include "matrix.h"
 #include <memory>
 #include <vector>
 
@@ -14,9 +14,9 @@
  */
 namespace losc {
 
-using matrix::Matrix;
+using losc::Matrix;
+using std::shared_ptr;
 using std::vector;
-using SharedMatrix = std::shared_ptr<Matrix>;
 
 /**
  * @brief Calculate Losc correcting Hamiltonian under AO basis.
@@ -27,20 +27,21 @@ using SharedMatrix = std::shared_ptr<Matrix>;
  *
  * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
  * @param [in] C_lo: LO coefficient matrix under AO basis with dimension
- * [nlo, nbasis]. see losc::LocalizerBase::compute().
+ * [nbasis, nlo]. see losc::LocalizerBase::compute().
  * @param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
  * see losc::CurvatureBase::compute().
  * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
  * see losc::local_occupation_matrix().
- * @return SharedMatrix: the Losc correcting Hamiltonian with dimension
+ * @return shared_ptr<Matrix>: the Losc correcting Hamiltonian with dimension
  * [nbasis, nbasis].
  *
  * @note Make sure all the input matrices have the same spin. The returned
  * Losc correcting Hamiltonian matrix is only for the input spin.
  */
-SharedMatrix losc_hamiltonian_correction(const Matrix &S, const Matrix &C_lo,
-                                         const Matrix &Curvature,
-                                         const Matrix &LocalOcc);
+shared_ptr<Matrix> losc_hamiltonian_correction(const Matrix &S,
+                                               const Matrix &C_lo,
+                                               const Matrix &Curvature,
+                                               const Matrix &LocalOcc);
 
 /**
  * @brief Calculate Losc correction to total energy.
@@ -66,10 +67,10 @@ double losc_total_energy_correction(const Matrix &Curvature,
  * original Losc paper (https://doi.org/10.1093/nsr/nwx111).
  *
  * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
- * @param [in] C_co: CO coefficient matrix under AO basis with dimension [nlo,
- * nbasis].
- * @param [in] C_lo: LO coefficient matrix under AO basis with dimension [nlo,
- * nbasis]. see losc::LocalizerBase::compute().
+ * @param [in] C_co: CO coefficient matrix under AO basis with dimension
+ * [nbasis, nlo].
+ * @param [in] C_lo: LO coefficient matrix under AO basis with dimension
+ * [nbasis, nlo]. see losc::LocalizerBase::compute().
  * @param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
  * see losc::CurvatureBase::compute().
  * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
@@ -99,8 +100,8 @@ vector<double> losc_orbital_energy_correction(const Matrix &S,
  * @param [in] H_dfa: DFA Hamiltonian under AO with dimension [nbasis, nbasis].
  * @param [in] H_losc: Losc correcting Hamiltonian under AO with dimension
  * [nbasis, nbasis]. See losc::losc_hamiltonian_correction().
- * @param [in] C_co: CO coefficient matrix under AO basis with dimension [n,
- * nbasis].
+ * @param [in] C_co: CO coefficient matrix under AO basis with dimension
+ * [nbasis, n].
  * @return std::vector<double>: the Losc corrected orbital energies for the `n`
  * COs.
  *

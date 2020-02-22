@@ -16,10 +16,6 @@ static double done[] = {1.0};
 
 extern "C" void drot_(const int *N, double *x, const int *incx, double *y,
                       const int *incy, const double *c, const double *s);
-extern "C" void dcopy_(const int *N, const double *x, const int *incx,
-                       double *y, const int *incy);
-extern "C" double ddot_(const int *N, const double *x, const int *incx,
-                        const double *y, const int *incy);
 
 } // namespace blas
 } // namespace losc

@@ -3,6 +3,7 @@
  * @brief Losc library exception realted definition.
  */
 #include "exception.h"
+#include "matrix.h"
 
 #include <sstream> // std::stringstream
 
@@ -21,7 +22,7 @@ DimensionError::DimensionError(const Matrix &A, size_t expected_row,
 {
     msg_ << "Description: " << msg << std::endl;
     msg_ << "Details: "
-         << "Current matrix dimension: [" << A.row() << ", " << A.col() << "]"
+         << "Current matrix dimension: [" << A.rows() << ", " << A.cols() << "]"
          << std::endl;
     msg_ << "         "
          << "Expected matrix dimension: [" << expected_row << ", "

@@ -1,15 +1,16 @@
 #include <cmath>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <matrix/matrix.h>
 #include <memory>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
 #include <losc/local_occupation.h>
+#include <losc/losc.h>
+#include "matrix_io.h"
 
-using matrix::Matrix;
+using losc::Matrix;
 using std::shared_ptr;
 using std::string;
 using std::vector;
@@ -36,10 +37,14 @@ TEST_P(LocalOccupationTest, test)
     string C_lo_path = dir_path + "/./data/" + mol + "/lo.txt";
     string D_path = dir_path + "/./data/" + mol + "/dfa_density.txt";
     string L_ref_path = dir_path + "/./data/" + mol + "/localocc.txt";
-    auto S = matrix::read_matrices_from_txt(S_path);
-    auto C_lo = matrix::read_matrices_from_txt(C_lo_path);
-    auto D = matrix::read_matrices_from_txt(D_path);
-    auto L_ref = matrix::read_matrices_from_txt(L_ref_path);
+    auto S = test::read_matrices_from_txt(S_path);
+    auto C_lo = test::read_matrices_from_txt(C_lo_path);
+    auto D = test::read_matrices_from_txt(D_path);
+    auto L_ref = test::read_matrices_from_txt(L_ref_path);
+
+    for (int is = 0; is < 2; is++) {
+        (*C_lo[is]).transposeInPlace();
+    }
 
     for (int is = 0; is < 2; is++) {
         // Do calculation.
@@ -48,7 +53,7 @@ TEST_P(LocalOccupationTest, test)
         // Testing.
         // True condition is the calculated Losc local occupation matrix matches
         // the reference to the 8-th digit.
-        bool status = L_calc->is_equal_to(*L_ref[is], 1e-8);
+        bool status = L_calc->is_cwise_equal(*L_ref[is], 1e-8);
         if (!status) {
             std::cout << "Mol: " << mol << std::endl;
             std::cout << "data dir path: " << dir_path << std::endl;

@@ -5,16 +5,15 @@
 #ifndef _LOSC_SRC_CURVATURE_H_
 #define _LOSC_SRC_CURVATURE_H_
 
-#include <matrix/matrix.h>
+#include "matrix.h"
 #include <memory>
 #include <vector>
 
 namespace losc {
 
-using matrix::Matrix;
+using losc::Matrix;
+using std::shared_ptr;
 using std::vector;
-using SharedMatrix = std::shared_ptr<Matrix>;
-using SharedDoubleVector = std::shared_ptr<vector<double>>;
 
 /**
  * @brief Type of density function approximation.
@@ -43,14 +42,14 @@ class CurvatureBase {
 
     /**
      * @brief LO coefficient matrix under AO.
-     * @details Dimension: [nlo, nbasis]
+     * @details Dimension: [nbasis, nlo]
      *
      * @par Availability
      * This matrix can be obtained from the losc::LocalizerBase::compute() or
      * any functions overwrite it from the derived localizer class.
      * @see losc::LoscLocalizerV2::compute()
      */
-    SharedMatrix C_lo_;
+    shared_ptr<Matrix> C_lo_;
 
     /**
      * @brief Three-body integral of <p|mn> matrix used in density fitting.
@@ -79,7 +78,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    SharedMatrix df_pmn_;
+    shared_ptr<Matrix> df_pmn_;
 
     /**
      * @brief Inverse of Vpq matrix used in density fitting.
@@ -102,7 +101,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    SharedMatrix df_Vpq_inverse_;
+    shared_ptr<Matrix> df_Vpq_inverse_;
 
     /**
      * @brief AO basis value on grid.
@@ -122,7 +121,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    SharedMatrix grid_basis_value_;
+    shared_ptr<Matrix> grid_basis_value_;
 
     /**
      * @brief Coefficient for grid points used in numerical integral.
@@ -137,7 +136,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    SharedDoubleVector grid_weight_;
+    shared_ptr<vector<double>> grid_weight_;
 
   public:
     /**
@@ -154,17 +153,17 @@ class CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid. See CurvatureBase::grid_weight_.
      */
-    CurvatureBase(enum DFAType dfa, const SharedMatrix &C_lo,
-                  const SharedMatrix &df_pmn,
-                  const SharedMatrix &df_Vpq_inverse,
-                  const SharedMatrix &grid_basis_value,
-                  const SharedDoubleVector &grid_weight);
+    CurvatureBase(DFAType dfa, const shared_ptr<Matrix> &C_lo,
+                  const shared_ptr<Matrix> &df_pmn,
+                  const shared_ptr<Matrix> &df_Vpq_inverse,
+                  const shared_ptr<Matrix> &grid_basis_value,
+                  const shared_ptr<vector<double>> &grid_weight);
 
     /**
      * @brief Compute the Losc curvature matrix.
-     * @return SharedMatrix: the Losc curvature matrix.
+     * @return shared_ptr<Matrix>: the Losc curvature matrix.
      */
-    virtual SharedMatrix compute() = 0;
+    virtual shared_ptr<Matrix> compute() = 0;
 };
 
 /**
@@ -189,8 +188,8 @@ class CurvatureV1 : public CurvatureBase {
      */
     double para_tau_ = 1.2378;
 
-    SharedMatrix compute_kappa_J();
-    SharedMatrix compute_kappa_xc();
+    shared_ptr<Matrix> compute_kappa_J();
+    shared_ptr<Matrix> compute_kappa_xc();
 
   public:
     /**
@@ -209,10 +208,11 @@ class CurvatureV1 : public CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid. See CurvatureBase::grid_weight_.
      */
-    CurvatureV1(enum DFAType dfa, const SharedMatrix &C_lo,
-                const SharedMatrix &df_pmn, const SharedMatrix &df_Vpq_inverse,
-                const SharedMatrix &grid_basis_value,
-                const SharedDoubleVector &grid_weight)
+    CurvatureV1(DFAType dfa, const shared_ptr<Matrix> &C_lo,
+                const shared_ptr<Matrix> &df_pmn,
+                const shared_ptr<Matrix> &df_Vpq_inverse,
+                const shared_ptr<Matrix> &grid_basis_value,
+                const shared_ptr<vector<double>> &grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value,
                         grid_weight)
     {
@@ -231,10 +231,10 @@ class CurvatureV1 : public CurvatureBase {
      * \f]
      * where \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return SharedMatrix: The Losc curvature version 1 matrix.
+     * @return shared_ptr<Matrix>: The Losc curvature version 1 matrix.
      * @see The original Losc paper (https://doi.org/10.1093/nsr/nwx11)
      */
-    virtual SharedMatrix compute() override;
+    virtual shared_ptr<Matrix> compute() override;
 };
 
 /**
@@ -278,10 +278,11 @@ class CurvatureV2 : public CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid. See CurvatureBase::grid_weight_.
      */
-    CurvatureV2(enum DFAType dfa, const SharedMatrix &C_lo,
-                const SharedMatrix &df_pmn, const SharedMatrix &df_Vpq_inverse,
-                const SharedMatrix &grid_basis_value,
-                const SharedDoubleVector &grid_weight)
+    CurvatureV2(DFAType dfa, const shared_ptr<Matrix> &C_lo,
+                const shared_ptr<Matrix> &df_pmn,
+                const shared_ptr<Matrix> &df_Vpq_inverse,
+                const shared_ptr<Matrix> &grid_basis_value,
+                const shared_ptr<vector<double>> &grid_weight)
         : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value,
                         grid_weight)
     {
@@ -302,10 +303,10 @@ class CurvatureV2 : public CurvatureBase {
      * \f$ S_{ij} = \int \sqrt{|\rho_i(\rm{r}) \rho_j(\rm{r})|}
      * \mbox{d}\rm{r}\f$, and \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return SharedMatrix: the Losc curvature version 2 matrix.
+     * @return shared_ptr<Matrix>: the Losc curvature version 2 matrix.
      * @see The Losc2 paper (xxx) for more details.
      */
-    virtual SharedMatrix compute() override;
+    virtual shared_ptr<Matrix> compute() override;
 };
 
 } // namespace losc

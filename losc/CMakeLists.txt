@@ -85,6 +85,38 @@ else()
     message(STATUS "openmp for CXX is not used. If you want to enable openmp, use `cmake -DOPENMP=on`.")
 endif()
 
+find_package (Eigen3 REQUIRED NO_MODULE)
+if(Eigen3_FOUND)
+    message(STATUS "Eigen3 library found.")
+else()
+    message(WARNING "Can not found library Eigen3, which will be used for testing.\
+        Test code will be skipped until Eigen3 is installed.")
+    return()
+endif()
+
+# blas library
+find_library(
+    BLAS_LIBRARY
+    NAMES blas
+    PATHS "/usr/lib")
+if (BLAS_LIBRARY)
+    message(STATUS "libblas: ${BLAS_LIBRARY}")
+else()
+    message(FATAL_ERROR "libblas not found")
+endif()
+
+# lapack library
+find_library(
+    LAPACK_LIBRARY
+    NAMES lapack
+    PATHS "/usr/lib")
+if (BLAS_LIBRARY)
+    message(STATUS "liblapack: ${LAPACK_LIBRARY}")
+else()
+    message(FATAL_ERROR "liblapack not found")
+endif()
+
+
 add_library(
     ${project_name} SHARED
     ${Sources}
@@ -93,7 +125,9 @@ add_library(
 target_link_libraries(
     ${project_name}
     PUBLIC
-    matrix)
+    ${BLAS_LIBRARY}
+    ${LAPAK_LIBRARY}
+    Eigen3::Eigen)
 
 if (OPENMP)
     if(OpenMP_CXX_FOUND)

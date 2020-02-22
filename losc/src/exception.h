@@ -5,7 +5,7 @@
 #ifndef _LOSC_SRC_EXCEPTION_H_
 #define _LOSC_SRC_EXCEPTION_H_
 
-#include <matrix/matrix.h>
+#include "matrix.h"
 #include <sstream> // std::stringstream
 #include <stdexcept>
 #include <string>
@@ -17,7 +17,7 @@ namespace losc {
  */
 namespace exception {
 
-using matrix::Matrix;
+using losc::Matrix;
 using std::string;
 using std::stringstream;
 

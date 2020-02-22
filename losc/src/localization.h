@@ -6,20 +6,18 @@
 #define _LOSC_SRC_LOCALIZATION_H_
 
 #include "exception.h"
+#include "matrix.h"
 #include <cstddef>
 #include <iostream>
-#include <matrix/matrix.h>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace losc {
 
-using matrix::Matrix;
+using losc::Matrix;
 using std::shared_ptr;
 using std::vector;
-
-using SharedMatrix = shared_ptr<Matrix>;
 
 enum PrintLevel {
     kPrintLevelNo,
@@ -41,26 +39,27 @@ class LocalizerBase {
     /**
      * @brief The unitary matrix that transfer LO basis coefficient matrix into
      * LO coefficient matrix.
-     * @details Dimension: [nlo, nlo]. Relation: C_lo = U * C_lo_basis
+     * @details Dimension: [nlo, nlo]. Relation: C_lo = C_lo_basis * U
      */
-    SharedMatrix U_;
+    shared_ptr<Matrix> U_;
 
     /**
      * @brief LO basis coefficient matrix under AO.
      * @details
-     * Dimension: [nlo, nbasis]
+     * Dimension: [nbasis, nlo]
      *
      * Relation between LO basis and AO via the coefficient matrix \f$C\f$ is
      * \f[
-     * \psi_i = \sum_\mu C_{i\mu} \phi_{\mu},
+     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
      * \f]
      * where \f$C\f$ matrix is stored in `C_lo_basis_`.
      *
      * @par Availability
-     * You have to build the matrix by yourself. Usually, Losc localization
-     * use the CO from DFA as the LO basis.
+     * You have to build the matrix by yourself and provide it to the Losc
+     * library.
+     * @note Usually, Losc localization use the CO from DFA as the LO basis.
      */
-    SharedMatrix C_lo_basis_;
+    shared_ptr<Matrix> C_lo_basis_;
 
   public:
     /**
@@ -70,8 +69,8 @@ class LocalizerBase {
      * @param [in] C_lo_basis: LO basis coefficient matrix under Ao. See
      * LocalizerBase::C_lo_basis_.
      */
-    LocalizerBase(const SharedMatrix &C_lo_basis)
-        : nlo_{C_lo_basis->row()}, nbasis_{C_lo_basis->col()},
+    LocalizerBase(const shared_ptr<Matrix> &C_lo_basis)
+        : nlo_{C_lo_basis->cols()}, nbasis_{C_lo_basis->rows()},
           print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
     {
         if (nlo_ > nbasis_) {
@@ -80,13 +79,18 @@ class LocalizerBase {
                 "larger than the number of AO.");
         }
         U_ = std::make_shared<Matrix>(nlo_, nlo_);
-        U_->set_identity();
+        U_->setIdentity();
     }
 
     /**
-     * @return SharedMatrix: the U matrix.
+     * @return shared_ptr<Matrix>: the U matrix.
      */
-    SharedMatrix get_u() const { return U_; }
+    shared_ptr<Matrix> get_u() { return U_; }
+
+    /**
+     * @return shared_ptr<const Matrix>: the U matrix.
+     */
+    shared_ptr<const Matrix> get_u() const { return U_; }
 
     /**
      * @brief Set up the U matrix.
@@ -94,26 +98,19 @@ class LocalizerBase {
      * @param [in] threshold: the threshold to check if the input matrix is
      * unitary.
      */
-    void set_u_matrix(const SharedMatrix &U, double threshold = 1e-8)
+    void set_u_matrix(const shared_ptr<Matrix> &U, double threshold = 1e-8)
     {
-        if (U) {
+        if (U == nullptr) {
             throw exception::LoscException(
                 "invalid U matrix: input U matrix is null.");
         }
-        if (!U->is_square() && U->row() != nlo_) {
+        if (!(U->is_square() && U->rows() == nlo_)) {
             throw exception::DimensionError(
                 *U, nlo_, nlo_, "wrong dimension for localization U matrix.");
         }
-        Matrix UU(nlo_, nlo_);
-        matrix::mult_dgemm(1.0, *U, "N", *U, "T", 0.0, UU);
-        if (UU.is_identity(threshold)) {
+        if (!U->isUnitary(threshold)) {
             throw exception::LoscException("Invalid U matrix: input U matrix "
-                                           "is not unitary, U * U^T != I.");
-        }
-        matrix::mult_dgemm(1.0, *U, "T", *U, "N", 0.0, UU);
-        if (UU.is_identity(threshold)) {
-            throw exception::LoscException("Invalid U matrix: input U matrix "
-                                           "is not unitary, U^T * U != I.");
+                                           "is not unitary");
         }
         U_ = U;
     }
@@ -121,7 +118,7 @@ class LocalizerBase {
     /**
      * @brief Set up the print level.
      */
-    void set_print(enum PrintLevel level) { print_level_ = level; }
+    void set_print(PrintLevel level) { print_level_ = level; }
 
     /**
      * @brief Compute the LO coefficient matrix under AO.
@@ -130,16 +127,16 @@ class LocalizerBase {
      * be used as the initial guess. After calling this function,
      * LocalizerBase::U_ matrix is updated.
      *
-     * LO coefficient matrix dimension: [nlo, nbasis]
+     * LO coefficient matrix dimension: [nbasis, nlo]
      *
      * Relation between LO and AO via the LO coefficient matrix \f$C\f$ is
      * \f[
-     * \psi_i = \sum_\mu C_{i\mu} \phi_{\mu},
+     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
      * \f]
      *
-     * @return SharedMatrix: the LO coefficient matrix under AO.
+     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO.
      */
-    virtual SharedMatrix compute() = 0;
+    virtual shared_ptr<Matrix> compute() = 0;
 };
 
 /**
@@ -154,13 +151,13 @@ class LoscLocalizerV2 : public LocalizerBase {
      *
      * Dimension: [nbasis, nbasis].
      */
-    SharedMatrix H_ao_;
+    shared_ptr<Matrix> H_ao_;
 
     /**
      * @brief Dipole matrix under AO in order of x, y and z directions.
      * @details Dimension: [nbasis, nbasis].
      */
-    vector<SharedMatrix> Dipole_ao_;
+    vector<shared_ptr<Matrix>> Dipole_ao_;
 
     /**
      * @brief Maximum iteration number of Jacobi-sweep algorithm for
@@ -203,8 +200,9 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @param [in] Dipole_ao: dipole matrix under AO in x, y and z order with
      * dimension [nbasis, nbasis].
      */
-    LoscLocalizerV2(const SharedMatrix &C_lo_basis, const SharedMatrix &H_ao,
-                    const vector<SharedMatrix> &Dipole_ao);
+    LoscLocalizerV2(const shared_ptr<Matrix> &C_lo_basis,
+                    const shared_ptr<Matrix> &H_ao,
+                    const vector<shared_ptr<Matrix>> &Dipole_ao);
 
     /**
      * @param [in] tol: Jacobi-sweep algorithm convergence tolerance.
@@ -229,10 +227,10 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @brief Compute the LO coefficient matrix under AO for Losc localization
      * version 2.
      *
-     * @return SharedMatrix: the LO coefficient matrix under AO.
+     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO.
      * @see LocalizerBase::compute()
      */
-    SharedMatrix compute() override;
+    shared_ptr<Matrix> compute() override;
 };
 
 } // namespace losc

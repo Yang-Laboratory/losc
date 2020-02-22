@@ -1,20 +1,21 @@
+#include <Eigen/Eigenvalues>
 #include <cmath>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <matrix/matrix.h>
 #include <memory>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
-#include <losc/correction.h>
+#include "matrix_io.h"
+#include <losc/losc.h>
 
-using matrix::Matrix;
+using losc::Matrix;
 using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using SharedMatrix = std::shared_ptr<Matrix>;
+using shared_ptr<Matrix> = std::shared_ptr<Matrix>;
 
 /**
  * Get Losc total energy correction from a txt file.
@@ -53,11 +54,15 @@ TEST_P(CorrectionTest, losc_Hamiltonian_correction)
     string K_path = dir_path + "/./data/" + mol + "/kappa.txt";
     string L_path = dir_path + "/./data/" + mol + "/localocc.txt";
     string H_losc_path = dir_path + "/./data/" + mol + "/losc_H_corr.txt";
-    auto S = matrix::read_matrices_from_txt(S_path);
-    auto C_lo = matrix::read_matrices_from_txt(C_lo_path);
-    auto K = matrix::read_matrices_from_txt(K_path);
-    auto L = matrix::read_matrices_from_txt(L_path);
-    auto H_losc_ref = matrix::read_matrices_from_txt(H_losc_path);
+    auto S = test::read_matrices_from_txt(S_path);
+    auto C_lo = test::read_matrices_from_txt(C_lo_path);
+    auto K = test::read_matrices_from_txt(K_path);
+    auto L = test::read_matrices_from_txt(L_path);
+    auto H_losc_ref = test::read_matrices_from_txt(H_losc_path);
+
+    for (int is = 0; is < 2; is++) {
+        (*C_lo[is]).transposeInPlace();
+    }
 
     for (int is = 0; is < 2; is++) {
         // Do calculation.
@@ -67,7 +72,7 @@ TEST_P(CorrectionTest, losc_Hamiltonian_correction)
         // Testing.
         // True condition is the calculated Losc H matrix matches the reference
         // to the 8-th digit.
-        bool status = H_losc_calc->is_equal_to(*H_losc_ref[is], 1e-8);
+        bool status = H_losc_calc->is_cwise_equal(*H_losc_ref[is], 1e-8);
         if (!status) {
             std::cout << "Mol: " << mol << std::endl;
             std::cout << "data dir path: " << dir_path << std::endl;
@@ -88,8 +93,8 @@ TEST_P(CorrectionTest, losc_energy_correction)
     string K_path = dir_path + "/./data/" + mol + "/kappa.txt";
     string L_path = dir_path + "/./data/" + mol + "/localocc.txt";
     string E_path = dir_path + "/./data/" + mol + "/energy.txt";
-    auto K = matrix::read_matrices_from_txt(K_path);
-    auto L = matrix::read_matrices_from_txt(L_path);
+    auto K = test::read_matrices_from_txt(K_path);
+    auto L = test::read_matrices_from_txt(L_path);
     auto E_ref = get_losc_E_correction(E_path);
 
     // Do calculation.
@@ -101,7 +106,7 @@ TEST_P(CorrectionTest, losc_energy_correction)
     // Testing.
     // True condition is the calculated total energy correction matches the
     // reference to the 8-th digit.
-    bool status = std::fabs(E_calc - E_ref) < 1e-8;
+    bool status = std::abs(E_calc - E_ref) < 1e-8;
     EXPECT_TRUE(status);
     if (!status) {
         std::cout << "Calculated total energy correction: " << E_calc
@@ -122,14 +127,16 @@ TEST_P(CorrectionTest, losc_orbE_correction)
     string K_path = dir_path + "/./data/" + mol + "/kappa.txt";
     string L_path = dir_path + "/./data/" + mol + "/localocc.txt";
     string eig_path = dir_path + "/./data/" + mol + "/losc_eig_direct.txt";
-    auto S = matrix::read_matrices_from_txt(S_path);
-    auto C_co = matrix::read_matrices_from_txt(C_co_path);
-    auto C_lo = matrix::read_matrices_from_txt(C_lo_path);
-    auto K = matrix::read_matrices_from_txt(K_path);
-    auto L = matrix::read_matrices_from_txt(L_path);
-    auto eig_ref = matrix::read_matrices_from_txt(eig_path);
+    auto S = test::read_matrices_from_txt(S_path);
+    auto C_co = test::read_matrices_from_txt(C_co_path);
+    auto C_lo = test::read_matrices_from_txt(C_lo_path);
+    auto K = test::read_matrices_from_txt(K_path);
+    auto L = test::read_matrices_from_txt(L_path);
+    auto eig_ref = test::read_matrices_from_txt(eig_path);
 
     for (int is = 0; is < 2; is++) {
+        (*C_co[is]).transposeInPlace();
+        (*C_lo[is]).transposeInPlace();
         // Do calculation.
         auto eig_calc = losc::losc_orbital_energy_correction(
             *S[0], *C_co[is], *C_lo[is], *K[is], *L[is]);
@@ -138,8 +145,12 @@ TEST_P(CorrectionTest, losc_orbE_correction)
         // Returned is vector<double>, transfer it into matrix to compare.
         // True condition is that the calculated eigenvalue matches to 8-th
         // digit.
-        Matrix eig_calc_M(1, eig_calc.size(), eig_calc);
-        bool status = eig_calc_M.is_equal_to(*eig_ref[is], 1e-8);
+        Matrix eig_calc_M(1, eig_calc.size());
+        eig_calc_M.setZero();
+        for (size_t i = 0; i < eig_calc.size(); ++i) {
+            eig_calc_M(0, i) = eig_calc[i];
+        }
+        bool status = eig_calc_M.is_cwise_equal(*eig_ref[is], 1e-8);
         EXPECT_TRUE(status);
         if (!status) {
             std::cout << "Calculated eig diag:\n";
@@ -159,12 +170,13 @@ TEST_P(CorrectionTest, losc_orbE_projection)
     string H_losc_path = dir_path + "/./data/" + mol + "/losc_H_corr.txt";
     string C_co_path = dir_path + "/./data/" + mol + "/lo_basis.txt";
     string eig_path = dir_path + "/./data/" + mol + "/losc_eig_proj.txt";
-    auto H_dfa = matrix::read_matrices_from_txt(H_dfa_path);
-    auto H_losc = matrix::read_matrices_from_txt(H_losc_path);
-    auto C_co = matrix::read_matrices_from_txt(C_co_path);
-    auto eig_ref = matrix::read_matrices_from_txt(eig_path);
+    auto H_dfa = test::read_matrices_from_txt(H_dfa_path);
+    auto H_losc = test::read_matrices_from_txt(H_losc_path);
+    auto C_co = test::read_matrices_from_txt(C_co_path);
+    auto eig_ref = test::read_matrices_from_txt(eig_path);
 
     for (int is = 0; is < 2; is++) {
+        (*C_co[is]).transposeInPlace();
         // Do calculation.
         auto eig_calc = losc::losc_corrected_orbital_energy_by_projection(
             *H_dfa[is], *H_losc[is], *C_co[is]);
@@ -173,8 +185,12 @@ TEST_P(CorrectionTest, losc_orbE_projection)
         // Return is vector<double>, transfer it into matrix to compare.
         // True condition is that the calculated eigenvalue matches to 8-th
         // digit.
-        Matrix eig_calc_M(1, eig_calc.size(), eig_calc);
-        bool status = eig_calc_M.is_equal_to(*eig_ref[is], 1e-8);
+        Matrix eig_calc_M(1, eig_calc.size());
+        eig_calc_M.setZero();
+        for (size_t i = 0; i < eig_calc.size(); ++i) {
+            eig_calc_M(0, i) = eig_calc[i];
+        }
+        bool status = eig_calc_M.is_cwise_equal(*eig_ref[is], 1e-8);
         EXPECT_TRUE(status);
         if (!status) {
             std::cout << "Calculated eig diag:\n";
@@ -194,19 +210,17 @@ TEST_P(CorrectionTest, losc_orbE_diagonalization)
     string H_losc_path = dir_path + "/./data/" + mol + "/losc_H_corr.txt";
     string S_path = dir_path + "/./data/" + mol + "/ao_overlap.txt";
     string eig_path = dir_path + "/./data/" + mol + "/losc_eig_diag.txt";
-    auto H_dfa = matrix::read_matrices_from_txt(H_dfa_path);
-    auto H_losc = matrix::read_matrices_from_txt(H_losc_path);
-    auto S = matrix::read_matrices_from_txt(S_path);
-    auto eig_ref = matrix::read_matrices_from_txt(eig_path);
+    auto H_dfa = test::read_matrices_from_txt(H_dfa_path);
+    auto H_losc = test::read_matrices_from_txt(H_losc_path);
+    auto S = test::read_matrices_from_txt(S_path);
+    auto eig_ref = test::read_matrices_from_txt(eig_path);
     // calculate S^(-1/2);
-    vector<double> S_eig(S[0]->row());
-    Matrix Shalf(S_eig.size(), S_eig.size());
-    Matrix S_eigV(S_eig.size(), S_eig.size());
-    matrix::diagonalize_sym_matrix_dsyev("L", *S[0], S_eig);
-    for (size_t i = 0; i < S_eig.size(); ++i) {
-        S_eigV(i, i) = 1.0 / std::sqrt(S_eig[i]);
-    }
-    matrix::mult_dgemm_ATBA(*S[0], S_eigV, Shalf);
+    const size_t nbasis = S[0]->rows();
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eig_solver(*S[0]);
+    Matrix D =
+        eig_solver.eigenvalues().array().sqrt().inverse().matrix().asDiagonal();
+    Matrix V = eig_solver.eigenvectors();
+    Matrix Shalf = V * D * V.transpose();
 
     for (int is = 0; is < 2; is++) {
         // Do calculation.
@@ -217,8 +231,12 @@ TEST_P(CorrectionTest, losc_orbE_diagonalization)
         // Return is vector<double>, transfer it into matrix to compare.
         // True condition is that the calculated eigenvalue matches to 8-th
         // digit.
-        Matrix eig_calc_M(1, eig_calc.size(), eig_calc);
-        bool status = eig_calc_M.is_equal_to(*eig_ref[is], 1e-8);
+        Matrix eig_calc_M(1, eig_calc.size());
+        eig_calc_M.setZero();
+        for (size_t i = 0; i < eig_calc.size(); ++i) {
+            eig_calc_M(0, i) = eig_calc[i];
+        }
+        bool status = eig_calc_M.is_cwise_equal(*eig_ref[is], 1e-8);
         EXPECT_TRUE(status);
         if (!status) {
             std::cout << "Calculated eig diag:\n";
