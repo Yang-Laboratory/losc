@@ -44,16 +44,16 @@ class CurvatureBase {
      * @brief LO coefficient matrix under AO.
      * @details Dimension: [nbasis, nlo]
      *
-     * @par Availability
      * This matrix can be obtained from the losc::LocalizerBase::compute() or
      * any functions overwrite it from the derived localizer class.
+     *
      * @see losc::LoscLocalizerV2::compute()
      */
     shared_ptr<Matrix> C_lo_;
 
     /**
      * @brief The three-body integral <p|ii> matrix used in density fitting.
-     * @details p is for fitbasis index and i is for LO index.
+     * @details `p` is fitbasis index and `i` is LO index.
      *
      * <p|ii> matrix has dimension of [nfitbasis, nlo].
      * The integral is defined as
@@ -63,18 +63,22 @@ class CurvatureBase {
      *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
      * \f]
      *
-     * @see losc::utils::convert_df_pmn2pii_blockwise().
+     * @par Availability
+     * You have to construct the matrix by yourself. See
+     * losc::utils::convert_df_pmn2pii_blockwise() for help.
      */
     shared_ptr<Matrix> df_pii_;
 
     /**
      * @brief Inverse of Vpq matrix used in density fitting.
      * @details
-     * Dimension: [nfitbasis, nfitbasis]. Symmetric matrix.
+     * Dimension: [nfitbasis, nfitbasis].
      *
-     * Element \f$Vpq\f$ is defined as
-     * \f$\langle \phi_p| \frac{1}{\rm{r}_{12}} |\phi_q \rangle\f$
-     * where p and q are the fitbasis index.
+     * `p` and `q` are the fitbasis index.
+     * \f$Vpq\f$ element is defined as
+     * \f[
+     * \langle \phi_p| \frac{1}{\rm{r}_{12}} |\phi_q \rangle
+     * \f]
      *
      * @par Availability
      * You have to construct the matrix by yourself. To set each element,
@@ -129,16 +133,17 @@ class CurvatureBase {
     /**
      * @brief Curvature base class constructor.
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO. See
-     * CurvatureBase::C_lo_.
-     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
-     * See CurvatureBase::df_pii_.
+     * @param [in] C_lo: LO coefficient matrix under AO with dimension
+     * [nbasis, nlo]. See CurvatureBase::C_lo_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
+     * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
-     * fitting. See CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid. See
-     * CurvatureBase::grid_basis_value_.
+     * fitting with dimension [nfitbasis, nfitbasis]. See
+     * CurvatureBase::df_Vpq_inverse_.
+     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
+     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
-     * grid. See CurvatureBase::grid_weight_.
+     * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
     CurvatureBase(DFAType dfa, const shared_ptr<Matrix> &C_lo,
                   const shared_ptr<Matrix> &df_pii,
@@ -148,7 +153,8 @@ class CurvatureBase {
 
     /**
      * @brief Compute the Losc curvature matrix.
-     * @return shared_ptr<Matrix>: the Losc curvature matrix.
+     * @return shared_ptr<Matrix>: the Losc curvature matrix with dimension
+     * [nlo, nlo].
      */
     virtual shared_ptr<Matrix> compute() = 0;
 };
@@ -184,16 +190,17 @@ class CurvatureV1 : public CurvatureBase {
      * @details See CurvatureV1::compute() for more details of curvature version
      * 1 matrix.
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO. See
-     * CurvatureBase::C_lo_.
-     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
-     * See CurvatureBase::df_pii_.
+     * @param [in] C_lo: LO coefficient matrix under AO with dimension
+     * [nbasis, nlo]. See CurvatureBase::C_lo_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
+     * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
-     * fitting. See CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid. See
-     * CurvatureBase::grid_basis_value_.
+     * fitting with dimension [nfitbasis, nfitbasis]. See
+     * CurvatureBase::df_Vpq_inverse_.
+     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
+     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
-     * grid. See CurvatureBase::grid_weight_.
+     * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
     CurvatureV1(DFAType dfa, const shared_ptr<Matrix> &C_lo,
                 const shared_ptr<Matrix> &df_pii,
@@ -218,7 +225,8 @@ class CurvatureV1 : public CurvatureBase {
      * \f]
      * where \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return shared_ptr<Matrix>: The Losc curvature version 1 matrix.
+     * @return shared_ptr<Matrix>: The Losc curvature version 1 matrix with
+     * dimension [nlo, nlo].
      * @see The original Losc paper (https://doi.org/10.1093/nsr/nwx11)
      */
     virtual shared_ptr<Matrix> compute() override;
@@ -254,16 +262,17 @@ class CurvatureV2 : public CurvatureBase {
     /**
      * @brief Class constructor for curvature version 2.
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO. See
-     * CurvatureBase::C_lo_.
-     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
-     * See CurvatureBase::df_pii_.
+     * @param [in] C_lo: LO coefficient matrix under AO with dimension
+     * [nbasis, nlo]. See CurvatureBase::C_lo_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
+     * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
-     * fitting. See CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid. See
-     * CurvatureBase::grid_basis_value_.
+     * fitting with dimension [nfitbasis, nfitbasis]. See
+     * CurvatureBase::df_Vpq_inverse_.
+     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
+     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
-     * grid. See CurvatureBase::grid_weight_.
+     * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
     CurvatureV2(DFAType dfa, const shared_ptr<Matrix> &C_lo,
                 const shared_ptr<Matrix> &df_pii,
@@ -282,20 +291,25 @@ class CurvatureV2 : public CurvatureBase {
      *
      * Curvature version 2 matrix is defined as
      * \f[
-     * \kappa^2_{ij} = \mbox{erf}(\zeta S_{ij}) \sqrt{\kappa^1_{i, i}
-     * \kappa^1_{j, j}} + \mbox{erfc}(\zeta S_{ij}) \kappa^1_{i, j},
+     * \kappa^2_{ij} = \mbox{erf}(\zeta S_{ij}) \sqrt{|\kappa^1_{i, i}
+     * \kappa^1_{j, j}|} + \mbox{erfc}(\zeta S_{ij}) \kappa^1_{i, j},
      * \f]
      * where \f$\kappa^1\f$ is the Losc curvature version 1 matrix,
      * \f$\kappa^2\f$ is the Losc curvature version 2 matrix,
-     * \f$ S_{ij} = \int \sqrt{|\rho_i(\rm{r}) \rho_j(\rm{r})|}
+     * \f$ S_{ij} = \int \sqrt{\rho_i(\rm{r}) \rho_j(\rm{r})}
      * \mbox{d}\rm{r}\f$, and \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return shared_ptr<Matrix>: the Losc curvature version 2 matrix.
+     * @return shared_ptr<Matrix>: the Losc curvature version 2 matrix with
+     * dimension [nlo, nlo].
      * @see The Losc2 paper (xxx) for more details.
      */
     virtual shared_ptr<Matrix> compute() override;
 };
 
+/**
+ * @brief Losc library utils namespace.
+ * @details Collection of helper functions and so on.
+ */
 namespace utils {
 
 /**
@@ -307,8 +321,8 @@ namespace utils {
  * p, q: fitbasis index.\n
  * m, n: AO basis index.\n
  *
- * <p|mn> matrix has dimension of [nfitbasis, nbasis * (nbasis + 1) / 2].
- * <p|mn> integral is associated with on fitbasis and two AO basis, and it
+ * The <p|mn> matrix has dimension of [nfitbasis, nbasis * (nbasis + 1) / 2].
+ * The <p|mn> integral is associated with one fitbasis and two AO basis. It
  * is defined as
  * \f[
  * \langle \phi_p | \phi_m \phi_n \rangle
@@ -316,8 +330,8 @@ namespace utils {
  *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
  * \f]
  *
- * <p|ii> matrix has dimension of [nfitbasis, nlo].
- * <p|ii> integral is associated with on fitbasis and one LO, and it
+ * The <p|ii> matrix has dimension of [nfitbasis, nlo].
+ * The <p|ii> integral is associated with one fitbasis and one LO, and it
  * is defined as
  * \f[
  * \langle \phi_p | \phi_i \phi_i \rangle
@@ -325,7 +339,7 @@ namespace utils {
  *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
  * \f]
  *
- * This function convert a block (block of fitbasis indices) <p|mn> matrix
+ * This function convert a block (block of fitbasis indices) of <p|mn> matrix
  * into <p|ii> matrix. The format of <p|mn> block is required and illustrated as
  * the following code.
  * @code
@@ -339,9 +353,6 @@ namespace utils {
  * }
  * @endcode
  *
- * @note To build the whole <p|ii> matrix, you need to traverse all the <p|mn>
- * blocks.
-
  * @param [in] p_index: the corresponding fitbasis index in `df_pmn_block`.
  * For example, the i-th row in `df_pmn_block` matrix coresponding to
  * `p_index[i]`-th fitbasis.
@@ -349,6 +360,9 @@ namespace utils {
  * @param [in] C_lo: LO coefficient matrix under AO. See losc::LocalizerBase().
  * @param [in, out] df_pii: density fitting <p|ii> matrix. On exit, the rows
  * whose index store in `p_index` vector are updated.
+ *
+ * @note To build the whole <p|ii> matrix, you need to traverse all the <p|mn>
+ * blocks.
  */
 void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
                                   const Matrix &df_pmn_block,

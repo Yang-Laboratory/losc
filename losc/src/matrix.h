@@ -21,7 +21,7 @@ using std::string;
  *
  * @note Since it is inherited from Eigen::MatrixXd, there is not choice to
  * set the matrix storage-order. Eigen::MatrixXd use the default column-major
- * order, so the losc::Matrix. Keep this is mind!
+ * order, so the losc::Matrix. Keep this in mind!
  */
 class Matrix : public MatrixXd {
   public:
@@ -76,7 +76,8 @@ class Matrix : public MatrixXd {
 
     /**
      * @brief Check if or not the matrix is numerically equal to the other
-     * matrix by element-wise comparision. Default `threshold = 1e-10`.
+     * matrix by element-wise (coefficient-wise) comparision.
+     * Default `threshold = 1e-10`.
      *
      * @param [in] other: The other matrix to be compared with.
      * @return bool
@@ -126,7 +127,6 @@ class Matrix : public MatrixXd {
      * the randomness behavior is repeatable at running time.
      */
     void randomize_seed_fixed(double a, double b);
-
 };
 
 } // namespace losc

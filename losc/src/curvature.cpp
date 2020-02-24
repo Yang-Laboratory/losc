@@ -61,7 +61,7 @@ namespace utils {
 
 /**
  * @note This function will not track if the matrix `df_pii` is fully filled.
- * The user should be carefully loop over each block of `df_pmn_block`.
+ * The user should be carefully traverse all the blocks of `df_pmn_block`.
  */
 void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
                                   const Matrix &df_pmn_block,

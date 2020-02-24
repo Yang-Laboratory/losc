@@ -39,7 +39,12 @@ class LocalizerBase {
     /**
      * @brief The unitary matrix that transfer LO basis coefficient matrix into
      * LO coefficient matrix.
-     * @details Dimension: [nlo, nlo]. Relation: C_lo = C_lo_basis * U
+     * @details Dimension: [nlo, nlo].
+     * The relation between the LO \f$\psi\f$ and LO basis \f$\phi\f$ via the U
+     * matrix is the following,
+     * \f[
+     * \psi_i = \sum_j U_{ij} \phi_j.
+     * \f]
      */
     shared_ptr<Matrix> U_;
 
@@ -64,10 +69,10 @@ class LocalizerBase {
   public:
     /**
      * @brief LocalizerBase class constructor
-     * @details After creation, the matrix (LocalizerBase::U_) will be
+     * @details After creation, the LocalizerBase::U_ matrix will be
      * intialized as an identity matrix.
-     * @param [in] C_lo_basis: LO basis coefficient matrix under Ao. See
-     * LocalizerBase::C_lo_basis_.
+     * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
+     * dimension [nbasis, nlo]. See LocalizerBase::C_lo_basis_.
      */
     LocalizerBase(const shared_ptr<Matrix> &C_lo_basis)
         : nlo_{C_lo_basis->cols()}, nbasis_{C_lo_basis->rows()},
@@ -83,12 +88,13 @@ class LocalizerBase {
     }
 
     /**
-     * @return shared_ptr<Matrix>: the U matrix.
+     * @return shared_ptr<Matrix>: the U matrix. See losc::LocalizerBase::U_.
      */
     shared_ptr<Matrix> get_u() { return U_; }
 
     /**
-     * @return shared_ptr<const Matrix>: the U matrix.
+     * @return shared_ptr<const Matrix>: the U matrix. See
+     * losc::localizerBase::U_.
      */
     shared_ptr<const Matrix> get_u() const { return U_; }
 
@@ -127,14 +133,14 @@ class LocalizerBase {
      * be used as the initial guess. After calling this function,
      * LocalizerBase::U_ matrix is updated.
      *
-     * LO coefficient matrix dimension: [nbasis, nlo]
+     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO with
+     * dimension [nbasis, nlo].
      *
-     * Relation between LO and AO via the LO coefficient matrix \f$C\f$ is
+     * The returned LO coefficient matrix \f$C\f$ relates the LO \f$\psi\f$
+     * and AO \f$\phi\f$ via the following,
      * \f[
-     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
+     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu}.
      * \f]
-     *
-     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO.
      */
     virtual shared_ptr<Matrix> compute() = 0;
 };
@@ -193,8 +199,8 @@ class LoscLocalizerV2 : public LocalizerBase {
 
   public:
     /**
-     * @param [in] C_lo_basis: LO basis coefficient matrix under AO. See
-     * LoscLocalizerV2::C_lo_basis_.
+     * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
+     * dimension [nbasis, nlo]. See LoscLocalizerV2::C_lo_basis_.
      * @param [in] H_ao: Hamiltonian matrix under AO used in localization with
      * dimension [nbasis, nbasis].
      * @param [in] Dipole_ao: dipole matrix under AO in x, y and z order with
@@ -227,7 +233,8 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @brief Compute the LO coefficient matrix under AO for Losc localization
      * version 2.
      *
-     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO.
+     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO with
+     * dimension [nbasis, nlo].
      * @see LocalizerBase::compute()
      */
     shared_ptr<Matrix> compute() override;

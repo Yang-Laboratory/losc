@@ -75,7 +75,8 @@ double losc_total_energy_correction(const Matrix &Curvature,
  * see losc::CurvatureBase::compute().
  * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
  * see losc::local_occupation_matrix().
- * @return std::vector<double>: the Losc correction to orbital energy.
+ * @return std::vector<double>: the Losc correction to orbital energy. Resulted
+ * vector size is `nlo`.
  *
  * @note Make sure all the input matrices have the same spin. The returned
  * orbital energy correction is only for input spin.
@@ -84,8 +85,10 @@ double losc_total_energy_correction(const Matrix &Curvature,
  * longer be a square matrix. In this case, you need to slice the original
  * squared CO coefficient matrix, and make sure the used \p C_co matrix
  * corresponds to all the COs you used in the localization process.
- * @note The size of returned vector is the number of the LOs. The order of the
- * correction is aligned to the COs' order in `C_co` matrix.
+ * @note The resulted vector is just the Losc correction to orbital energy.
+ * To get Losc corrected orbital energies, add it to the corresponding orbital
+ * energy from DFA. The order of the correction is aligned to the COs' order
+ * in `C_co` matrix.
  */
 vector<double> losc_orbital_energy_correction(const Matrix &S,
                                               const Matrix &C_co,
@@ -103,7 +106,7 @@ vector<double> losc_orbital_energy_correction(const Matrix &S,
  * @param [in] C_co: CO coefficient matrix under AO basis with dimension
  * [nbasis, n].
  * @return std::vector<double>: the Losc corrected orbital energies for the `n`
- * COs.
+ * COs. Resulted vector size is `n`.
  *
  * @note Make sure all the input matrices have the same spin. The returned
  * orbital corrections is only for the input spin.
@@ -123,10 +126,9 @@ vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa,
  * @param [in] H_dfa: DFA Hamiltonian under AO with dimension [nbasis, nbasis].
  * @param [in] H_losc: Losc correcting Hamiltonian under AO with dimension
  * [nbasis, nbasis]. See losc::losc_hamiltonian_correction().
- * @param [in] S_neg_half: AO overlap matrix to the power of (-1/2), that is
- * S^(-1/2).
+ * @param [in] S_neg_half: AO overlap matrix to the power of (-1/2).
  * @return std::vector<double>: the Losc corrected orbital energies for the all
- * the COs.
+ * the COs. Resulted vector size is `nbasis`.
  *
  * @note Make sure all the input matrices have the same spin. The return orbital
  * corrections are only for the input spin.
