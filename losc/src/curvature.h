@@ -52,33 +52,20 @@ class CurvatureBase {
     shared_ptr<Matrix> C_lo_;
 
     /**
-     * @brief Three-body integral of <p|mn> matrix used in density fitting.
-     * @details
-     * Dimension: [nfitbasis, nbasis * (nbasis + 1) / 2]
+     * @brief The three-body integral <p|ii> matrix used in density fitting.
+     * @details p is for fitbasis index and i is for LO index.
      *
-     * <p|mn> integral is defined as
+     * <p|ii> matrix has dimension of [nfitbasis, nlo].
+     * The integral is defined as
      * \f[
-     * \langle \phi_p | \phi_m \phi_n \rangle
-     * = \int \frac{\phi_p(\rm{r}) \phi_m(\rm{r'}) \phi_n(\rm{r'})}{|\rm{r}
+     * \langle \phi_p | \phi_i \phi_i \rangle
+     * = \int \frac{\phi_p(\rm{r}) \phi_i(\rm{r'}) \phi_i(\rm{r'})}{|\rm{r}
      *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
      * \f]
-     * where index p is for the fibbasis and m, n are for AO basis.
      *
-     * @par Availability
-     * You have to construct the matrix by yourself. To set each element,
-     * you can do as the following,
-     * @code
-     * for (size_t p = 0; p < nfitbasis; ++p) {
-     *     for (size_t m = 0; m < nbasis; ++m) {
-     *         for (size_t n = 0; n <= m; ++n) {
-     *             // set each element <p|mn> as zero.
-     *             (*C_lo_)(p, m * (m + 1)/2 + n) = 0;
-     *         }
-     *     }
-     * }
-     * @endcode
+     * @see losc::utils::convert_df_pmn2pii_blockwise().
      */
-    shared_ptr<Matrix> df_pmn_;
+    shared_ptr<Matrix> df_pii_;
 
     /**
      * @brief Inverse of Vpq matrix used in density fitting.
@@ -144,8 +131,8 @@ class CurvatureBase {
      * @param [in] dfa: Type of DFA.
      * @param [in] C_lo: LO coefficient matrix under AO. See
      * CurvatureBase::C_lo_.
-     * @param [in] df_pmn: Three-body integral <p|mn> used in density fitting.
-     * See CurvatureBase::df_pmn_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
+     * See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting. See CurvatureBase::df_Vpq_inverse_.
      * @param [in] grid_basis_value: Value of AO basis on grid. See
@@ -154,7 +141,7 @@ class CurvatureBase {
      * grid. See CurvatureBase::grid_weight_.
      */
     CurvatureBase(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                  const shared_ptr<Matrix> &df_pmn,
+                  const shared_ptr<Matrix> &df_pii,
                   const shared_ptr<Matrix> &df_Vpq_inverse,
                   const shared_ptr<Matrix> &grid_basis_value,
                   const shared_ptr<vector<double>> &grid_weight);
@@ -199,8 +186,8 @@ class CurvatureV1 : public CurvatureBase {
      * @param [in] dfa: Type of DFA.
      * @param [in] C_lo: LO coefficient matrix under AO. See
      * CurvatureBase::C_lo_.
-     * @param [in] df_pmn: Three-body integral <p|mn> used in density fitting.
-     * See CurvatureBase::df_pmn_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
+     * See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting. See CurvatureBase::df_Vpq_inverse_.
      * @param [in] grid_basis_value: Value of AO basis on grid. See
@@ -209,11 +196,11 @@ class CurvatureV1 : public CurvatureBase {
      * grid. See CurvatureBase::grid_weight_.
      */
     CurvatureV1(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                const shared_ptr<Matrix> &df_pmn,
+                const shared_ptr<Matrix> &df_pii,
                 const shared_ptr<Matrix> &df_Vpq_inverse,
                 const shared_ptr<Matrix> &grid_basis_value,
                 const shared_ptr<vector<double>> &grid_weight)
-        : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value,
+        : CurvatureBase(dfa, C_lo, df_pii, df_Vpq_inverse, grid_basis_value,
                         grid_weight)
     {
     }
@@ -269,8 +256,8 @@ class CurvatureV2 : public CurvatureBase {
      * @param [in] dfa: Type of DFA.
      * @param [in] C_lo: LO coefficient matrix under AO. See
      * CurvatureBase::C_lo_.
-     * @param [in] df_pmn: Three-body integral <p|mn> used in density fitting.
-     * See CurvatureBase::df_pmn_.
+     * @param [in] df_pii: Three-body integral <p|ii> used in density fitting.
+     * See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting. See CurvatureBase::df_Vpq_inverse_.
      * @param [in] grid_basis_value: Value of AO basis on grid. See
@@ -279,11 +266,11 @@ class CurvatureV2 : public CurvatureBase {
      * grid. See CurvatureBase::grid_weight_.
      */
     CurvatureV2(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                const shared_ptr<Matrix> &df_pmn,
+                const shared_ptr<Matrix> &df_pii,
                 const shared_ptr<Matrix> &df_Vpq_inverse,
                 const shared_ptr<Matrix> &grid_basis_value,
                 const shared_ptr<vector<double>> &grid_weight)
-        : CurvatureBase(dfa, C_lo, df_pmn, df_Vpq_inverse, grid_basis_value,
+        : CurvatureBase(dfa, C_lo, df_pii, df_Vpq_inverse, grid_basis_value,
                         grid_weight)
     {
     }
@@ -308,6 +295,66 @@ class CurvatureV2 : public CurvatureBase {
      */
     virtual shared_ptr<Matrix> compute() override;
 };
+
+namespace utils {
+
+/**
+ * @brief Convert density fitting matrix three-body integral <p|mn> into <p|ii>
+ * matrix block by block.
+ *
+ * @details
+ * i, j: LO index.\n
+ * p, q: fitbasis index.\n
+ * m, n: AO basis index.\n
+ *
+ * <p|mn> matrix has dimension of [nfitbasis, nbasis * (nbasis + 1) / 2].
+ * <p|mn> integral is associated with on fitbasis and two AO basis, and it
+ * is defined as
+ * \f[
+ * \langle \phi_p | \phi_m \phi_n \rangle
+ * = \int \frac{\phi_p(\rm{r}) \phi_m(\rm{r'}) \phi_n(\rm{r'})}{|\rm{r}
+ *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
+ * \f]
+ *
+ * <p|ii> matrix has dimension of [nfitbasis, nlo].
+ * <p|ii> integral is associated with on fitbasis and one LO, and it
+ * is defined as
+ * \f[
+ * \langle \phi_p | \phi_i \phi_i \rangle
+ * = \int \frac{\phi_p(\rm{r}) \phi_i(\rm{r'}) \phi_i(\rm{r'})}{|\rm{r}
+ *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
+ * \f]
+ *
+ * This function convert a block (block of fitbasis indices) <p|mn> matrix
+ * into <p|ii> matrix. The format of <p|mn> block is required and illustrated as
+ * the following code.
+ * @code
+ * for (size_t p = 0; p < block_size; ++p) {
+ *     for (size_t m = 0; m < nbasis; ++m) {
+ *         for (size_t n = 0; n <= m; ++n) {
+ *             // set each element <p|mn> in the block as zero.
+ *             df_pmn_block(p, m * (m + 1)/2 + n) = 0;
+ *         }
+ *     }
+ * }
+ * @endcode
+ *
+ * @note To build the whole <p|ii> matrix, you need to traverse all the <p|mn>
+ * blocks.
+
+ * @param [in] p_index: the corresponding fitbasis index in `df_pmn_block`.
+ * For example, the i-th row in `df_pmn_block` matrix coresponding to
+ * `p_index[i]`-th fitbasis.
+ * @param [in] df_pmn_block: density fitting <p|mn> matrix block.
+ * @param [in] C_lo: LO coefficient matrix under AO. See losc::LocalizerBase().
+ * @param [in, out] df_pii: density fitting <p|ii> matrix. On exit, the rows
+ * whose index store in `p_index` vector are updated.
+ */
+void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
+                                  const Matrix &df_pmn_block,
+                                  const Matrix &C_lo, Matrix &df_pii);
+
+} // namespace utils
 
 } // namespace losc
 

@@ -60,7 +60,7 @@ shared_ptr<Matrix> CurvatureV2::compute()
     p_S_lo->to_symmetric("L");
 
     // build the curvature version 1.
-    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pmn_, df_Vpq_inverse_,
+    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pii_, df_Vpq_inverse_,
                            grid_basis_value_, grid_weight_);
     auto p_kappa1 = kappa1_man.compute();
 

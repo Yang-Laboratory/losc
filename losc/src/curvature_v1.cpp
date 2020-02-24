@@ -14,44 +14,11 @@ namespace losc {
 
 shared_ptr<Matrix> CurvatureV1::compute_kappa_J()
 {
-    // i, j: LO index.
-    // p, q: fitbasis index.
-    // m, n: AO basis index.
-
-    // (p|ii): [nfitbasis, nlo].
-    Matrix df_pii(nfitbasis_, nlo_);
-    const Matrix &C_lo = *C_lo_;
-    const Matrix &df_pmn = *df_pmn_;
-    for (size_t p = 0; p < nfitbasis_; ++p) {
-        // For each p0 (p0|mn), the (m, n) block has dimension:
-        // [nbasis x nbasis].
-        Matrix df_pmn_p0_mn(nbasis_, nbasis_);
-        for (size_t m = 0; m < nbasis_; ++m) {
-            for (size_t n = 0; n <= m; ++n) {
-                const size_t mn = m * (m + 1) / 2 + n;
-                df_pmn_p0_mn(m, n) = df_pmn(p, mn);
-            }
-        }
-        df_pmn_p0_mn.to_symmetric("L");
-
-        // For each p0 (p0|in), the (i, n) block dimension:
-        // [nlo x nbasis].
-        // Formula: (p0|in) = C_lo^T * (p|mn).
-        Matrix df_pmn_p0_in(nlo_, nbasis_);
-        df_pmn_p0_in.noalias() = C_lo.transpose() * df_pmn_p0_mn;
-
-        // calculate element (p|ii)
-        for (size_t i = 0; i < nlo_; ++i) {
-            df_pii(p, i) = df_pmn_p0_in.row(i).dot(C_lo.col(i));
-        }
-    }
-
     // kappa_J_ij = \sum_{pq} (\rho_i | p) V^{-1}_{pq} (q | \rho_j)
     // kappa_J = df_pii^T * V^{-1} * df_pii.
     auto kappa_J = std::make_shared<Matrix>(nlo_, nlo_);
-    const Matrix &df_Vpq_inverse = *df_Vpq_inverse_;
-    (*kappa_J).noalias() = df_pii.transpose() * df_Vpq_inverse * df_pii;
-
+    (*kappa_J).noalias() =
+        (*df_pii_).transpose() * (*df_Vpq_inverse_) * (*df_pii_);
     return kappa_J;
 }
 
