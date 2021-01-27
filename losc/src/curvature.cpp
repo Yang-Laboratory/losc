@@ -3,57 +3,43 @@
  * @brief definition relates to Losc curvature.
  */
 #include "curvature.h"
-
+#include "eigen_helper.h"
 #include "exception.h"
-#include "matrix.h"
 
 namespace losc {
 
 using exception::DimensionError;
 
-CurvatureBase::CurvatureBase(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                             const shared_ptr<Matrix> &df_pii,
-                             const shared_ptr<Matrix> &df_Vpq_inverse,
-                             const shared_ptr<Matrix> &grid_basis_value,
-                             const shared_ptr<vector<double>> &grid_weight)
-    : dfa_type_{dfa}, npts_{grid_weight->size()}, nlo_{C_lo->cols()},
-      nbasis_{C_lo->rows()}, nfitbasis_{df_pii->rows()}, C_lo_{C_lo},
+CurvatureBase::CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &C_lo,
+                             ConstRefMat &df_pii, ConstRefMat &df_Vpq_inverse,
+                             ConstRefMat &grid_basis_value,
+                             ConstRefVec &grid_weight)
+    : npts_{grid_weight.size()}, nlo_{C_lo.cols()}, nbasis_{C_lo.rows()},
+      nfitbasis_{df_pii.rows()}, dfa_info_{dfa_info}, C_lo_{C_lo},
       df_pii_{df_pii}, df_Vpq_inverse_{df_Vpq_inverse},
       grid_basis_value_{grid_basis_value}, grid_weight_{grid_weight}
 {
-    if (df_pii_->cols() != nlo_) {
-        throw DimensionError(*df_pii_, nfitbasis_, nlo_,
+    if (!mtx_match_dimension(C_lo_, nlo_, nbasis_)) {
+        throw DimensionError(C_lo_, nlo_, nbasis_,
+                             "wrong dimension for LO's coefficient matrix.");
+    }
+    if (!mtx_match_dimension(df_pii_, nfitbasis_, nlo_)) {
+        throw DimensionError(df_pii_, nfitbasis_, nlo_,
                              "wrong dimension for density fitting three-body "
                              "integral matrix <p|ii>.");
     }
-    if (!df_Vpq_inverse_->is_square() ||
-        df_Vpq_inverse_->rows() != nfitbasis_) {
+    if (!mtx_match_dimension(df_Vpq_inverse_, nfitbasis_, nfitbasis_)) {
         throw DimensionError(
-            *df_Vpq_inverse_, nfitbasis_, nfitbasis_,
+            df_Vpq_inverse_, nfitbasis_, nfitbasis_,
             "wrong dimension for density fitting Vpq inverse matrix.");
     }
-    if (npts_ != grid_basis_value_->rows() ||
-        nbasis_ != grid_basis_value_->cols()) {
-        throw DimensionError(*grid_basis_value_, npts_, nbasis_,
+    if (!mtx_match_dimension(grid_basis_value_, npts_, nbasis_)) {
+        throw DimensionError(grid_basis_value_, npts_, nbasis_,
                              "wrong dimension for grid value of AO basis.");
     }
-    switch (dfa) {
-    case losc::LDA: {
-        para_alpha_ = para_beta_ = 0.0;
-        break;
-    }
-    case losc::GGA: {
-        para_alpha_ = para_beta_ = 0.0;
-        break;
-    }
-    case losc::B3LYP: {
-        para_alpha_ = 0.2;
-        para_beta_ = 0.0;
-        break;
-    }
-    default: {
-        throw exception::LoscException("Unknown DFA choice.");
-    }
+    if (grid_weight_.size() != npts_) {
+        throw DimensionError(grid_weight_, npts_, 1,
+                             "wrong dimension for grid weights.");
     }
 }
 
@@ -64,8 +50,8 @@ namespace utils {
  * The user should be carefully traverse all the blocks of `df_pmn_block`.
  */
 void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
-                                  const Matrix &df_pmn_block,
-                                  const Matrix &C_lo, Matrix &df_pii)
+                                  ConstRefMat &df_pmn_block, ConstRefMat &C_lo,
+                                  RefMat df_pii)
 {
     // i, j: LO index.
     // p, q: fitbasis index.

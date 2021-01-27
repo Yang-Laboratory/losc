@@ -4,17 +4,17 @@
  */
 #include "curvature.h"
 
+#include "eigen_helper.h"
 #include "exception.h"
-#include "matrix.h"
 #include <cmath>
 
 namespace losc {
 
-shared_ptr<Matrix> CurvatureV2::compute()
+MatrixXd CurvatureV2::compute()
 {
     // construct absolute overlap under LO.
-    auto p_S_lo = std::make_shared<Matrix>(nlo_, nlo_);
-    p_S_lo->setZero();
+    MatrixXd S_lo(nlo_, nlo_);
+    S_lo.setZero();
     // The LO grid value matrix has dimension of (npts, nlo), which could be
     // very large. To limit the memory usage on LO grid value, we build it by
     // blocks. For now we limit the memory usage to be 1GB.
@@ -38,31 +38,29 @@ shared_ptr<Matrix> CurvatureV2::compute()
         // grid_lo: [block_size, nlo]
         // grid_ao: [block_size, nbasis]
         // C_lo: [nbasis, nlo]
-        Matrix grid_lo_block(size, nlo_);
-        auto grid_ao_block =
-            (*grid_basis_value_).block(n * block_size, 0, size, nbasis_);
-        grid_lo_block.noalias() = grid_ao_block * (*C_lo_);
+        MatrixXd grid_lo_block(size, nlo_);
+        grid_lo_block.noalias() =
+            grid_basis_value_.block(n * block_size, 0, size, nbasis_) * C_lo_;
 
         // sum over current block contribution to the LO overlap.
-        vector<double>::const_iterator wt =
-            grid_weight_->begin() + n * block_size;
+        auto wt = grid_weight_.data() + n * block_size;
         for (size_t ip = 0; ip < size; ++ip) {
             const double wt_value = wt[ip];
             for (size_t i = 0; i < nlo_; ++i) {
                 for (size_t j = 0; j <= i; ++j) {
                     const double pi = grid_lo_block(ip, i);
                     const double pj = grid_lo_block(ip, j);
-                    (*p_S_lo)(i, j) += wt_value * std::abs(pi * pj);
+                    S_lo(i, j) += wt_value * std::abs(pi * pj);
                 }
             }
         }
     }
-    p_S_lo->to_symmetric("L");
+    mtx_to_symmetric(S_lo, "L");
 
     // build the curvature version 1.
-    CurvatureV1 kappa1_man(dfa_type_, C_lo_, df_pii_, df_Vpq_inverse_,
+    CurvatureV1 kappa1_man(dfa_info_, C_lo_, df_pii_, df_Vpq_inverse_,
                            grid_basis_value_, grid_weight_);
-    auto p_kappa1 = kappa1_man.compute();
+    MatrixXd kappa1 = kappa1_man.compute();
 
     // build LOSC2 kappa matrix:
     // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau *
@@ -71,22 +69,21 @@ shared_ptr<Matrix> CurvatureV2::compute()
     using std::erf;
     using std::erfc;
     using std::sqrt;
-    auto p_kappa2 = std::make_shared<Matrix>(nlo_, nlo_);
+    MatrixXd kappa2(nlo_, nlo_);
     for (size_t i = 0; i < nlo_; ++i) {
-        const double K1_ii = (*p_kappa1)(i, i);
-        (*p_kappa2)(i, i) = K1_ii;
+        const double K1_ii = kappa1(i, i);
+        kappa2(i, i) = K1_ii;
         for (size_t j = 0; j < i; ++j) {
-            const double S_ij = (*p_S_lo)(i, j);
-            const double K1_ij = (*p_kappa1)(i, j);
-            const double K1_jj = (*p_kappa1)(j, j);
-            const double f = para_zeta_ * S_ij;
-            (*p_kappa2)(i, j) =
-                erf(f) * sqrt(abs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
+            const double S_ij = S_lo(i, j);
+            const double K1_ij = kappa1(i, j);
+            const double K1_jj = kappa1(j, j);
+            const double f = zeta_ * S_ij;
+            kappa2(i, j) = erf(f) * sqrt(abs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
         }
     }
-    p_kappa2->to_symmetric("L");
+    mtx_to_symmetric(kappa2, "L");
 
-    return p_kappa2;
+    return kappa2;
 }
 
 } // namespace losc

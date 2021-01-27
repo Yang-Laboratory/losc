@@ -1,44 +1,73 @@
 /**
- * @file
- * @brief declaration relates to Losc curvature.
+ * @file curvature.h
+ * @brief C++ interface for the curvature matrix of LOSC.
+ *
+ * @note
+ * 1. We use the famous Eigen template library to share data between the
+ * construction of curvature matrix and users. The `Eigen::MatrixXd` is used to
+ * represent matrices. To avoid the unnecessary copy of data from the user, we
+ * use `Eigen::Ref<MatrixXd>` in the interface to map the needed matrices to the
+ * existing matrices that are provided by the user. Thus, the life of all the
+ * input matrices are controlled by the users, not us! Make sure these input
+ * matrices are alive during computation of curvature matrix. We do not perform
+ * any check to these conditions.
+ * 2. Caution: a common pitfall related to the life of input matrices is passing
+ * a temporary matrix to the curvature constructor. This could happen if you
+ * pass a matrix expression, supported by Eigen, which is finally evalated into
+ * a temporary matrix object (note, matrix and matrix expression are different
+ * concept in Eigen). So keep in mind that always prepared the matrices at
+ * first, then call the curvature constructor.
+ * 3. All the input matrices from users are stored in column-wise, which follows
+ * the default behavior of the Eigen library.
+ * 4. We never change the input data from the user.
  */
+
 #ifndef _LOSC_SRC_CURVATURE_H_
 #define _LOSC_SRC_CURVATURE_H_
 
-#include "matrix.h"
+#include <Eigen/Dense>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace losc {
 
-using losc::Matrix;
-using std::shared_ptr;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+using std::string;
 using std::vector;
+using ConstRefMat = const Eigen::Ref<const MatrixXd>;
+using ConstRefVec = const Eigen::Ref<const VectorXd>;
+using RefMat = Eigen::Ref<MatrixXd>;
+using RefVec = Eigen::Ref<VectorXd>;
 
 /**
- * @brief Type of density function approximation.
+ * @brief Density functional approximation (DFA) information.
+ *
+ * It includes the exchange types in the DFA and their weights.
  */
-enum DFAType {
-    LDA,   /**< Local density approximation. */
-    GGA,   /**< General gradient approximation. */
-    B3LYP, /**< Hybrid type: B3LYP function. */
+struct DFAInfo {
+    const string &name; /**< DFA name. */
+    double gga_x;       /**< GGA type exchange weight. */
+    double hf_x;        /**< Hatree-Fock exchange weight. */
+
+    DFAInfo(double gga_x_wt, double hf_x_wt, const string &name = "")
+        : name{name}, gga_x{gga_x_wt}, hf_x{hf_x_wt}
+    {
+    }
 };
 
 /**
- * @brief Base class for Losc curvature.
+ * @brief Base class for LOSC curvature.
  */
 class CurvatureBase {
   protected:
-    DFAType dfa_type_; /**< type of DFA the curvature is related to. */
-
-    size_t nlo_;       /**< number of LOs */
-    size_t nbasis_;    /**< number of AOs basis. */
+    const DFAInfo dfa_info_; /**< DFA information. */
+    size_t nlo_;             /**< number of LOs */
+    size_t nbasis_;          /**< number of AOs basis. */
     size_t nfitbasis_; /**< number of fitbasis for density fitting in curvature
                           matrix construction. */
     size_t npts_;      /**< number of grid for numerical integration. */
-
-    double para_alpha_ = 0.0;
-    double para_beta_ = 0.0;
 
     /**
      * @brief LO coefficient matrix under AO.
@@ -49,7 +78,7 @@ class CurvatureBase {
      *
      * @see losc::LoscLocalizerV2::compute()
      */
-    shared_ptr<Matrix> C_lo_;
+    ConstRefMat &C_lo_;
 
     /**
      * @brief The three-body integral <p|ii> matrix used in density fitting.
@@ -67,7 +96,7 @@ class CurvatureBase {
      * You have to construct the matrix by yourself. See
      * losc::utils::convert_df_pmn2pii_blockwise() for help.
      */
-    shared_ptr<Matrix> df_pii_;
+    ConstRefMat &df_pii_;
 
     /**
      * @brief Inverse of Vpq matrix used in density fitting.
@@ -92,7 +121,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    shared_ptr<Matrix> df_Vpq_inverse_;
+    ConstRefMat &df_Vpq_inverse_;
 
     /**
      * @brief AO basis value on grid.
@@ -112,7 +141,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    shared_ptr<Matrix> grid_basis_value_;
+    ConstRefMat &grid_basis_value_;
 
     /**
      * @brief Coefficient for grid points used in numerical integral.
@@ -127,11 +156,12 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    shared_ptr<vector<double>> grid_weight_;
+    ConstRefVec &grid_weight_;
 
   public:
     /**
      * @brief Curvature base class constructor.
+     *
      * @param [in] dfa: Type of DFA.
      * @param [in] C_lo: LO coefficient matrix under AO with dimension
      * [nbasis, nlo]. See CurvatureBase::C_lo_.
@@ -145,44 +175,42 @@ class CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
-    CurvatureBase(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                  const shared_ptr<Matrix> &df_pii,
-                  const shared_ptr<Matrix> &df_Vpq_inverse,
-                  const shared_ptr<Matrix> &grid_basis_value,
-                  const shared_ptr<vector<double>> &grid_weight);
+    CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &C_lo,
+                  ConstRefMat &df_pii, ConstRefMat &df_Vpq_inverse,
+                  ConstRefMat &grid_basis_value, ConstRefVec &grid_weight);
 
     /**
-     * @brief Compute the Losc curvature matrix.
-     * @return shared_ptr<Matrix>: the Losc curvature matrix with dimension
+     * @brief Compute the LOSC curvature matrix.
+     * @return MatrixXd: the LOSC curvature matrix with dimension
      * [nlo, nlo].
      */
-    virtual shared_ptr<Matrix> compute() = 0;
+    virtual MatrixXd compute() = 0;
 };
 
 /**
- * @brief Losc curvature class for version 1.
+ * @brief LOSC curvature class for version 1.
  * @details This class take the responsibility to generate curvature
  * version 1 matrix. Curvature version 1 is used in the original
- * Losc paper (https://doi.org/10.1093/nsr/nwx11).
+ * LOSC paper (https://doi.org/10.1093/nsr/nwx11).
  */
 class CurvatureV1 : public CurvatureBase {
   private:
     /**
      * @brief Paramerter \f$C_x\f$ in curvature.
-     * @details See Eq. (10) in the original Losc paper
+     * @details See Eq. (10) in the original LOSC paper
      * (https://doi.org/10.1093/nsr/nwx111).
      */
-    double para_cx_ = 0.930526;
+    double cx_ = 0.930526;
 
     /**
      * @brief Paramerter \f$\tau\f$ in curvature.
-     * @details See Eq. (10) in the original Losc paper
+     * @details See Eq. (10) in the original LOSC paper
      * (https://doi.org/10.1093/nsr/nwx111).
      */
-    double para_tau_ = 1.2378;
+    double tau_ = 1.2378;
 
-    shared_ptr<Matrix> compute_kappa_J();
-    shared_ptr<Matrix> compute_kappa_xc();
+    MatrixXd compute_kappa_J();
+    MatrixXd compute_kappa_xc();
 
   public:
     /**
@@ -202,18 +230,16 @@ class CurvatureV1 : public CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
-    CurvatureV1(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                const shared_ptr<Matrix> &df_pii,
-                const shared_ptr<Matrix> &df_Vpq_inverse,
-                const shared_ptr<Matrix> &grid_basis_value,
-                const shared_ptr<vector<double>> &grid_weight)
-        : CurvatureBase(dfa, C_lo, df_pii, df_Vpq_inverse, grid_basis_value,
-                        grid_weight)
+    CurvatureV1(const DFAInfo &dfa_info, ConstRefMat &C_lo, ConstRefMat &df_pii,
+                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_basis_value,
+                ConstRefVec &grid_weight)
+        : CurvatureBase(dfa_info, C_lo, df_pii, df_Vpq_inverse,
+                        grid_basis_value, grid_weight)
     {
     }
 
     /**
-     * @brief Compute the Losc curvature version 1 matrix.
+     * @brief Compute the LOSC curvature version 1 matrix.
      * @details Dimension of curvature matrix is [nlo, nlo].
      *
      * Curvature version 1 matrix is defined as
@@ -225,38 +251,38 @@ class CurvatureV1 : public CurvatureBase {
      * \f]
      * where \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return shared_ptr<Matrix>: The Losc curvature version 1 matrix with
-     * dimension [nlo, nlo].
-     * @see The original Losc paper (https://doi.org/10.1093/nsr/nwx11)
+     * @return MatrixXd: The LOSC curvature version 1 matrix.
+     * Dimension: [nlo, nlo].
+     * @see The original LOSC paper (https://doi.org/10.1093/nsr/nwx11)
      */
-    virtual shared_ptr<Matrix> compute() override;
+    virtual MatrixXd compute() override;
 };
 
 /**
- * @brief Losc curvature class for version 2.
+ * @brief LOSC curvature class for version 2.
  * @details This class take the responsibility to generate curvature version 2
- * matrix. Curvature version 2 is used in the Losc2 paper (xxx). Check it out
- * for more details.
+ * matrix. Curvature version 2 is used in the LOSC2 paper
+ * (see J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535).
  */
 class CurvatureV2 : public CurvatureBase {
   private:
     /**
      * @brief Paramerter \f$\zeta\f$ in curvature.
-     * @details See Eq. (xxx) in the Losc2 paper.
+     * @details See Eq. (xxx) in the LOSC2 paper.
      */
-    double para_zeta_ = 8.0;
+    double zeta_ = 8.0;
 
     /**
      * @brief Paramerter \f$C_x\f$ in curvature.
-     * @details See Eq. (xxx) in the Losc2 paper.
+     * @details See Eq. (xxx) in the LOSC2 paper.
      */
-    double para_cx_ = 0.930526;
+    double cx_ = 0.930526;
 
     /**
      * @brief Paramerter \f$\tau\f$ in curvature.
-     * @details See Eq. (xxx) in the Losc2 paper.
+     * @details See Eq. (xxx) in the LOSC2 paper.
      */
-    double para_tau_ = 1.2378;
+    double tau_ = 1.2378;
 
   public:
     /**
@@ -274,18 +300,16 @@ class CurvatureV2 : public CurvatureBase {
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
-    CurvatureV2(DFAType dfa, const shared_ptr<Matrix> &C_lo,
-                const shared_ptr<Matrix> &df_pii,
-                const shared_ptr<Matrix> &df_Vpq_inverse,
-                const shared_ptr<Matrix> &grid_basis_value,
-                const shared_ptr<vector<double>> &grid_weight)
+    CurvatureV2(const DFAInfo &dfa, ConstRefMat &C_lo, ConstRefMat &df_pii,
+                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_basis_value,
+                ConstRefVec &grid_weight)
         : CurvatureBase(dfa, C_lo, df_pii, df_Vpq_inverse, grid_basis_value,
                         grid_weight)
     {
     }
 
     /**
-     * @brief Compute the Losc curvature version 2 matrix.
+     * @brief Compute the LOSC curvature version 2 matrix.
      *
      * @details Dimension of curvature matrix is [nlo, nlo].
      *
@@ -294,20 +318,20 @@ class CurvatureV2 : public CurvatureBase {
      * \kappa^2_{ij} = \mbox{erf}(\zeta S_{ij}) \sqrt{|\kappa^1_{i, i}
      * \kappa^1_{j, j}|} + \mbox{erfc}(\zeta S_{ij}) \kappa^1_{i, j},
      * \f]
-     * where \f$\kappa^1\f$ is the Losc curvature version 1 matrix,
-     * \f$\kappa^2\f$ is the Losc curvature version 2 matrix,
+     * where \f$\kappa^1\f$ is the LOSC curvature version 1 matrix,
+     * \f$\kappa^2\f$ is the LOSC curvature version 2 matrix,
      * \f$ S_{ij} = \int \sqrt{\rho_i(\rm{r}) \rho_j(\rm{r})}
      * \mbox{d}\rm{r}\f$, and \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
      *
-     * @return shared_ptr<Matrix>: the Losc curvature version 2 matrix with
+     * @return MatrixXd: the LOSC curvature version 2 matrix with
      * dimension [nlo, nlo].
-     * @see The Losc2 paper (xxx) for more details.
+     * @see The LOSC2 paper (xxx) for more details.
      */
-    virtual shared_ptr<Matrix> compute() override;
+    virtual MatrixXd compute() override;
 };
 
 /**
- * @brief Losc library utils namespace.
+ * @brief LOSC library utils namespace.
  * @details Collection of helper functions and so on.
  */
 namespace utils {
@@ -365,8 +389,8 @@ namespace utils {
  * blocks.
  */
 void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
-                                  const Matrix &df_pmn_block,
-                                  const Matrix &C_lo, Matrix &df_pii);
+                                  ConstRefMat &df_pmn_block, ConstRefMat &C_lo,
+                                  RefMat df_pii);
 
 } // namespace utils
 
