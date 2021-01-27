@@ -10,7 +10,7 @@
 
 namespace losc {
 
-MatrixXd CurvatureV2::compute()
+MatrixXd CurvatureV2::kappa()
 {
     // construct absolute overlap under LO.
     MatrixXd S_lo(nlo_, nlo_);
@@ -60,7 +60,7 @@ MatrixXd CurvatureV2::compute()
     // build the curvature version 1.
     CurvatureV1 kappa1_man(dfa_info_, C_lo_, df_pii_, df_Vpq_inverse_,
                            grid_basis_value_, grid_weight_);
-    MatrixXd kappa1 = kappa1_man.compute();
+    MatrixXd kappa1 = kappa1_man.kappa();
 
     // build LOSC2 kappa matrix:
     // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau *

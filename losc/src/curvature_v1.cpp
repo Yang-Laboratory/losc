@@ -71,7 +71,7 @@ MatrixXd CurvatureV1::compute_kappa_xc()
     return kappa_xc;
 }
 
-MatrixXd CurvatureV1::compute()
+MatrixXd CurvatureV1::kappa()
 {
     MatrixXd kappa_J = compute_kappa_J();
     MatrixXd kappa_xc = compute_kappa_xc();

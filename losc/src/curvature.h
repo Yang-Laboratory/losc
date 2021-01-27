@@ -44,7 +44,7 @@ using RefVec = Eigen::Ref<VectorXd>;
 /**
  * @brief Density functional approximation (DFA) information.
  *
- * It includes the exchange types in the DFA and their weights.
+ * It includes the exchange types and their weights in the DFA.
  */
 struct DFAInfo {
     const string &name; /**< DFA name. */
@@ -72,6 +72,11 @@ class CurvatureBase {
     /**
      * @brief LO coefficient matrix under AO.
      * @details Dimension: [nbasis, nlo]
+     * \f[
+     * \psi_p = C_{\mu p} \phi_{\mu}
+     * \f]
+     * in which $\psi_p$ is the \f$p\f$-th LO, \f$C_{\mu p}\f$ is the LO
+     * coefficient matrix and \f$\phi_{\mu}\f$ is the \f$\mu\f$-th AO.
      *
      * This matrix can be obtained from the losc::LocalizerBase::compute() or
      * any functions overwrite it from the derived localizer class.
@@ -81,16 +86,16 @@ class CurvatureBase {
     ConstRefMat &C_lo_;
 
     /**
-     * @brief The three-body integral <p|ii> matrix used in density fitting.
-     * @details `p` is fitbasis index and `i` is LO index.
+     * @brief The three-body integral \f$\langle p|ii \rangle\f$ matrix used in
+     * density fitting.
+     * @details Dimension: [nfitbasis, nlo].
      *
-     * <p|ii> matrix has dimension of [nfitbasis, nlo].
-     * The integral is defined as
      * \f[
      * \langle \phi_p | \phi_i \phi_i \rangle
      * = \int \frac{\phi_p(\rm{r}) \phi_i(\rm{r'}) \phi_i(\rm{r'})}{|\rm{r}
      *   - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'},
      * \f]
+     * in which index \f$p\f$ is for fitbasis and index \f$i\f$ is for LOs.
      *
      * @par Availability
      * You have to construct the matrix by yourself. See
@@ -99,15 +104,13 @@ class CurvatureBase {
     ConstRefMat &df_pii_;
 
     /**
-     * @brief Inverse of Vpq matrix used in density fitting.
-     * @details
-     * Dimension: [nfitbasis, nfitbasis].
+     * @brief Inverse of \f$V_{pq}\f$ matrix used in density fitting.
+     * @details Dimension: [nfitbasis, nfitbasis].
      *
-     * `p` and `q` are the fitbasis index.
-     * \f$Vpq\f$ element is defined as
      * \f[
-     * \langle \phi_p| \frac{1}{\rm{r}_{12}} |\phi_q \rangle
-     * \f]
+     * V_{pq} =
+     * \langle \phi_p| \frac{1}{\rm{r}_{12}} |\phi_q \rangle,
+     * \f] in which indices \f$p, q\f$ are for fitting basis.
      *
      * @par Availability
      * You have to construct the matrix by yourself. To set each element,
@@ -125,8 +128,8 @@ class CurvatureBase {
 
     /**
      * @brief AO basis value on grid.
-     * @details
-     * Dimension: [npts, nbasis].
+     * @details Dimension: [npts, nbasis]. \f$V_{\mu \nu}\f$ is the \f$\mu\f$-th
+     * grid point value for the \f$\nu\f$-th AO.
      *
      * @par Availability
      * You have to build the matrix by yourself. To construct the matrix,
@@ -184,7 +187,7 @@ class CurvatureBase {
      * @return MatrixXd: the LOSC curvature matrix with dimension
      * [nlo, nlo].
      */
-    virtual MatrixXd compute() = 0;
+    virtual MatrixXd kappa() = 0;
 };
 
 /**
@@ -240,22 +243,11 @@ class CurvatureV1 : public CurvatureBase {
 
     /**
      * @brief Compute the LOSC curvature version 1 matrix.
-     * @details Dimension of curvature matrix is [nlo, nlo].
-     *
-     * Curvature version 1 matrix is defined as
-     * \f[
-     * \kappa_{ij} = (1 - \alpha -\beta) \int \int \frac{\rho_i(\rm{r})
-     * \rho_j(\rm{r'})}{|\rm{r} - \rm{r'}|} \mbox{d} \rm{r} \mbox{d} \rm{r'}
-     * - \frac{2\tau C_x}{3} (1 - \alpha) \int [\rho_i(\rm{r})]^{\frac{2}{3}}
-     * [\rho_j(\rm{r})]^{\frac{2}{3}} \mbox{d} \rm{r},
-     * \f]
-     * where \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
-     *
-     * @return MatrixXd: The LOSC curvature version 1 matrix.
-     * Dimension: [nlo, nlo].
-     * @see The original LOSC paper (https://doi.org/10.1093/nsr/nwx11)
+     * @return MatrixXd: The LOSC curvature version 1 matrix with dimension of
+     * [nlo, nlo]. The curvature matrix is defined as \f$\kappa\f$ in Eq. 3
+     * of the original LOSC paper (https://doi.org/10.1093/nsr/nwx11).
      */
-    virtual MatrixXd compute() override;
+    virtual MatrixXd kappa() override;
 };
 
 /**
@@ -268,19 +260,19 @@ class CurvatureV2 : public CurvatureBase {
   private:
     /**
      * @brief Paramerter \f$\zeta\f$ in curvature.
-     * @details See Eq. (xxx) in the LOSC2 paper.
+     * @details See Eq. 8 in the LOSC2 paper.
      */
     double zeta_ = 8.0;
 
     /**
      * @brief Paramerter \f$C_x\f$ in curvature.
-     * @details See Eq. (xxx) in the LOSC2 paper.
+     * @details See Eq. 2 in the LOSC2 paper.
      */
     double cx_ = 0.930526;
 
     /**
      * @brief Paramerter \f$\tau\f$ in curvature.
-     * @details See Eq. (xxx) in the LOSC2 paper.
+     * @details See Eq. 2 in the LOSC2 paper.
      */
     double tau_ = 1.2378;
 
@@ -310,24 +302,11 @@ class CurvatureV2 : public CurvatureBase {
 
     /**
      * @brief Compute the LOSC curvature version 2 matrix.
-     *
-     * @details Dimension of curvature matrix is [nlo, nlo].
-     *
-     * Curvature version 2 matrix is defined as
-     * \f[
-     * \kappa^2_{ij} = \mbox{erf}(\zeta S_{ij}) \sqrt{|\kappa^1_{i, i}
-     * \kappa^1_{j, j}|} + \mbox{erfc}(\zeta S_{ij}) \kappa^1_{i, j},
-     * \f]
-     * where \f$\kappa^1\f$ is the LOSC curvature version 1 matrix,
-     * \f$\kappa^2\f$ is the LOSC curvature version 2 matrix,
-     * \f$ S_{ij} = \int \sqrt{\rho_i(\rm{r}) \rho_j(\rm{r})}
-     * \mbox{d}\rm{r}\f$, and \f$\rho_i\f$ is the LO density \f$|\phi_i|^2\f$.
-     *
-     * @return MatrixXd: the LOSC curvature version 2 matrix with
-     * dimension [nlo, nlo].
-     * @see The LOSC2 paper (xxx) for more details.
+     * @return MatrixXd: The LOSC curvature version 2 matrix with dimension of
+     * [nlo, nlo]. The curvature matrix is defined as \f$\tilde{\kappa}\f$ in
+     * Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535).
      */
-    virtual MatrixXd compute() override;
+    virtual MatrixXd kappa() override;
 };
 
 /**
