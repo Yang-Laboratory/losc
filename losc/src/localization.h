@@ -1,169 +1,69 @@
 /**
- * @file
- * @brief Declaration relates to orbital localization.
+ * @file localization.h
+ * @brief C++ interface for the LOSC localization.
+ *
+ * @note
+ * 1. We use the famous Eigen template library to share data between the
+ * construction of curvature matrix and users. The `Eigen::MatrixXd` is used to
+ * represent matrices. To avoid the unnecessary copy of data from the user, we
+ * use `Eigen::Ref<MatrixXd>` in the interface to map the needed matrices to the
+ * existing matrices that are provided by the user. Thus, the life of all the
+ * input matrices are controlled by the users, not us! Make sure these input
+ * matrices are alive during computation of curvature matrix. We do not perform
+ * any check to these conditions.
+ * 2. Caution: a common pitfall related to the life of input matrices is passing
+ * a temporary matrix to the curvature constructor. This could happen if you
+ * pass a matrix expression, supported by Eigen, which is finally evalated into
+ * a temporary matrix object (note, matrix and matrix expression are different
+ * concept in Eigen). So keep in mind that always prepared the matrices at
+ * first, then call the curvature constructor.
+ * 3. All the input matrices from users are stored in column-wise, which follows
+ * the default behavior of the Eigen library.
+ * 4. We never change the input data from the user.
  */
 #ifndef _LOSC_SRC_LOCALIZATION_H_
 #define _LOSC_SRC_LOCALIZATION_H_
 
-#include "exception.h"
-#include "matrix.h"
+#include <Eigen/Dense>
 #include <cstddef>
-#include <iostream>
-#include <memory>
 #include <string>
 #include <vector>
 
 namespace losc {
 
-using losc::Matrix;
-using std::shared_ptr;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+using std::string;
 using std::vector;
-
-enum PrintLevel {
-    kPrintLevelNo,
-    kPrintLevelNormal,
-    kPrintLevelDebug1,
-    kPrintLevelDebug2,
-};
+using ConstRefMat = const Eigen::Ref<const MatrixXd>;
+using ConstRefVec = const Eigen::Ref<const VectorXd>;
+using RefMat = Eigen::Ref<MatrixXd>;
+using RefVec = Eigen::Ref<VectorXd>;
 
 /**
- * @brief Base class for Losc localization.
+ * @brief Base class for LOSC localization.
  */
 class LocalizerBase {
   protected:
     size_t nlo_;    /**<number of LO. */
     size_t nbasis_; /**< number of AO basis. */
 
-    enum PrintLevel print_level_ = kPrintLevelNo;
-
-    /**
-     * @brief The unitary matrix that transfer LO basis coefficient matrix into
-     * LO coefficient matrix.
-     * @details Dimension: [nlo, nlo].
-     * The relation between the LO \f$\psi\f$ and LO basis \f$\phi\f$ via the U
-     * matrix is the following,
-     * \f[
-     * \psi_i = \sum_j U_{ij} \phi_j.
-     * \f]
-     */
-    shared_ptr<Matrix> U_;
-
     /**
      * @brief LO basis coefficient matrix under AO.
-     * @details
-     * Dimension: [nbasis, nlo]
+     * @details Dimension: [nbasis, nlo]
      *
      * Relation between LO basis and AO via the coefficient matrix \f$C\f$ is
      * \f[
      * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
      * \f]
-     * where \f$C\f$ matrix is stored in `C_lo_basis_`.
+     * where \f$ \psi_i \f$ is the LO basis and \f$ \phi_\mu \f$ is the AO.
      *
      * @par Availability
-     * You have to build the matrix by yourself and provide it to the Losc
+     * You have to build the matrix by yourself and provide it to the LOSC
      * library.
      * @note Usually, Losc localization use the CO from DFA as the LO basis.
      */
-    shared_ptr<Matrix> C_lo_basis_;
-
-  public:
-    /**
-     * @brief LocalizerBase class constructor
-     * @details After creation, the LocalizerBase::U_ matrix will be
-     * intialized as an identity matrix.
-     * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
-     * dimension [nbasis, nlo]. See LocalizerBase::C_lo_basis_.
-     */
-    LocalizerBase(const shared_ptr<Matrix> &C_lo_basis)
-        : nlo_{C_lo_basis->cols()}, nbasis_{C_lo_basis->rows()},
-          print_level_{kPrintLevelNo}, C_lo_basis_{C_lo_basis}
-    {
-        if (nlo_ > nbasis_) {
-            throw exception::DimensionError(
-                "wrong dimension for LO coefficient matrix: number of LO is "
-                "larger than the number of AO.");
-        }
-        U_ = std::make_shared<Matrix>(nlo_, nlo_);
-        U_->setIdentity();
-    }
-
-    /**
-     * @return shared_ptr<Matrix>: the U matrix. See losc::LocalizerBase::U_.
-     */
-    shared_ptr<Matrix> get_u() { return U_; }
-
-    /**
-     * @return shared_ptr<const Matrix>: the U matrix. See
-     * losc::localizerBase::U_.
-     */
-    shared_ptr<const Matrix> get_u() const { return U_; }
-
-    /**
-     * @brief Set up the U matrix.
-     * @param [in] U: The localization U matrix.
-     * @param [in] threshold: the threshold to check if the input matrix is
-     * unitary.
-     */
-    void set_u_matrix(const shared_ptr<Matrix> &U, double threshold = 1e-8)
-    {
-        if (U == nullptr) {
-            throw exception::LoscException(
-                "invalid U matrix: input U matrix is null.");
-        }
-        if (!(U->is_square() && U->rows() == nlo_)) {
-            throw exception::DimensionError(
-                *U, nlo_, nlo_, "wrong dimension for localization U matrix.");
-        }
-        if (!U->isUnitary(threshold)) {
-            throw exception::LoscException("Invalid U matrix: input U matrix "
-                                           "is not unitary");
-        }
-        U_ = U;
-    }
-
-    /**
-     * @brief Set up the print level.
-     */
-    void set_print(PrintLevel level) { print_level_ = level; }
-
-    /**
-     * @brief Compute the LO coefficient matrix under AO.
-     *
-     * @details The current U matrix stored in LocalizerBase::U_ will
-     * be used as the initial guess. After calling this function,
-     * LocalizerBase::U_ matrix is updated.
-     *
-     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO with
-     * dimension [nbasis, nlo].
-     *
-     * The returned LO coefficient matrix \f$C\f$ relates the LO \f$\psi\f$
-     * and AO \f$\phi\f$ via the following,
-     * \f[
-     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu}.
-     * \f]
-     */
-    virtual shared_ptr<Matrix> compute() = 0;
-};
-
-/**
- * @brief Losc localization version 2.
- * @details This is the version used in the Losc2 paper (xxx).
- */
-class LoscLocalizerV2 : public LocalizerBase {
-  private:
-    /**
-     * @brief Hamiltonian matrix under AO used in Losc2 localization.
-     * @details In Losc2 method, it is the DFA Hamiltonian.
-     *
-     * Dimension: [nbasis, nbasis].
-     */
-    shared_ptr<Matrix> H_ao_;
-
-    /**
-     * @brief Dipole matrix under AO in order of x, y and z directions.
-     * @details Dimension: [nbasis, nbasis].
-     */
-    vector<shared_ptr<Matrix>> Dipole_ao_;
+    ConstRefMat &C_lo_basis_;
 
     /**
      * @brief Maximum iteration number of Jacobi-sweep algorithm for
@@ -184,18 +84,164 @@ class LoscLocalizerV2 : public LocalizerBase {
     double js_tol_ = 1e-10;
 
     /**
-     * @brief Parameter \f$C\f$ in Losc2 localization cost function.
-     * @details See Eq. (xxx) in Losc2 paper. Default: 1000
+     * Internal function to set the initial U matrix.
+     * @param U [in, out]: the initial U matrix is updated at exit.
      */
-    double para_c_ = 1000;
+    void set_u_guess(RefMat U, const string &guess);
 
     /**
-     * @brief Parameter \f$\gamma\f$ in Losc2 localization cost function.
-     * @details See Eq. (xxx) in Losc2 paper. Default: 0.707
+     * Internal function to set the initial U matrix.
+     * @param U [in, out]: the initial U matrix is copied from `U_guess`.
      */
-    double para_gamma_ = 0.707;
+    void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold);
 
-    void message(std::string t, ...) const;
+    /**
+     * Internal function to do the localization.
+     * @param L [in, out]: the LO coefficient matrix at exit.
+     * @param U [in, out]: the U matrix at the exit.
+     */
+    virtual void compute(RefMat L, RefMat U) = 0;
+
+  public:
+    /**
+     * @brief LocalizerBase class constructor
+     * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
+     * dimension [nbasis, nlo]. See LocalizerBase::C_lo_basis_.
+     * @note
+     * 1. The initial guess is to set an identity U matrix.
+     */
+    LocalizerBase(ConstRefMat &C_lo_basis);
+    virtual ~LocalizerBase();
+
+    /**
+     * @brief Set the maximum iteration number for localization.
+     */
+    void set_max_iter(size_t max_iter) { js_max_iter_ = max_iter; }
+
+    /**
+     * @brief Set the convergence of localization.
+     */
+    void set_convergence(double tol) { js_tol_ = tol; }
+
+    /**
+     * @param [in] true_or_false: flag to do random permutation or not
+     * Jacobi-sweep algorithm.
+     */
+    void set_random_permutation(bool flag) { js_random_permutation_ = flag; }
+
+    /**
+     * @brief Calculate the LOs and the unitary transformation matrix.
+     *
+     * The calculated LOs are expanded under AOs via the following relation
+     * \f[
+     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
+     * \f]
+     * in which \f$ \psi_i \f$ is the LO, \f$ C_{\mu i} \f$ is the LO
+     * coefficient matrix and \f$ \phi_i \f$ is the AO.
+     * Dimension of LO coefficient matrix: [nbasis, nlo].
+
+     * The unitary matrix is associated with the LOs and LOs basis via the
+     * following relation.
+     * \f[
+     * \psi_i = \sum_j U_{i\mu} \phi_\mu,
+     * \f]
+     * in which \f$ psi_i\f$ is the LO, \f$ U_{i\mu} \f$ is the unitary matrix
+     * and \f$ \phi_\mu \f$ is the LO basis that expands the LO.
+     * Dimension of the U matrix: [nlo, nlo].
+     *
+     * @param guess: Valid choices are
+     * ["identity", "random", "random_fixed_seed"]. Default to "identity"
+     * "identity": initial U matrix is set as an identity matrix.
+     * "random": initial U matrix is set as a random unitary matrix.
+     * "random_fixed_seed": initial U matrix is set as a random unitary matrix
+     * with fixed random seed.
+     *
+     * @return a size 2 vector of matrix `rst`. `rst[0]` is the LO coefficient
+     * matrix. `rst[1]` is the corresponding U matrix.
+     */
+    virtual vector<MatrixXd> lo_U(const string &guess = "identity") = 0;
+
+    /**
+     * @brief Calculate the LOs and the unitary transformation matrix.
+     *
+     * @param U_guess: the initial guess of U matrix. Its data will be copied
+     * for localization. Its unitarity will be verified and throw an exception
+     * if the validation fails.
+     * @param threshold: the threshold used to check the unitarity. Default to
+     * 1e-8.
+     */
+    virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
+                                  double threshold = 1e-8) = 0;
+
+    /**
+     * @brief Calculate the LOs' coefficient matrix under AO.
+     *
+     * @param guess: a string represents the initial guess. See `lo_U`.
+     * @return the LOs' coefficient matrix under AO.
+     */
+    virtual MatrixXd lo(const string &guess = "identity")
+    {
+        return lo_U(guess)[0];
+    }
+
+    /**
+     * @brief Calculate the LOs' coefficient matrix under AO.
+     *
+     * @param U_guess: the initial guess of U matrix. See `lo_U`.
+     * @return the LOs' coefficient matrix under AO.
+     */
+    virtual MatrixXd lo(ConstRefMat &U_guess) { return lo_U(U_guess)[0]; }
+};
+
+/**
+ * @brief LOSC localization version 2.
+ * @note This is the version used in the LOSC2 paper.
+ * @see J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535.
+ */
+class LoscLocalizerV2 : public LocalizerBase {
+  private:
+    /**
+     * @brief Hamiltonian matrix under AO used in LOSC localization v2.
+     * @details In LOSC2 method, it is just the Hamiltonian of the parent DFA.
+     * Dimension: [nbasis, nbasis].
+     */
+    ConstRefMat &H_ao_;
+
+    /**
+     * @brief Dipole matrix under AO in order of x, y and z directions.
+     * @details Dimension: [nbasis, nbasis].
+     */
+    vector<ConstRefMat> Dipole_ao_;
+
+    /**
+     * @brief Parameter \f$ C \f$ in the cost function of localization v2.
+     * @see Eq. 7 in the LOSC2 paper. Default to 1000.
+     */
+    double c_ = 1000;
+
+    /**
+     * @brief Parameter \f$\gamma\f$ in the cost function of localization v2.
+     * @see Eq. 7 in the LOSC2 paper. Default to 0.707.
+     */
+    double gamma_ = 0.707;
+
+    /**
+     * Internal function to calculate the optimal rotation angle.
+     */
+    void js_optimize_one_pair(const size_t i, const size_t j,
+                              const vector<MatrixXd> dipole_lo,
+                              ConstRefMat &H_lo, double &theta_val,
+                              double &delta_val);
+    /**
+     * Internal function to rotate two orbitals.
+     */
+    void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
+                            RefMat U, vector<MatrixXd> &Dipole_lo, RefMat H_lo);
+
+    /**
+     * @see LocalizerBase::compute.
+     */
+    virtual void compute(RefMat L, RefMat U);
 
   public:
     /**
@@ -206,38 +252,31 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @param [in] Dipole_ao: dipole matrix under AO in x, y and z order with
      * dimension [nbasis, nbasis].
      */
-    LoscLocalizerV2(const shared_ptr<Matrix> &C_lo_basis,
-                    const shared_ptr<Matrix> &H_ao,
-                    const vector<shared_ptr<Matrix>> &Dipole_ao);
+    LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
+                    const vector<ConstRefMat> &Dipole_ao);
 
     /**
-     * @param [in] tol: Jacobi-sweep algorithm convergence tolerance.
-     */
-    void set_tolerance(double tol) { js_tol_ = tol; }
-
-    /**
-     * @param [in] max_iter: Jacobi-sweep algorithm maximum iteration number.
-     */
-    void set_max_iteration(size_t max_iter) { js_max_iter_ = max_iter; }
-
-    /**
-     * @param [in] true_or_false: flag to do random permutation or not
-     * Jacobi-sweep algorithm.
-     */
-    void set_random_permutation(bool true_or_false)
-    {
-        js_random_permutation_ = true_or_false;
-    }
-
-    /**
-     * @brief Compute the LO coefficient matrix under AO for Losc localization
-     * version 2.
+     * @brief Calculate the LOs and the unitary transformation matrix from the
+     * LOSC localization v2.
      *
-     * @return shared_ptr<Matrix>: the LO coefficient matrix under AO with
-     * dimension [nbasis, nlo].
-     * @see LocalizerBase::compute()
+     * @param guess: a string represents the initial guess.
+     * See LocalizerBase::lo_U.
+     * @return the LOs' coefficient matrix under AO.
+     * @see LocalizerBase::lo_U()
      */
-    shared_ptr<Matrix> compute() override;
+    virtual vector<MatrixXd> lo_U(const string &guess = "identity") override;
+
+    /**
+     * @brief Calculate the LOs and the unitary transformation matrix from the
+     * LOSC localization v2.
+     *
+     * @param U_guess: the initial guess of U matrix. See LocalizerBase::lo_U.
+     * @param threshold: the threshold used to check the unitarity. Default to
+     * 1e-8.
+     * @see LocalizerBase::lo_U()
+     */
+    virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
+                                  double threshold = 1e-8) override;
 };
 
 } // namespace losc
