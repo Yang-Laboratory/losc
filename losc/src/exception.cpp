@@ -3,8 +3,6 @@
  * @brief Losc library exception realted definition.
  */
 #include "exception.h"
-#include "matrix.h"
-
 #include <sstream> // std::stringstream
 
 namespace losc {
@@ -16,7 +14,7 @@ void LoscException::make_message(const char *msg)
     msg_ << "Fatal error: " << msg << std::endl;
 }
 
-DimensionError::DimensionError(const Matrix &A, size_t expected_row,
+DimensionError::DimensionError(ConstRefMat &A, size_t expected_row,
                                size_t expected_col, const string &msg)
     : LoscException("Wrong matrix dimension.")
 {

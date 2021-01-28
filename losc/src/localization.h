@@ -27,9 +27,6 @@
  * first, then call the curvature constructor.
  * 5. All the input matrices from users are stored in column-wise, which follows
  * the default behavior of the Eigen library.
- * 6. All internally used matrices (not for sharing with users) are stored with
- * `Eigen::MatrixXd`. All internal functions use `Eigen::MatrixXd &`, NOT
- * `Eigen::Ref<MatrixXd>`, to pass matrices as reference for efficiency.
  */
 #ifndef _LOSC_SRC_LOCALIZATION_H_
 #define _LOSC_SRC_LOCALIZATION_H_
@@ -73,7 +70,7 @@ class LocalizerBase {
      * library.
      * @note Usually, Losc localization use the CO from DFA as the LO basis.
      */
-    ConstRefMat &C_lo_basis_;
+    ConstRefMat C_lo_basis_;
 
     /**
      * @brief Maximum iteration number of Jacobi-sweep algorithm for
@@ -97,20 +94,20 @@ class LocalizerBase {
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is updated at exit.
      */
-    void set_u_guess(MatrixXd &U, const string &guess);
+    void set_u_guess(RefMat U, const string &guess);
 
     /**
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is copied from `U_guess`.
      */
-    void set_u_guess(MatrixXd &U, ConstRefMat &U_guess, double threshold);
+    void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold);
 
     /**
      * Internal function to do the localization.
      * @param L [in, out]: the LO coefficient matrix at exit.
      * @param U [in, out]: the U matrix at the exit.
      */
-    virtual void compute(MatrixXd &L, MatrixXd &U) = 0;
+    virtual void compute(RefMat L, RefMat U) = 0;
 
   public:
     /**
@@ -215,7 +212,7 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @details In LOSC2 method, it is just the Hamiltonian of the parent DFA.
      * Dimension: [nbasis, nbasis].
      */
-    ConstRefMat &H_ao_;
+    ConstRefMat H_ao_;
 
     /**
      * @brief Dipole matrix under AO in order of x, y and z directions.
@@ -253,7 +250,7 @@ class LoscLocalizerV2 : public LocalizerBase {
     /**
      * @see LocalizerBase::compute.
      */
-    virtual void compute(MatrixXd &L, MatrixXd &U) override;
+    virtual void compute(RefMat L, RefMat U) override;
 
   public:
     /**

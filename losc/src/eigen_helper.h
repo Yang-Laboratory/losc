@@ -9,13 +9,10 @@
 
 namespace losc {
 
-using namespace Eigen;
-using ConstRefMat = const Eigen::Ref<const MatrixXd>;
-using ConstRefVec = const Eigen::Ref<const VectorXd>;
-using RefMat = Eigen::Ref<MatrixXd>;
-using RefVec = Eigen::Ref<VectorXd>;
-using RowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
-using ColVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
+using ConstRefMat = const Eigen::Ref<const Eigen::MatrixXd>;
+using ConstRefVec = const Eigen::Ref<const Eigen::VectorXd>;
+using RefMat = Eigen::Ref<Eigen::MatrixXd>;
+using RefVec = Eigen::Ref<Eigen::VectorXd>;
 
 /**
  * @brief Check if the matrix is square or not.
@@ -29,7 +26,7 @@ inline bool mtx_is_square(ConstRefMat &m) { return m.rows() == m.cols(); }
  */
 inline bool mtx_match_dimension(ConstRefMat &m, int row, int col)
 {
-    return (m.rows() == row) && (m.cols() == col));
+    return (m.rows() == row) && (m.cols() == col);
 }
 
 /**
@@ -41,7 +38,6 @@ inline bool mtx_match_dimension(ConstRefMat &m, int row, int col)
 inline void mtx_to_symmetric(RefMat m, const string &uplo)
 {
     const size_t row = m.rows();
-    const size_t col = m.cols();
     if (!mtx_is_square(m)) {
         throw exception::DimensionError(
             "Cannot symmetrize a matrix that is not squared.");

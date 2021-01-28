@@ -3,7 +3,6 @@
  * @brief LOSC curvature version 1 implementation.
  */
 #include "curvature.h"
-
 #include "eigen_helper.h"
 #include "exception.h"
 #include <cmath>

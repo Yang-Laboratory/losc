@@ -108,7 +108,7 @@ LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LoscLocalizerV2::compute(MatrixXd &L, MatrixXd &U)
+void LoscLocalizerV2::compute(RefMat L, RefMat U)
 {
     MatrixXd L_init = C_lo_basis_ * U;
     // calculate dipole on LO initial guess.

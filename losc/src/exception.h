@@ -5,10 +5,10 @@
 #ifndef _LOSC_SRC_EXCEPTION_H_
 #define _LOSC_SRC_EXCEPTION_H_
 
-#include "matrix.h"
 #include <sstream> // std::stringstream
 #include <stdexcept>
 #include <string>
+#include <Eigen/Dense>
 
 namespace losc {
 
@@ -17,9 +17,13 @@ namespace losc {
  */
 namespace exception {
 
-using losc::Matrix;
 using std::string;
 using std::stringstream;
+using namespace Eigen;
+using ConstRefMat = const Eigen::Ref<const MatrixXd>;
+using ConstRefVec = const Eigen::Ref<const VectorXd>;
+using RefMat = Eigen::Ref<MatrixXd>;
+using RefVec = Eigen::Ref<VectorXd>;
 
 class LoscException : public std::runtime_error {
   private:
@@ -39,7 +43,7 @@ class LoscException : public std::runtime_error {
 
 class DimensionError : public LoscException {
   public:
-    DimensionError(const Matrix &A, size_t expected_row, size_t expected_col,
+    DimensionError(ConstRefMat &A, size_t expected_row, size_t expected_col,
                    const string &msg);
 
     DimensionError(const string &msg);

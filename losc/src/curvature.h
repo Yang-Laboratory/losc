@@ -27,9 +27,6 @@
  * first, then call the curvature constructor.
  * 5. All the input matrices from users are stored in column-wise, which follows
  * the default behavior of the Eigen library.
- * 6. All internally used matrices (not for sharing with users) are stored with
- * `Eigen::MatrixXd`. All internal functions use `Eigen::MatrixXd &`, NOT
- * `Eigen::Ref<MatrixXd>`, to pass matrices as reference for efficiency.
  */
 
 #ifndef _LOSC_SRC_CURVATURE_H_
@@ -93,7 +90,7 @@ class CurvatureBase {
      *
      * @see losc::LoscLocalizerV2::compute()
      */
-    ConstRefMat &C_lo_;
+    ConstRefMat C_lo_;
 
     /**
      * @brief The three-body integral \f$\langle p|ii \rangle\f$ matrix used in
@@ -111,7 +108,7 @@ class CurvatureBase {
      * You have to construct the matrix by yourself. See
      * losc::utils::convert_df_pmn2pii_blockwise() for help.
      */
-    ConstRefMat &df_pii_;
+    ConstRefMat df_pii_;
 
     /**
      * @brief Inverse of \f$V_{pq}\f$ matrix used in density fitting.
@@ -134,7 +131,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    ConstRefMat &df_Vpq_inverse_;
+    ConstRefMat df_Vpq_inverse_;
 
     /**
      * @brief AO basis value on grid.
@@ -154,7 +151,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    ConstRefMat &grid_basis_value_;
+    ConstRefMat grid_basis_value_;
 
     /**
      * @brief Coefficient for grid points used in numerical integral.
@@ -169,7 +166,7 @@ class CurvatureBase {
      * }
      * @endcode
      */
-    ConstRefVec &grid_weight_;
+    ConstRefVec grid_weight_;
 
   public:
     /**

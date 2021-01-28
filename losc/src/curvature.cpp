@@ -75,19 +75,19 @@ void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
         const size_t p = p_index[pi];
         // For each p0 (p0|mn), the (m, n) block has dimension:
         // [nbasis x nbasis].
-        Matrix df_pmn_p0_mn(nbasis, nbasis);
+        MatrixXd df_pmn_p0_mn(nbasis, nbasis);
         for (size_t m = 0; m < nbasis; ++m) {
             for (size_t n = 0; n <= m; ++n) {
                 const size_t mn = m * (m + 1) / 2 + n;
                 df_pmn_p0_mn(m, n) = df_pmn_block(pi, mn);
             }
         }
-        df_pmn_p0_mn.to_symmetric("L");
+        mtx_to_symmetric(df_pmn_p0_mn, "L");
 
         // For each p0 (p0|in), the (i, n) block dimension:
         // [nlo x nbasis].
         // Formula: (p0|in) = C_lo^T * (p|mn).
-        Matrix df_pmn_p0_in(nlo, nbasis);
+        MatrixXd df_pmn_p0_in(nlo, nbasis);
         df_pmn_p0_in.noalias() = C_lo.transpose() * df_pmn_p0_mn;
 
         // calculate element (p|ii)
