@@ -35,6 +35,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace losc {
@@ -190,18 +191,55 @@ class CurvatureBase {
                   ConstRefMat &grid_basis_value, ConstRefVec &grid_weight);
 
     /**
+     * @brief Compute the LOSC curvature matrix in place.
+     *
+     * @param K [in, out]: curvature matrix with dimension [nlo, nlo].
+     * @note
+     * 1. The curvature matrix should be allocated in advance with an
+     * expected dimension. Otherwise, it will throw an exception.
+     * 2. Providing this function is to make the easier data communication
+     * (in-out data communication) with C or Fortran code.
+     */
+    virtual void kappa(RefMat K) const = 0;
+
+    /**
      * @brief Compute the LOSC curvature matrix.
      * @return MatrixXd: the LOSC curvature matrix with dimension
      * [nlo, nlo].
      */
-    virtual MatrixXd kappa() = 0;
+    virtual MatrixXd kappa() const
+    {
+        MatrixXd K(nlo_, nlo_);
+        kappa(K);
+        return std::move(K);
+    }
+
+    /**
+     * Return number of LOs.
+     */
+    size_t nlo() const { return nlo_; }
+
+    /**
+     * Return number of AOs.
+     */
+    size_t nbasis() const { return nbasis_; }
+
+    /**
+     * Return number of fit basis.
+     */
+    size_t nfitbasis() const { return nfitbasis_; }
+
+    /**
+     * Return number of grid points.
+     */
+    size_t npts() const { return npts_; }
 };
 
 /**
  * @brief LOSC curvature class for version 1.
  * @details This class take the responsibility to generate curvature
- * version 1 matrix. Curvature version 1 is used in the original
- * LOSC paper (https://doi.org/10.1093/nsr/nwx11).
+ * version 1 matrix. Curvature version 1 is defined as \f$ \kappa \f$ in
+ * Eq. 3 in the original LOSC paper (https://doi.org/10.1093/nsr/nwx11).
  */
 class CurvatureV1 : public CurvatureBase {
   private:
@@ -219,8 +257,8 @@ class CurvatureV1 : public CurvatureBase {
      */
     double tau_ = 1.2378;
 
-    MatrixXd compute_kappa_J();
-    MatrixXd compute_kappa_xc();
+    MatrixXd compute_kappa_J() const;
+    MatrixXd compute_kappa_xc() const;
 
   public:
     /**
@@ -248,20 +286,19 @@ class CurvatureV1 : public CurvatureBase {
     {
     }
 
+    using CurvatureBase::kappa;
     /**
      * @brief Compute the LOSC curvature version 1 matrix.
-     * @return MatrixXd: The LOSC curvature version 1 matrix with dimension of
-     * [nlo, nlo]. The curvature matrix is defined as \f$\kappa\f$ in Eq. 3
-     * of the original LOSC paper (https://doi.org/10.1093/nsr/nwx11).
+     * @param K [in, out]: curvature matrix with dimension [nlo, nlo].
      */
-    virtual MatrixXd kappa() override;
+    virtual void kappa(RefMat K) const override;
 };
 
 /**
  * @brief LOSC curvature class for version 2.
  * @details This class take the responsibility to generate curvature version 2
- * matrix. Curvature version 2 is used in the LOSC2 paper
- * (see J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535).
+ * matrix. The curvature matrix is defined as \f$\tilde{\kappa}\f$ in
+ * Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
  */
 class CurvatureV2 : public CurvatureBase {
   private:
@@ -307,13 +344,12 @@ class CurvatureV2 : public CurvatureBase {
     {
     }
 
+    using CurvatureBase::kappa;
     /**
      * @brief Compute the LOSC curvature version 2 matrix.
-     * @return MatrixXd: The LOSC curvature version 2 matrix with dimension of
-     * [nlo, nlo]. The curvature matrix is defined as \f$\tilde{\kappa}\f$ in
-     * Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535).
+     * @param K [in, out]: curvature matrix with dimension [nlo, nlo].
      */
-    virtual MatrixXd kappa() override;
+    virtual void kappa(RefMat K) const override;
 };
 
 /**

@@ -20,3 +20,6 @@ extern*/
 # doxygen
 **/doxygen*/
 **/Doxyfile
+
+**/__*
+**/*.so

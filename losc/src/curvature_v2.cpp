@@ -9,8 +9,14 @@
 
 namespace losc {
 
-MatrixXd CurvatureV2::kappa()
+void CurvatureV2::kappa(RefMat kappa2) const
 {
+    if (!mtx_match_dimension(kappa2, nlo_, nlo_)) {
+        throw exception::DimensionError(
+            kappa2, nlo_, nlo_,
+            "CurvatureV2::kappa(): wrong dimension of the input kappa matrix.");
+    }
+
     // construct absolute overlap under LO.
     MatrixXd S_lo(nlo_, nlo_);
     S_lo.setZero();
@@ -68,7 +74,6 @@ MatrixXd CurvatureV2::kappa()
     using std::erf;
     using std::erfc;
     using std::sqrt;
-    MatrixXd kappa2(nlo_, nlo_);
     for (size_t i = 0; i < nlo_; ++i) {
         const double K1_ii = kappa1(i, i);
         kappa2(i, i) = K1_ii;
@@ -81,8 +86,6 @@ MatrixXd CurvatureV2::kappa()
         }
     }
     mtx_to_symmetric(kappa2, "L");
-
-    return kappa2;
 }
 
 } // namespace losc

@@ -10,13 +10,13 @@
 
 namespace losc {
 
-MatrixXd CurvatureV1::compute_kappa_J()
+MatrixXd CurvatureV1::compute_kappa_J() const
 {
     // K_ij = <ii|p> V_{pq}^-1 <q|jj>
     return df_pii_.transpose() * df_Vpq_inverse_ * df_pii_;
 }
 
-MatrixXd CurvatureV1::compute_kappa_xc()
+MatrixXd CurvatureV1::compute_kappa_xc() const
 {
     MatrixXd kappa_xc(nlo_, nlo_);
     kappa_xc.setZero();
@@ -70,11 +70,17 @@ MatrixXd CurvatureV1::compute_kappa_xc()
     return kappa_xc;
 }
 
-MatrixXd CurvatureV1::kappa()
+void CurvatureV1::kappa(RefMat K) const
 {
+    if (!mtx_match_dimension(K, nlo_, nlo_)) {
+        throw exception::DimensionError(
+            K, nlo_, nlo_,
+            "CurvatureV1::kappa(): wrong dimension of the input kappa matrix.");
+    }
     MatrixXd kappa_J = compute_kappa_J();
     MatrixXd kappa_xc = compute_kappa_xc();
-    return (1 - dfa_info_.hf_x) * kappa_J - (2.0 * tau_ * cx_ / 3.0) * kappa_xc;
+    K.noalias() =
+        (1 - dfa_info_.hf_x) * kappa_J - (2.0 * tau_ * cx_ / 3.0) * kappa_xc;
 }
 
 } // namespace losc
