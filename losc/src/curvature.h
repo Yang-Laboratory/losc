@@ -5,21 +5,31 @@
  * @note
  * 1. We use the famous Eigen template library to share data between the
  * construction of curvature matrix and users. The `Eigen::MatrixXd` is used to
- * represent matrices. To avoid the unnecessary copy of data from the user, we
- * use `Eigen::Ref<MatrixXd>` in the interface to map the needed matrices to the
- * existing matrices that are provided by the user. Thus, the life of all the
- * input matrices are controlled by the users, not us! Make sure these input
- * matrices are alive during computation of curvature matrix. We do not perform
- * any check to these conditions.
- * 2. Caution: a common pitfall related to the life of input matrices is passing
+ * represent matrices. The matrices that communicate between the library
+ * and users are called sharing matrices. To avoid unnecessary copy for
+ * efficiency, we use `using ConstRefMat = const Eigen::Ref<const MatrixXd>`
+ * and `using RefMat = Eigen::Ref<MatrixXd>` to represent the sharing
+ * matrices (also vectors). Note the difference in const-qualification between
+ * `ConstRefMat` and `RefMat`.
+ * 2. For sharing matrices, `ConstRefMat` is used for matrices provided by
+ * the user with read-only access. `RefMat` is used for matrices with both
+ * read-write access.
+ * 3. The sharing matrices are controlled by `Eigen::Ref` template class
+ * which maps to an existing matrix class. Thus, the life of all these sharing
+ * matrices are controlled by the users, not by us! Make sure these sharing
+ * matrices are alive during the usage of this library. This library does not
+ * perform any check to valide these conditions of lifetime.
+ * 4. Caution: a common pitfall related to the life of input matrices is passing
  * a temporary matrix to the curvature constructor. This could happen if you
  * pass a matrix expression, supported by Eigen, which is finally evalated into
  * a temporary matrix object (note, matrix and matrix expression are different
  * concept in Eigen). So keep in mind that always prepared the matrices at
  * first, then call the curvature constructor.
- * 3. All the input matrices from users are stored in column-wise, which follows
+ * 5. All the input matrices from users are stored in column-wise, which follows
  * the default behavior of the Eigen library.
- * 4. We never change the input data from the user.
+ * 6. All internally used matrices (not for sharing with users) are stored with
+ * `Eigen::MatrixXd`. All internal functions use `Eigen::MatrixXd &`, NOT
+ * `Eigen::Ref<MatrixXd>`, to pass matrices as reference for efficiency.
  */
 
 #ifndef _LOSC_SRC_CURVATURE_H_

@@ -5,21 +5,31 @@
  * @note
  * 1. We use the famous Eigen template library to share data between the
  * construction of curvature matrix and users. The `Eigen::MatrixXd` is used to
- * represent matrices. To avoid the unnecessary copy of data from the user, we
- * use `Eigen::Ref<MatrixXd>` in the interface to map the needed matrices to the
- * existing matrices that are provided by the user. Thus, the life of all the
- * input matrices are controlled by the users, not us! Make sure these input
- * matrices are alive during computation of curvature matrix. We do not perform
- * any check to these conditions.
- * 2. Caution: a common pitfall related to the life of input matrices is passing
+ * represent matrices. The matrices that communicate between the library
+ * and users are called sharing matrices. To avoid unnecessary copy for
+ * efficiency, we use `using ConstRefMat = const Eigen::Ref<const MatrixXd>`
+ * and `using RefMat = Eigen::Ref<MatrixXd>` to represent the sharing
+ * matrices (also vectors). Note the difference in const-qualification between
+ * `ConstRefMat` and `RefMat`.
+ * 2. For sharing matrices, `ConstRefMat` is used for matrices provided by
+ * the user with read-only access. `RefMat` is used for matrices with both
+ * read-write access.
+ * 3. The sharing matrices are controlled by `Eigen::Ref` template class
+ * which maps to an existing matrix class. Thus, the life of all these sharing
+ * matrices are controlled by the users, not by us! Make sure these sharing
+ * matrices are alive during the usage of this library. This library does not
+ * perform any check to valide these conditions of lifetime.
+ * 4. Caution: a common pitfall related to the life of input matrices is passing
  * a temporary matrix to the curvature constructor. This could happen if you
  * pass a matrix expression, supported by Eigen, which is finally evalated into
  * a temporary matrix object (note, matrix and matrix expression are different
  * concept in Eigen). So keep in mind that always prepared the matrices at
  * first, then call the curvature constructor.
- * 3. All the input matrices from users are stored in column-wise, which follows
+ * 5. All the input matrices from users are stored in column-wise, which follows
  * the default behavior of the Eigen library.
- * 4. We never change the input data from the user.
+ * 6. All internally used matrices (not for sharing with users) are stored with
+ * `Eigen::MatrixXd`. All internal functions use `Eigen::MatrixXd &`, NOT
+ * `Eigen::Ref<MatrixXd>`, to pass matrices as reference for efficiency.
  */
 #ifndef _LOSC_SRC_LOCALIZATION_H_
 #define _LOSC_SRC_LOCALIZATION_H_
@@ -87,20 +97,20 @@ class LocalizerBase {
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is updated at exit.
      */
-    void set_u_guess(RefMat U, const string &guess);
+    void set_u_guess(MatrixXd &U, const string &guess);
 
     /**
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is copied from `U_guess`.
      */
-    void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold);
+    void set_u_guess(MatrixXd &U, ConstRefMat &U_guess, double threshold);
 
     /**
      * Internal function to do the localization.
      * @param L [in, out]: the LO coefficient matrix at exit.
      * @param U [in, out]: the U matrix at the exit.
      */
-    virtual void compute(RefMat L, RefMat U) = 0;
+    virtual void compute(MatrixXd &L, MatrixXd &U) = 0;
 
   public:
     /**
@@ -229,19 +239,21 @@ class LoscLocalizerV2 : public LocalizerBase {
      * Internal function to calculate the optimal rotation angle.
      */
     void js_optimize_one_pair(const size_t i, const size_t j,
-                              const vector<MatrixXd> dipole_lo,
-                              ConstRefMat &H_lo, double &theta_val,
+                              const vector<MatrixXd> &D_lo,
+                              const MatrixXd &H_lo, double &theta_val,
                               double &delta_val);
     /**
-     * Internal function to rotate two orbitals.
+     * Internal function to rotate two orbitals: rotate D_lo, H_lo and U
+     * matrices.
      */
     void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
-                            RefMat U, vector<MatrixXd> &Dipole_lo, RefMat H_lo);
+                            MatrixXd &U, vector<MatrixXd> &D_lo,
+                            MatrixXd &H_lo);
 
     /**
      * @see LocalizerBase::compute.
      */
-    virtual void compute(RefMat L, RefMat U);
+    virtual void compute(MatrixXd &L, MatrixXd &U) override;
 
   public:
     /**

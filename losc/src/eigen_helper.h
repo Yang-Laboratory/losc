@@ -3,15 +3,19 @@
 
 #include <Eigen/Dense>
 #include <string>
+#include <cmath>
 
 #include "exception.h"
 
 namespace losc {
 
+using namespace Eigen;
 using ConstRefMat = const Eigen::Ref<const MatrixXd>;
 using ConstRefVec = const Eigen::Ref<const VectorXd>;
 using RefMat = Eigen::Ref<MatrixXd>;
 using RefVec = Eigen::Ref<VectorXd>;
+using RowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
+using ColVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 
 /**
  * @brief Check if the matrix is square or not.
@@ -59,6 +63,20 @@ inline void mtx_to_symmetric(RefMat m, const string &uplo)
             "Implementation Error: wrong choice to symmetrize a matrix.");
     }
 }
+
+/**
+ * apply rotation matrix to x and y vector. x and y can represent either row or
+ * column vector.
+ */
+template<typename T>
+inline void rotate_two_vectors(T &&x, T &&y, double theta)
+{
+    const double c = cos(theta);
+    const double s = sin(theta);
+    x = x * c + y * s;
+    y = x * -s + y * c;
+}
+
 
 } // namespace losc
 #endif

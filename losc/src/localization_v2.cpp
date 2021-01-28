@@ -3,7 +3,6 @@
  * @brief Implementation of Losc localization v2.
  */
 
-#include "blas_base.h"
 #include "eigen_helper.h"
 #include "exception.h"
 #include "localization.h"
@@ -16,9 +15,9 @@
 namespace losc {
 
 void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
-                                           const vector<MatrixXd> D_lo,
-                                           ConstRefMat &H_lo, double &theta_val,
-                                           double &delta_val)
+                                           const vector<MatrixXd> &D_lo,
+                                           const MatrixXd &H_lo,
+                                           double &theta_val, double &delta_val)
 {
     // Spacial part: constant x1 and x2.
     double x1 = 0.0;
@@ -64,35 +63,22 @@ void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
 }
 
 void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
-                                         const double theta, RefMat U,
-                                         vector<MatrixXd> &D_lo, RefMat H_lo)
+                                         const double theta, MatrixXd &U,
+                                         vector<MatrixXd> &D_lo, MatrixXd &H_lo)
 {
-    // TODO: check if Eigen supports the rotation matrix?
-    double costheta = cos(theta);
-    double sintheta = sin(theta);
-    int nlo = nlo_;
-
     // rotate U
-    losc::blas::drot_(&nlo, U.data() + i * nlo, losc::blas::ione,
-                      U.data() + j * nlo, losc::blas::ione, &costheta,
-                      &sintheta);
+    rotate_two_vectors(U.row(i), U.row(j), theta);
 
     // rotate D_lo
     for (int xyz = 0; xyz < 3; ++xyz) {
-        RefMat D = D_lo[xyz];
-        losc::blas::drot_(&nlo, D.data() + i * nlo, losc::blas::ione,
-                          D.data() + j * nlo, losc::blas::ione, &costheta,
-                          &sintheta);
-        losc::blas::drot_(&nlo, D.data() + i, &nlo, D.data() + j, &nlo,
-                          &costheta, &sintheta);
+        MatrixXd &D = D_lo[xyz];
+        rotate_two_vectors(D.row(i), D.row(j), theta);
+        rotate_two_vectors(D.col(i), D.col(j), theta);
     }
 
     // rotate H_lo
-    losc::blas::drot_(&nlo, H_lo.data() + i * nlo, losc::blas::ione,
-                      H_lo.data() + j * nlo, losc::blas::ione, &costheta,
-                      &sintheta);
-    losc::blas::drot_(&nlo, H_lo.data() + i, &nlo, H_lo.data() + j, &nlo,
-                      &costheta, &sintheta);
+    rotate_two_vectors(H_lo.row(i), H_lo.row(j), theta);
+    rotate_two_vectors(H_lo.col(i), H_lo.col(j), theta);
 }
 
 LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
@@ -122,7 +108,7 @@ LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LoscLocalizerV2::compute(RefMat L, RefMat U)
+void LoscLocalizerV2::compute(MatrixXd &L, MatrixXd &U)
 {
     MatrixXd L_init = C_lo_basis_ * U;
     // calculate dipole on LO initial guess.
@@ -182,8 +168,8 @@ void LoscLocalizerV2::compute(RefMat L, RefMat U)
 vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess)
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
-    RefMat L = rst[0];
-    RefMat U = rst[1];
+    MatrixXd &L = rst[0];
+    MatrixXd &U = rst[1];
     set_u_guess(U, guess);
     compute(L, U);
     return rst;
@@ -192,8 +178,8 @@ vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess)
 vector<MatrixXd> LoscLocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
-    RefMat L = rst[0];
-    RefMat U = rst[1];
+    MatrixXd &L = rst[0];
+    MatrixXd &U = rst[1];
     set_u_guess(U, U_guess, threshold);
     compute(L, U);
     return rst;
