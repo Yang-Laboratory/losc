@@ -46,7 +46,6 @@ def _np2eigen(func):
     def wrapper(*args, **kargs):
         n_args = []
         for i in range(len(args)):
-            print(f'arg: {i}, {args[i]}')
             n_args.append(to_fortran(args[i]))
         n_kargs = {}
         for k in kargs:

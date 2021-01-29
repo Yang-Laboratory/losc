@@ -91,7 +91,10 @@ void export_curvature_base(py::module &m)
                       ConstRefMat &,   // df_Vpq_inv
                       ConstRefMat &,   // grid_basis_value
                       ConstRefVec &    // grid_weight
-                      >())
+                      >(),
+             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
+             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
+             "grid_weight"_a.noconvert())
         // nlo
         .def("nlo", &CurvatureBase::nlo, R"pddoc(
             Returns
@@ -144,7 +147,10 @@ void export_curvature_v1(py::module &m)
                       ConstRefMat &,   // df_Vpq_inv
                       ConstRefMat &,   // grid_basis_value
                       ConstRefVec &    // grid_weight
-                      >());
+                      >(),
+             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
+             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
+             "grid_weight"_a.noconvert());
     // CurvatureV1 class has no new functions compared to CurvatureBase.
     // So no more functions need to be exported here.
 }
@@ -161,7 +167,10 @@ void export_curvature_v2(py::module &m)
                       ConstRefMat &,   // df_Vpq_inv
                       ConstRefMat &,   // grid_basis_value
                       ConstRefVec &    // grid_weight
-                      >());
+                      >(),
+             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
+             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
+             "grid_weight"_a.noconvert());
     // CurvatureV2 class has no new functions compared to CurvatureBase.
     // So no more functions need to be exported here.
 }

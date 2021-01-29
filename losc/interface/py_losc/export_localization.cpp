@@ -123,7 +123,8 @@ void export_localization_base(py::module &m)
         m, "LocalizerBase", "LOSC localization base", py::dynamic_attr())
         // constructor
         .def(py::init<ConstRefMat & // C_lo_basis
-                      >())
+                      >(),
+             "C_lo_basis"_a.noconvert())
         // set_max_iter
         .def("set_max_iter", &LocalizerBase::set_max_iter, R"pddoc(
         Set the maximum iteration number for localization.
@@ -262,7 +263,9 @@ void export_localization_v2(py::module &m)
         .def(py::init<ConstRefMat &,              // C_lo_basis
                       ConstRefMat &,              // H_ao
                       const vector<RefConstMat> & // D_ao
-                      >());
+                      >(),
+             "C_lo_basis"_a.noconvert(), "H_ao"_a.noconvert(),
+             "D_ao"_a.noconvert());
     // LoscLocalizerV2 class has no new functions compared to LocalizerBase.
     // So no more functions can be exported here.
 }
