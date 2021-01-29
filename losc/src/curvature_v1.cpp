@@ -79,8 +79,8 @@ void CurvatureV1::kappa(RefMat K) const
     }
     MatrixXd kappa_J = compute_kappa_J();
     MatrixXd kappa_xc = compute_kappa_xc();
-    K.noalias() =
-        (1 - dfa_info_.hf_x) * kappa_J - (2.0 * tau_ * cx_ / 3.0) * kappa_xc;
+    K.noalias() = (1 - dfa_info_.hf_x()) * kappa_J -
+                  dfa_info_.gga_x() * (2.0 * tau_ * cx_ / 3.0) * kappa_xc;
 }
 
 } // namespace losc

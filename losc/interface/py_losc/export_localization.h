@@ -5,5 +5,6 @@
 namespace py = pybind11;
 
 void export_localization_base(py::module &m);
+void export_localization_v2(py::module &m);
 
 #endif

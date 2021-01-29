@@ -54,15 +54,19 @@ using RefVec = Eigen::Ref<VectorXd>;
  *
  * It includes the exchange types and their weights in the DFA.
  */
-struct DFAInfo {
-    const string &name; /**< DFA name. */
-    double gga_x;       /**< GGA type exchange weight. */
-    double hf_x;        /**< Hatree-Fock exchange weight. */
+class DFAInfo {
+    const string name_; /**< DFA name. */
+    double gga_x_;      /**< GGA type exchange weight. */
+    double hf_x_;       /**< Hatree-Fock exchange weight. */
 
-    DFAInfo(double gga_x_wt, double hf_x_wt, const string &name = "")
-        : name{name}, gga_x{gga_x_wt}, hf_x{hf_x_wt}
+  public:
+    DFAInfo(double gga_x, double hf_x, const string &name = "")
+        : name_{name}, gga_x_{gga_x}, hf_x_{hf_x}
     {
     }
+    const string &name() const { return name_; }
+    const double &gga_x() const { return gga_x_; }
+    const double &hf_x() const { return hf_x_; }
 };
 
 /**

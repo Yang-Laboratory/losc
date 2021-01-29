@@ -1,8 +1,8 @@
 """
 Python interface for localized orbital scaling correction (LOSC) library.
 
-Notation
------------
+Notations
+---------
 LO refers to the localized orbital.
 AO refers to the atomic orbitals.
 CO refers to the canonical orbital.
@@ -11,8 +11,8 @@ CO refers to the canonical orbital.
 `nfitbasis` refers to the number of fitting basis for density fitting.
 `npts` refers to the number of grids.
 
-Note
---------
+Notes
+-----
 1. All the matrices are represented and stored in 2-dimensional
 `np.ndarray` object. The storage order of matrices is required to be
 Fortran-style (column major). If the input matrix is not Fortran-style,
@@ -20,7 +20,6 @@ it will be converted into Fortran-style with calling `np.asfortranarray()`
 function interanally.
 """
 
-from py_losc_core import DFAInfo
 import numpy as np
 import py_losc_core as core
 import functools
@@ -50,37 +49,49 @@ def _np2eigen(func):
     return wrapper
 
 
-def _add_common_attr(cls):
-    @property
-    def nlo(self):
-        "Number of LOs"
-        return self._calc_man.nlo()
+class DFAInfo(core.DFAInfo):
+    def __init__(self, gga_x, hf_x, name=''):
+        """
+        Constructor of DFAInfo class that represents a DFA.
 
-    @property
-    def nbasis(self):
-        "Number of AOs"
-        return self._calc_man.nbasis()
+        Parameters
+        ----------
+        name: str
+           The description of the DFA. Default to an empty string.
+        hf_x: float
+           The weight of HF exchange in the DFA.
+        gga_x: float
+           The total weights of ALL GGA and LDA type exchange in the DFA.
 
-    @property
-    def nfitbasis(self):
-        "Number of fit basis"
-        return self._calc_man.nfitbasis()
+        Examples
+        --------
+        B3LYP functional is:
+        E_B3LYP = E_LDA_x + a0 * (E_HF_x - E_LDA_x) + ax * (E_GGA_x - E_LDA_x)
+        + E_LDA_c + ac * (E_GGA_c - E_LDA_c),
+        in which exchanges end with suffix "_x" and correlations end with
+        suffix "_c", and (a0, ax, ac) are coefficients.
 
-    @property
-    def npts(self):
-        "Number of grid points"
-        return self._calc_man.npts()
+        The total weights of GGA and LDA exchanges are:
+        gga_x = 1 + a0 * (-1) + ax * (1 - 1) = 1 - a0
 
-    setattr(cls, 'nlo', nlo)
-    setattr(cls, 'nbasis', nbasis)
-    setattr(cls, 'nfitbasis', nfitbasis)
-    setattr(cls, 'npts', npts)
-    return cls
+        The total weights of HF exchanges is clear:
+        hf_x = a0
+        >>> b3lyp = DFAInfo(gga_x, hf_x, "B3LYP")
+        """
+        core.DFAInfo.__init__(self, gga_x, hf_x, name)
 
+    def __repr__(self):
+        "Representation of DFAInfo object."
+        return ("<py_losc.DFAInfo> object: {"
+                f"name: {None if self.name() == '' else self.name()}, "
+                f"gga_x: {self.gga_x()}, "
+                f"hf_x: {self.hf_x()}"
+                "}")
 
 # Interface for curvature matrix.
-@_add_common_attr
-class CurvatureV1():
+
+
+class CurvatureV1(core.CurvatureV1):
     """LOSC curvature matrix version 1.
 
     Curvature version 1 is defined as $\kappa$ in Eq. 10 of the original
@@ -98,38 +109,37 @@ class CurvatureV1():
         Curvature version 1 class constructor.
 
         Parameters
-        ------------
+        ----------
         dfa_info: DFAInfo
             The information of the associated DFA.
         C_lo: np.ndarray [nbasis, nlo]
-            LO coefficient matrix.
+            LOs' coefficient matrix under AOs. The relation between LOs
+            ($\phi_i$) and AOs ($\psi_\mu$) via the coefficient matrix
+            ($C_{\mu i}$) is the following:
+            $\phi_i = \psi_{\mu} C_{\mu i}$.
         df_pii: np.ndarray [nfitbasis, nlo]
-            Three-body integral <p|ii> for density fitting.
+            Three-body integral <p|ii> for density fitting, in which index
+            p is for fitting basis and index i is for LOs.
         df_Vpq_inv: np.ndarray [nfitbasis, nfitbasis]
-            Inverse matrix of integral <p|1/r|q> for density fitting.
+            Inverse matrix of integral <p|1/r|q> for density fitting, in
+            which index p and q are for fitting basis.
         grid_basis_val: np.ndarray [npts, nbasis]
-            Grid values of AOs.
+            Grid values of AOs. grid_basis_val[ip, i] is the i-th AO's value
+            on ip-th grid point.
         grid_weight: list or np.ndarray [npts, 1]
             Weights of grids.
+
+        See Also
+        --------
+        DFAInfo: the DFA information class.
         """
-        self._calc_man = core.CurvatureV1(dfa_info, C_lo, df_pii,
-                                          df_vpq_inv, grid_basis_val,
-                                          grid_weight)
-
-    def kappa(self) -> np.ndarray:
-        """
-        Compute the curvature matrix version 1.
-
-        Return
-        -------
-        np.ndarray [nlo, nlo]
-            The curvature matrix.
-        """
-        return self._calc_man.kappa()
+        # Pybind11 has to call the base.__init__() explicitly, instead of
+        # using super().__init__() to initialize the base class.
+        core.CurvatureV1.__init__(self, dfa_info, C_lo, df_pii, df_vpq_inv,
+                                  grid_basis_val, grid_weight)
 
 
-@_add_common_attr
-class CurvatureV2():
+class CurvatureV2(core.CurvatureV2):
     """LOSC curvature matrix version 2.
 
     Curvature version 2 is defined as $\tilde{\kappa}$ in Eq. 8 of the
@@ -146,23 +156,15 @@ class CurvatureV2():
         """
         Curvature version 2 class constructor.
 
-        Parameters
-        ------------
+        Notes
+        -----
         Same interface for input parameters as described in CurvatureV1 class.
-        """
-        self._calc_man = core.CurvatureV2(dfa_info, C_lo, df_pii,
-                                          df_vpq_inv, grid_basis_val,
-                                          grid_weight)
 
-    def kappa(self):
+        See Also
+        --------
+        CurvatureV1: constructor of LOSC curvature version 1.
         """
-        Compute the curvature matrix version 2.
-
-        Return
-        -------
-        np.ndarray [nlo, nlo]
-            The curvature matrix.
-        """
-        return self._calc_man.kappa()
+        core.CurvatureV2.__init__(self, dfa_info, C_lo, df_pii, df_vpq_inv,
+                                  grid_basis_val, grid_weight)
 
 # TODO: Interface for localization matrix.

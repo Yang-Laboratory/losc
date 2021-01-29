@@ -127,27 +127,27 @@ void export_localization_base(py::module &m)
         .def("set_max_iter", &LocalizerBase::set_max_iter, R"pddoc(
         Set the maximum iteration number for localization.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         max_iter: int
-            the max number of iterations.
+            The max number of iterations.
 
-        Return
-        ------
-        None
+        Returns
+        -------
+        out: None
         )pddoc")
         // set_convergence
         .def("set_convergence", &LocalizerBase::set_convergence, R"pddoc(
         Set the convergence tolerance for localization.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         tol: double
-            the convergence tolerance.
+            The convergence tolerance.
 
-        Return
-        ------
-        None
+        Returns
+        -------
+        out: None
         )pddoc")
         // set_random_permutation
         .def("set_random_permutation", &LocalizerBase::set_random_permutation,
@@ -155,13 +155,13 @@ void export_localization_base(py::module &m)
         Set the flag for performing random permutation or not in localization
         with Jacobi-Sweep algorithm.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         flag: bool
 
-        Return
-        ------
-        None
+        Returns
+        -------
+        out: None
         )pddoc")
         // lo_U: overload 1
         .def("lo_U",
@@ -170,8 +170,8 @@ void export_localization_base(py::module &m)
              R"pddoc(
         Calculate the LOs and the unitary transformation matrix.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         guess: str
             Initial guess of the unitary matrix to do localization. The choices
             are ['identity', 'random', 'random_fixed_seed']. Default to 'identity'.
@@ -181,8 +181,8 @@ void export_localization_base(py::module &m)
                 matrix with fixed random seed.
 
         Returns
-        ------
-        (np.ndarray, np.ndarray)
+        -------
+        out: (np.ndarray, np.ndarray)
             The first one is the LO coefficient matrix, and the second one is the
             corresponding U matrix.
         )pddoc")
@@ -194,8 +194,8 @@ void export_localization_base(py::module &m)
         Calculate the LOs and the unitary transformation matrix with a given
         U matrix as the initial guess.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         U_guess: np.ndarray
             The initial guess of U matrix. Its data will be copied for
             localization. Its unitarity will be verified and throw an exception
@@ -204,8 +204,8 @@ void export_localization_base(py::module &m)
             The threshold used to check the unitarity. Default to 1e-8.
 
         Returns
-        ------
-        (np.ndarray, np.ndarray)
+        -------
+        out: (np.ndarray, np.ndarray)
             The first one is the LO coefficient matrix, and the second one is the
             corresponding U matrix.
         )pddoc")
@@ -216,17 +216,18 @@ void export_localization_base(py::module &m)
              R"pddoc(
         Calculate the LOs' coefficient matrix under AO.
 
-        Parameter
-        ---------
-        guess: str
-            Initial guess of the unitary matrix to do localization. The choices
-            are ['identity', 'random', 'random_fixed_seed']. Default to 'identity'.
-            See lo_U.
-
         Returns
-        ------
-        np.ndarray
+        -------
+        out: np.ndarray
             The the LO coefficient matrix.
+
+        Notes
+        -----
+        Same interface of arguments as lo_U.
+
+        See Also
+        --------
+        lo_U: Return both LOs and the U matrix.
         )pddoc")
         // lo: overload 2
         .def("lo",
@@ -236,19 +237,18 @@ void export_localization_base(py::module &m)
         Calculate the LOs' coefficient matrix under AO with a given U matrix as
         the initial guess.
 
-        Parameter
-        ---------
-        U_guess: np.ndarray
-            The initial guess of U matrix. Its data will be copied for
-            localization. Its unitarity will be verified and throw an exception
-            if the validation fails.
-        threshold: float
-            The threshold used to check the unitarity. Default to 1e-8.
-
         Returns
-        ------
-        np.ndarray
+        -------
+        out: np.ndarray
             The the LO coefficient matrix.
+
+        Notes
+        -----
+        Same interface of arguments as lo_U.
+
+        See Also
+        --------
+        lo_U: return both LOs and the U matrix.
         )pddoc");
 }
 
