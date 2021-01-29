@@ -11,15 +11,17 @@
 extern "C" {
 #endif
 
-#include "matrix.h"
-
-typedef struct DFAInfo DFAInfo;
-typedef struct CurvatureV1 CurvatureV1;
-typedef struct CurvatureV2 CurvatureV2;
+//***********************
+// ==> Matrix <==
+//***********************
+#include "matrix.h" // This brings the interface of matrix.
 
 //***********************
 // ==> Class DFAInfo <==
 //***********************
+typedef struct DFAInfo DFAInfo;
+typedef struct CurvatureV1 CurvatureV1;
+typedef struct CurvatureV2 CurvatureV2;
 
 /**
  * Constructor of DFAInfo struct that stores the information

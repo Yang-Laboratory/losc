@@ -1,7 +1,7 @@
 #ifndef __LOSC_INTERFACE_C_LOSC_MATRIX_INTERNAL_H__
 #define __LOSC_INTERFACE_C_LOSC_MATRIX_INTERNAL_H__
 
-#include "../../src/exception.h"
+#include "../../../src/exception.h"
 #include <Eigen/Dense>
 
 /**

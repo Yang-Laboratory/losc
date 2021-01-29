@@ -1,6 +1,6 @@
 #include "losc.h"
 #include "../../src/curvature.h"
-#include "matrix_internal.h"
+#include "internal/matrix_impl.h"
 #include <Eigen/Dense>
 
 namespace losc {
