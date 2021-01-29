@@ -4,7 +4,7 @@
 
 namespace losc {
 
-void LocalizerBase::set_u_guess(RefMat U, const string &guess)
+void LocalizerBase::set_u_guess(RefMat U, const string &guess) const
 {
     if (guess == "identity")
         U.setIdentity();
@@ -18,7 +18,7 @@ void LocalizerBase::set_u_guess(RefMat U, const string &guess)
 }
 
 void LocalizerBase::set_u_guess(RefMat U, ConstRefMat &U_guess,
-                                double threshold)
+                                double threshold) const
 {
     if (!mtx_match_dimension(U, nlo_, nlo_)) {
         throw exception::DimensionError(
@@ -41,5 +41,7 @@ LocalizerBase::LocalizerBase(ConstRefMat &C_lo_basis)
                                         "LO basis matrix under AO.");
     }
 }
+
+LocalizerBase::~LocalizerBase() {}
 
 } // namespace losc

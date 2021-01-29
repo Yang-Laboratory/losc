@@ -8,6 +8,7 @@
 #include "localization.h"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <random>
 #include <stdarg.h>
 #include <string>
@@ -17,7 +18,8 @@ namespace losc {
 void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
                                            const vector<MatrixXd> &D_lo,
                                            const MatrixXd &H_lo,
-                                           double &theta_val, double &delta_val)
+                                           double &theta_val,
+                                           double &delta_val) const
 {
     // Spacial part: constant x1 and x2.
     double x1 = 0.0;
@@ -64,7 +66,8 @@ void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
 
 void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
                                          const double theta, MatrixXd &U,
-                                         vector<MatrixXd> &D_lo, MatrixXd &H_lo)
+                                         vector<MatrixXd> &D_lo,
+                                         MatrixXd &H_lo) const
 {
     // rotate U
     rotate_two_vectors(U.row(i), U.row(j), theta);
@@ -82,7 +85,7 @@ void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
 }
 
 LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
-                                 const vector<ConstRefMat> &Dipole_ao)
+                                 const vector<RefConstMat> &Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
     if (!mtx_match_dimension(H_ao_, nbasis_, nbasis_)) {
@@ -108,7 +111,7 @@ LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LoscLocalizerV2::compute(RefMat L, RefMat U)
+void LoscLocalizerV2::compute(MatrixXd &L, MatrixXd &U) const
 {
     MatrixXd L_init = C_lo_basis_ * U;
     // calculate dipole on LO initial guess.
@@ -165,7 +168,7 @@ void LoscLocalizerV2::compute(RefMat L, RefMat U)
     L.noalias() = C_lo_basis_ * U;
 }
 
-vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess)
+vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     MatrixXd &L = rst[0];
@@ -175,7 +178,8 @@ vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess)
     return rst;
 }
 
-vector<MatrixXd> LoscLocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
+vector<MatrixXd> LoscLocalizerV2::lo_U(ConstRefMat &U_guess,
+                                       double threshold) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     MatrixXd &L = rst[0];

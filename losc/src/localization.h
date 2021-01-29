@@ -46,6 +46,8 @@ using ConstRefMat = const Eigen::Ref<const MatrixXd>;
 using ConstRefVec = const Eigen::Ref<const VectorXd>;
 using RefMat = Eigen::Ref<MatrixXd>;
 using RefVec = Eigen::Ref<VectorXd>;
+using RefConstMat = Eigen::Ref<const MatrixXd>;
+using RefConstVec = Eigen::Ref<const VectorXd>;
 
 /**
  * @brief Base class for LOSC localization.
@@ -94,20 +96,20 @@ class LocalizerBase {
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is updated at exit.
      */
-    void set_u_guess(RefMat U, const string &guess);
+    void set_u_guess(RefMat U, const string &guess) const;
 
     /**
      * Internal function to set the initial U matrix.
      * @param U [in, out]: the initial U matrix is copied from `U_guess`.
      */
-    void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold);
+    void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold) const;
 
     /**
      * Internal function to do the localization.
      * @param L [in, out]: the LO coefficient matrix at exit.
      * @param U [in, out]: the U matrix at the exit.
      */
-    virtual void compute(RefMat L, RefMat U) = 0;
+    virtual void compute(MatrixXd &L, MatrixXd &U) const = 0;
 
   public:
     /**
@@ -166,7 +168,7 @@ class LocalizerBase {
      * @return a size 2 vector of matrix `rst`. `rst[0]` is the LO coefficient
      * matrix. `rst[1]` is the corresponding U matrix.
      */
-    virtual vector<MatrixXd> lo_U(const string &guess = "identity") = 0;
+    virtual vector<MatrixXd> lo_U(const string &guess = "identity") const = 0;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix.
@@ -178,7 +180,7 @@ class LocalizerBase {
      * 1e-8.
      */
     virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) = 0;
+                                  double threshold = 1e-8) const = 0;
 
     /**
      * @brief Calculate the LOs' coefficient matrix under AO.
@@ -186,7 +188,7 @@ class LocalizerBase {
      * @param guess: a string represents the initial guess. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(const string &guess = "identity")
+    virtual MatrixXd lo(const string &guess = "identity") const
     {
         return lo_U(guess)[0];
     }
@@ -197,7 +199,10 @@ class LocalizerBase {
      * @param U_guess: the initial guess of U matrix. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(ConstRefMat &U_guess) { return lo_U(U_guess)[0]; }
+    virtual MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8) const
+    {
+        return lo_U(U_guess, threshold)[0];
+    }
 };
 
 /**
@@ -218,7 +223,7 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @brief Dipole matrix under AO in order of x, y and z directions.
      * @details Dimension: [nbasis, nbasis].
      */
-    vector<ConstRefMat> Dipole_ao_;
+    const vector<RefConstMat> Dipole_ao_;
 
     /**
      * @brief Parameter \f$ C \f$ in the cost function of localization v2.
@@ -238,19 +243,19 @@ class LoscLocalizerV2 : public LocalizerBase {
     void js_optimize_one_pair(const size_t i, const size_t j,
                               const vector<MatrixXd> &D_lo,
                               const MatrixXd &H_lo, double &theta_val,
-                              double &delta_val);
+                              double &delta_val) const;
     /**
      * Internal function to rotate two orbitals: rotate D_lo, H_lo and U
      * matrices.
      */
     void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
                             MatrixXd &U, vector<MatrixXd> &D_lo,
-                            MatrixXd &H_lo);
+                            MatrixXd &H_lo) const;
 
     /**
      * @see LocalizerBase::compute.
      */
-    virtual void compute(RefMat L, RefMat U) override;
+    virtual void compute(MatrixXd &L, MatrixXd &U) const override;
 
   public:
     /**
@@ -262,7 +267,7 @@ class LoscLocalizerV2 : public LocalizerBase {
      * dimension [nbasis, nbasis].
      */
     LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
-                    const vector<ConstRefMat> &Dipole_ao);
+                    const vector<RefConstMat> &Dipole_ao);
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
@@ -273,7 +278,8 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @return the LOs' coefficient matrix under AO.
      * @see LocalizerBase::lo_U()
      */
-    virtual vector<MatrixXd> lo_U(const string &guess = "identity") override;
+    virtual vector<MatrixXd>
+    lo_U(const string &guess = "identity") const override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
@@ -285,7 +291,7 @@ class LoscLocalizerV2 : public LocalizerBase {
      * @see LocalizerBase::lo_U()
      */
     virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) override;
+                                  double threshold = 1e-8) const override;
 };
 
 } // namespace losc

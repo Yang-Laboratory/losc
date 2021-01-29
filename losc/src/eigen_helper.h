@@ -13,6 +13,7 @@ using ConstRefMat = const Eigen::Ref<const Eigen::MatrixXd>;
 using ConstRefVec = const Eigen::Ref<const Eigen::VectorXd>;
 using RefMat = Eigen::Ref<Eigen::MatrixXd>;
 using RefVec = Eigen::Ref<Eigen::VectorXd>;
+using std::string;
 
 /**
  * @brief Check if the matrix is square or not.
