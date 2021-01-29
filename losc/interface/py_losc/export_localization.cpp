@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h> // to bind std::vector to python list.
 #include <vector>
 
 namespace py = pybind11;
@@ -72,11 +73,11 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
   protected:
     void compute(MatrixXd &L, MatrixXd &U) const override
     {
-        PYBIND11_OVERRIDE_PURE(void,      /* Return type */
-                               Derive_L1, /* Parent class */
-                               compute,   /* Name of function */
-                               L,         /* Arguments */
-                               U          /* Arguments */
+        PYBIND11_OVERRIDE(void,      /* Return type */
+                          Derive_L1, /* Parent class */
+                          compute,   /* Name of function */
+                          L,         /* Arguments */
+                          U          /* Arguments */
         );
     }
 
@@ -97,20 +98,20 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
     // class, and override ALL the virtual functions showing in Derive_L1 class.
     vector<MatrixXd> lo_U(const string &guess = "identity") const override
     {
-        PYBIND11_OVERRIDE_PURE(vector<MatrixXd>, /* Return type */
-                               Derive_L1,        /* Parent class */
-                               lo_U,             /* Name of function */
-                               guess             /* Arguments */
+        PYBIND11_OVERRIDE(vector<MatrixXd>, /* Return type */
+                          Derive_L1,        /* Parent class */
+                          lo_U,             /* Name of function */
+                          guess             /* Arguments */
         );
     }
     vector<MatrixXd> lo_U(ConstRefMat &U_guess,
                           double threshold = 1e-8) const override
     {
-        PYBIND11_OVERRIDE_PURE(vector<MatrixXd>, /* Return type */
-                               Derive_L1,        /* Parent class */
-                               lo_U,             /* Name of function */
-                               U_guess,          /* Arguments */
-                               threshold         /* Arguments */
+        PYBIND11_OVERRIDE(vector<MatrixXd>, /* Return type */
+                          Derive_L1,        /* Parent class */
+                          lo_U,             /* Name of function */
+                          U_guess,          /* Arguments */
+                          threshold         /* Arguments */
         );
     }
 };

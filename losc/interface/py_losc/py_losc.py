@@ -23,6 +23,7 @@ function interanally.
 import numpy as np
 import py_losc_core as core
 import functools
+from typing import List
 
 
 def _np2eigen(func):
@@ -34,13 +35,18 @@ def _np2eigen(func):
         "Convert the variable into a fortran-style np.array if it is np.ndarray."
         if isinstance(t, np.ndarray):
             if not t.flags['F_CONTIGUOUS']:
-                return np.asfortranarray(t)
+                t = np.asfortranarray(t)
+        elif isinstance(t, list):
+            for i in range(len(t)):
+                if not t[i].flags['F_CONTIGUOUS']:
+                    t[i] = np.asfortranarray(t[i])
         return t
 
     @functools.wraps(func)
     def wrapper(*args, **kargs):
         n_args = []
         for i in range(len(args)):
+            print(f'arg: {i}, {args[i]}')
             n_args.append(to_fortran(args[i]))
         n_kargs = {}
         for k in kargs:
@@ -49,6 +55,7 @@ def _np2eigen(func):
     return wrapper
 
 
+# Interface for curvature matrix.
 class DFAInfo(core.DFAInfo):
     def __init__(self, gga_x, hf_x, name=''):
         """
@@ -87,8 +94,6 @@ class DFAInfo(core.DFAInfo):
                 f"gga_x: {self.gga_x()}, "
                 f"hf_x: {self.hf_x()}"
                 "}")
-
-# Interface for curvature matrix.
 
 
 class CurvatureV1(core.CurvatureV1):
@@ -132,6 +137,7 @@ class CurvatureV1(core.CurvatureV1):
         See Also
         --------
         DFAInfo: the DFA information class.
+        LoscLocalizerV2: it can build the LOs.
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
@@ -163,8 +169,39 @@ class CurvatureV2(core.CurvatureV2):
         See Also
         --------
         CurvatureV1: constructor of LOSC curvature version 1.
+        LoscLocalizerV2: it can build the LOs.
         """
         core.CurvatureV2.__init__(self, dfa_info, C_lo, df_pii, df_vpq_inv,
                                   grid_basis_val, grid_weight)
 
-# TODO: Interface for localization matrix.
+# Interface for localization matrix.
+class LoscLocalizerV2(core.LoscLocalizerV2):
+    """LOSC localization version 2.
+
+    The LOSC localization version 2 is defined in Eq. 7 of the
+    LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
+    """
+
+    @_np2eigen
+    def __init__(self, C_lo_basis: np.ndarray,
+                 H_ao: np.ndarray,
+                 D_ao: List[np.ndarray]):
+        """
+        LOSC localization version 2 class constructor.
+
+        Parameters
+        ----------
+        C_lo_basis: np.ndarray [nbasis, nlo]
+            The coefficient matrix under AO for the molecular orbitals that
+            serves as the basis to expand the LOs. These molecular orbitals
+            are called LO basis. The LO basis $\psi_i$ is expanded under AOs
+            $\phi_\mu$ via the coefficient matrix $C_{\mu i}$ as
+            $\psi_i = \phi_\mu C_{\mu i}$.
+        H_ao: np.ndarray [nbasis, nbasis]
+            The Halmiltonian matrix under AOs. The LOSC localization v2,
+            the Halmiltonian matrix is defined as just the DFA's
+            Halmiltonian (note, not the LOSC-DFA Hamiltonian).
+        D_ao: list(np.ndarray [nbasis, nbasis])
+            The dipole matrix under AOs in the order of x, y and z directions.
+        """
+        core.LoscLocalizerV2.__init__(self, C_lo_basis, H_ao, D_ao)

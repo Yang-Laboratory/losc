@@ -252,6 +252,7 @@ class LoscLocalizerV2 : public LocalizerBase {
                             MatrixXd &U, vector<MatrixXd> &D_lo,
                             MatrixXd &H_lo) const;
 
+  protected:
     /**
      * @see LocalizerBase::compute.
      */
