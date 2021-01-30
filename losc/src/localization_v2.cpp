@@ -65,7 +65,7 @@ void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
 }
 
 void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
-                                         const double theta, MatrixXd &U,
+                                         const double theta, RefMat U,
                                          vector<MatrixXd> &D_lo,
                                          MatrixXd &H_lo) const
 {
@@ -111,8 +111,20 @@ LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LoscLocalizerV2::compute(MatrixXd &L, MatrixXd &U) const
+void LoscLocalizerV2::lo_U(RefMat L, RefMat U) const
 {
+    // Sanity check of the input.
+    if (!mtx_match_dimension(L, nbasis_, nlo_)) {
+        throw exception::DimensionError(
+            L, nbasis_, nlo_,
+            "LoscLocalizerV2::lo_U: dimension error of LO coefficient matrix.");
+    }
+    if (!mtx_match_dimension(U, nbasis_, nlo_)) {
+        throw exception::DimensionError(
+            U, nbasis_, nlo_,
+            "LoscLocalizerV2::lo_U: dimension error of the U matrix.");
+    }
+
     MatrixXd L_init = C_lo_basis_ * U;
     // calculate dipole on LO initial guess.
     // D_lo = U^T * C_lo_basis^T * D_ao * C_lo_basis * U
@@ -171,10 +183,10 @@ void LoscLocalizerV2::compute(MatrixXd &L, MatrixXd &U) const
 vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
-    MatrixXd &L = rst[0];
-    MatrixXd &U = rst[1];
+    RefMat L = rst[0];
+    RefMat U = rst[1];
     set_u_guess(U, guess);
-    compute(L, U);
+    lo_U(L, U);
     return rst;
 }
 
@@ -182,10 +194,10 @@ vector<MatrixXd> LoscLocalizerV2::lo_U(ConstRefMat &U_guess,
                                        double threshold) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
-    MatrixXd &L = rst[0];
-    MatrixXd &U = rst[1];
+    RefMat L = rst[0];
+    RefMat U = rst[1];
     set_u_guess(U, U_guess, threshold);
-    compute(L, U);
+    lo_U(L, U);
     return rst;
 }
 

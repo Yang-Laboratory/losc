@@ -104,13 +104,6 @@ class LocalizerBase {
      */
     void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold) const;
 
-    /**
-     * Internal function to do the localization.
-     * @param L [in, out]: the LO coefficient matrix at exit.
-     * @param U [in, out]: the U matrix at the exit.
-     */
-    virtual void compute(MatrixXd &L, MatrixXd &U) const = 0;
-
   public:
     /**
      * @brief LocalizerBase class constructor
@@ -183,6 +176,24 @@ class LocalizerBase {
                                   double threshold = 1e-8) const = 0;
 
     /**
+     * @brief Calculate the LOs and the unitary
+     * @param L [in, out]: Dimension of [nbasis, nlo]. The content of L is
+     * ignored. At exit, it is overwrote to be the LO coefficient matrix.
+     * @param U [in, out]: Dimension of [nlo, nlo]. At entrance, it stores a
+     * unitary matrix as the initial guess for the localization. The unitarity
+     * of the input U matrix is not verified. At exit, it is updated by the
+     * localization process.
+     *
+     * @note
+     * 1. The dimensions of input matrices will be check. It will throw an
+     * exception if they do not match the expectation.
+     * 2. This function is designed to be exported to C users only. Such
+     * in-out way of manipulating matrix makes the implementation of C
+     * interface easier.
+     */
+    virtual void lo_U(RefMat L, RefMat U) const = 0;
+
+    /**
      * @brief Calculate the LOs' coefficient matrix under AO.
      *
      * @param guess: a string represents the initial guess. See `lo_U`.
@@ -249,14 +260,8 @@ class LoscLocalizerV2 : public LocalizerBase {
      * matrices.
      */
     void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
-                            MatrixXd &U, vector<MatrixXd> &D_lo,
+                            RefMat U, vector<MatrixXd> &D_lo,
                             MatrixXd &H_lo) const;
-
-  protected:
-    /**
-     * @see LocalizerBase::compute.
-     */
-    virtual void compute(MatrixXd &L, MatrixXd &U) const override;
 
   public:
     /**
@@ -293,6 +298,15 @@ class LoscLocalizerV2 : public LocalizerBase {
      */
     virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
                                   double threshold = 1e-8) const override;
+
+    /**
+     * @brief Calculate the LOs and the unitary transformation matrix in an
+     * in-out way from the LOSC localization v2.
+     *
+     * @see
+     * LocalizerBase::lo_U
+     */
+    virtual void lo_U(RefMat L, RefMat U) const override;
 };
 
 } // namespace losc
