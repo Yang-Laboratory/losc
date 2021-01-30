@@ -12,17 +12,6 @@ using namespace Eigen;
 
 template <class Base> class PyBase : public Base {
     // Here, Base class is the LocalizerBase class.
-  protected:
-    void compute(MatrixXd &L, MatrixXd &U) const override
-    {
-        PYBIND11_OVERRIDE_PURE(void,    /* Return type */
-                               Base,    /* Parent class */
-                               compute, /* Name of function */
-                               L,       /* Arguments */
-                               U        /* Arguments */
-        );
-    }
-
   public:
     using Base::Base; // Inherit constructors.
 
@@ -48,6 +37,15 @@ template <class Base> class PyBase : public Base {
                                threshold         /* Arguments */
         );
     }
+    void lo_U(RefMat L, RefMat U) const override
+    {
+        PYBIND11_OVERRIDE_PURE(void, /* Return type */
+                               Base, /* Parent class */
+                               lo_U, /* Name of function */
+                               L,    /* Arguments */
+                               U     /* Arguments */
+        );
+    }
     MatrixXd lo(const string &guess = "identity") const override
     {
         PYBIND11_OVERRIDE(MatrixXd, /* Return type */
@@ -69,18 +67,6 @@ template <class Base> class PyBase : public Base {
 template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
     // Derive_L1 is the level 1 derived class from base.
     // Level 1 derived class includes: LoscLocalizerV2 ...
-
-  protected:
-    void compute(MatrixXd &L, MatrixXd &U) const override
-    {
-        PYBIND11_OVERRIDE(void,      /* Return type */
-                          Derive_L1, /* Parent class */
-                          compute,   /* Name of function */
-                          L,         /* Arguments */
-                          U          /* Arguments */
-        );
-    }
-
   public:
     using PyBase<Derive_L1>::PyBase; // Inherit constructors.
 
@@ -112,6 +98,15 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
                           lo_U,             /* Name of function */
                           U_guess,          /* Arguments */
                           threshold         /* Arguments */
+        );
+    }
+    void lo_U(RefMat L, RefMat U) const override
+    {
+        PYBIND11_OVERRIDE(void,      /* Return type */
+                          Derive_L1, /* Parent class */
+                          lo_U,      /* Name of function */
+                          L,         /* Arguments */
+                          U          /* Arguments */
         );
     }
 };
