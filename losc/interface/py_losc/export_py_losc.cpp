@@ -32,6 +32,8 @@
 #include "export_py_losc.h"
 #include "export_curvature.h"
 #include "export_localization.h"
+#include "export_correction.h"
+#include "export_local_occupation.h"
 
 PYBIND11_MODULE(PY_LOSC_MODULE_NAME, m)
 {
@@ -45,4 +47,10 @@ PYBIND11_MODULE(PY_LOSC_MODULE_NAME, m)
     // localization
     export_localization_base(m);
     export_localization_v2(m);
+
+    // correction
+    export_correction(m);
+
+    // local_occ
+    export_local_occupation(m);
 }
