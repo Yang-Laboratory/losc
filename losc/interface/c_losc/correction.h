@@ -1,16 +1,13 @@
-/**
- * @file correction.h
- * @brief C++ interface for the correction from LOSC.
- */
-#ifndef __LOSC_SRC_CORRECTION_H__
-#define __LOSC_SRC_CORRECTION_H__
+#ifndef __LOSC_INTERFACE_C_LOSC_CORRECTION_H__
+#define __LOSC_INTERFACE_C_LOSC_CORRECTION_H__
 
-#include "eigen_def.h"
-#include <vector>
+#include "matrix.h"
+#include <stddef.h>
 
-namespace losc {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-using std::vector;
 /**
  * @brief Calculate LOSC effective Hamiltonian under AO basis.
  *
@@ -28,23 +25,20 @@ using std::vector;
  * @param [in] Curvature: LOSC curvature matrix with dimension [nlo, nlo].
  * @param [in] LocalOcc: LOSC local occupation matrix with dimension [nlo, nlo].
  *
- * @return MatrixXd: the LOSC effective Hamiltonian with dimension
+ * @return losc_matrix*: the LOSC effective Hamiltonian with dimension
  * [nbasis, nbasis].
  *
  * @see
- * losc::CurvatureBase::kappa(): Obtain the curvature matrix.
- * losc::local_occupation(): Obtain the local occupation matrix.
+ * LoscLocalizerBase.kappa(): Obtain the curvature matrix.
+ * losc_local_occupation(): Obtain the local occupation matrix.
  *
  * @note
  * Make sure all the input matrices are corrresponding to the same spin.
  */
-MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
-                                   ConstRefMat &Curvature,
-                                   ConstRefMat &LocalOcc);
-
-void _ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
-                                ConstRefMat &Curvature, ConstRefMat &LocalOcc,
-                                RefMat H_losc);
+losc_matrix *losc_ao_hamiltonian_correction(const losc_matrix *S,
+                                            const losc_matrix *C_lo,
+                                            const losc_matrix *Curvature,
+                                            const losc_matrix *LocalOcc);
 
 /**
  * @brief Calculate the total energy correction from LOSC.
@@ -58,10 +52,11 @@ void _ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
  * @return double: the total energy correction from LOSC.
  *
  * @see
- * losc::CurvatureBase::kappa(): obtain the LOSC curvature matrix.
- * losc::local_occupation(): obtain the LOSC local occupation matrix.
+ * LoscLocalizerBase.kappa(): obtain the LOSC curvature matrix.
+ * losc_local_occupation(): obtain the LOSC local occupation matrix.
  */
-double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc);
+double energy_correction(const losc_matrix *Curvature,
+                         const losc_matrix *LocalOcc);
 
 /**
  * @brief Calculate corrected orbital energy from LOSC in a post-SCF approach.
@@ -82,12 +77,12 @@ double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc);
  * @param [in] C_co: The coefficient matrix of converged DFA's COs under AOs
  * with dimension of [nbasis, n] (n <= nbasis, which is the number of COs).
  *
- * @return vector<double>: the corrected orbital energies from LOSC with size
+ * @return double*: the corrected orbital energies from LOSC with size
  * of n. The order of orbital energies match the order of input COs (order
  * of columns in C_co matrix).
  *
  * @see
- * losc::ao_hamiltonian_correction(): obtain the LOSC effective Hamiltonian
+ * losc_ao_hamiltonian_correction(): obtain the LOSC effective Hamiltonian
  * under AOs.
  *
  * @note
@@ -100,12 +95,12 @@ double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc);
  * prouce very similar results. Here, we only provide the commonly used
  * approach.
  */
-vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
-                                       ConstRefMat &C_co);
+double *orbital_energy_post_scf(const losc_matrix *H_dfa,
+                                const losc_matrix *H_losc,
+                                const losc_matrix *C_co);
 
-void _orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
-                              ConstRefMat &C_co, double *eig);
-
-} // namespace losc
+#ifdef __cplusplus
+}
+#endif
 
 #endif

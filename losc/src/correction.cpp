@@ -8,9 +8,9 @@
 
 namespace losc {
 
-MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
-                                   ConstRefMat &Curvature,
-                                   ConstRefMat &LocalOcc)
+void _ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                ConstRefMat &Curvature, ConstRefMat &LocalOcc,
+                                RefMat H_losc)
 {
     const size_t nlo = C_lo.cols();
     const size_t nbasis = C_lo.rows();
@@ -51,7 +51,17 @@ MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
         }
     }
 
-    return S * C_lo * A * C_lo.transpose() * S;
+    H_losc = S * C_lo * A * C_lo.transpose() * S;
+}
+
+MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                   ConstRefMat &Curvature,
+                                   ConstRefMat &LocalOcc)
+{
+    const size_t nbasis = S.cols();
+    MatrixXd H_losc(nbasis, nbasis);
+    _ao_hamiltonian_correction(S, C_lo, Curvature, LocalOcc, H_losc);
+    return std::move(H_losc);
 }
 
 double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc)
@@ -79,8 +89,8 @@ double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc)
     return energy;
 }
 
-vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
-                                       ConstRefMat &C_co)
+void _orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
+                              ConstRefMat &C_co, double *eig)
 {
     const size_t nbasis = C_co.rows();
     const size_t nlo = C_co.cols();
@@ -98,10 +108,17 @@ vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
     }
 
     MatrixXd H_tot = H_dfa + H_losc;
-    vector<double> eig(nlo, 0.0);
     for (size_t i = 0; i < nlo; ++i) {
         eig[i] = C_co.col(i).transpose() * H_tot * C_co.col(i);
     }
+}
+
+vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
+                                       ConstRefMat &C_co)
+{
+    const size_t n = C_co.cols();
+    vector<double> eig(n, 0);
+    _orbital_energy_post_scf(H_dfa, H_losc, C_co, eig.data());
     return std::move(eig);
 }
 

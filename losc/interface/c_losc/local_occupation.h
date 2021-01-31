@@ -1,15 +1,12 @@
-/**
- * @file local_occupation.h
- * @brief C++ interface for the local occupation matrix within LOSC.
- */
+#ifndef __LOSC_INTERFACE_C_LOSC_LOCAL_OCCUPATION_H__
+#define __LOSC_INTERFACE_C_LOSC_LOCAL_OCCUPATION_H__
 
-#ifndef __LOSC_SRC_LOCAL_OCCUPATION_H__
-#define __LOSC_SRC_LOCAL_OCCUPATION_H__
+#include "matrix.h"
+#include <stddef.h>
 
-#include "eigen_def.h"
-#include <Eigen/Dense>
-
-namespace losc {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Calculate the local occupation matrix.
@@ -27,14 +24,16 @@ namespace losc {
  * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
  * @param [in] D: Spin density matrix under AO with dimension [nbasis, nbasis].
  *
- * @return MatrixXd: The local occupation matrix with dimension [nlo, nlo].
+ * @return losc_matrix*: The local occupation matrix with dimension [nlo, nlo].
  *
  * @see
- * LocalizerBase::lo(): Obtain the LOs' coefficient matrix.
+ * LoscLocalizerBase.lo(): Obtain the LOs' coefficient matrix.
  */
-MatrixXd local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D);
-void _local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D,
-                       RefMat LocalOcc);
+losc_matrix *losc_local_occupation(const losc_matrix *C_lo,
+                                   const losc_matrix *S, const losc_matrix *D);
 
-} // namespace losc
-#endif // _LOSC_SRC_LOCAL_OCCUPATION_H_
+#ifdef __cplusplus
+}
+#endif
+
+#endif
