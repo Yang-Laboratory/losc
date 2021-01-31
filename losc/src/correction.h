@@ -1,143 +1,104 @@
 /**
- * @file
- * @brief declaration relates to Losc correction.
+ * @file correction.h
+ * @brief C++ interface for the correction from LOSC.
  */
-#ifndef _LOSC_SRC_CORRECTION_H_
-#define _LOSC_SRC_CORRECTION_H_
+#ifndef __LOSC_SRC_CORRECTION_H__
+#define __LOSC_SRC_CORRECTION_H__
 
-#include "matrix.h"
-#include <memory>
+#include "eigen_def.h"
 #include <vector>
 
-/**
- * @brief top-level losc namespace.
- */
 namespace losc {
 
-using losc::Matrix;
-using std::shared_ptr;
 using std::vector;
-
 /**
- * @brief Calculate Losc correcting Hamiltonian under AO basis.
+ * @brief Calculate LOSC effective Hamiltonian under AO basis.
  *
- * @details The Losc correcting Hamiltonian is constructed with LO frozen. The
- * formula is expressed as Eq. S25 in the supporting information of the
- * original Losc paper (https://doi.org/10.1093/nsr/nwx111).
+ * @details The LOSC effective Hamiltonian is constructed with LOs fixed. The
+ * expression of the effective Hamiltonian is shown as Eq. S25 in the
+ * supporting information of the original LOSC paper
+ * (https://doi.org/10.1093/nsr/nwx111). This effective Hamiltonian is exact
+ * in the developed version of SCF-LOSC (self-consistent LOSC). See reference
+ * (J. Phys. Chem. Lett. 2020, 11, 23, 10269-10277) for more details about
+ * how to perform reliable SCF-LOSC calculations.
  *
  * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
  * @param [in] C_lo: LO coefficient matrix under AO basis with dimension
- * [nbasis, nlo]. see losc::LocalizerBase::compute().
- * @param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
- * see losc::CurvatureBase::compute().
- * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
- * see losc::local_occupation_matrix().
- * @return shared_ptr<Matrix>: the Losc correcting Hamiltonian with dimension
+ * [nbasis, nlo].
+ * @param [in] Curvature: LOSC curvature matrix with dimension [nlo, nlo].
+ * @param [in] LocalOcc: LOSC local occupation matrix with dimension [nlo, nlo].
+ *
+ * @return MatrixXd: the LOSC effective Hamiltonian with dimension
  * [nbasis, nbasis].
  *
- * @note Make sure all the input matrices have the same spin. The returned
- * Losc correcting Hamiltonian matrix is only for the input spin.
+ * @see
+ * losc::CurvatureBase::kappa(): Obtain the curvature matrix.
+ * losc::local_occupation(): Obtain the local occupation matrix.
+ *
+ * @note
+ * Make sure all the input matrices are corrresponding to the same spin.
  */
-shared_ptr<Matrix> losc_hamiltonian_correction(const Matrix &S,
-                                               const Matrix &C_lo,
-                                               const Matrix &Curvature,
-                                               const Matrix &LocalOcc);
+MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                   ConstRefMat &Curvature,
+                                   ConstRefMat &LocalOcc);
 
 /**
- * @brief Calculate Losc correction to total energy.
+ * @brief Calculate the total energy correction from LOSC.
  *
- * @param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
- * see losc::CurvatureBase::compute().
- * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
- * see losc::local_occupation_matrix().
- * @return double: the Losc correction to total energy.
+ * This is just the energy correction from LOSC, NOT the total energy of
+ * LOSC-DFA. Total energy of LOSC-DFA is: E_losc_dfa = E_dfa + E_losc.
  *
- * @note Make sure all the input matrices have the same spin. The return total
- * energy correction is only for the input spin.
- * @note The total Losc correction to the total energy is the summation of both
- * alpha and beta spin.
+ * @param [in] Curvature: LOSC curvature matrix with dimension [nlo, nlo].
+ * @param [in] LocalOcc: LOSC local occupation matrix with dimension [nlo, nlo].
+ *
+ * @return double: the total energy correction from LOSC.
+ *
+ * @see
+ * losc::CurvatureBase::kappa(): obtain the LOSC curvature matrix.
+ * losc::local_occupation(): obtain the LOSC local occupation matrix.
  */
-double losc_total_energy_correction(const Matrix &Curvature,
-                                    const Matrix &LocalOcc);
+double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc);
 
 /**
- * @brief Calculate Losc correction to orbital energy with direct correction.
+ * @brief Calculate corrected orbital energy from LOSC in a post-SCF approach.
  *
- * @details The dirrect correction $\Delta \epsilon$ is defined in Eq. 11 in the
- * original Losc paper (https://doi.org/10.1093/nsr/nwx111).
+ * @details This function gives the final orbital energies WITH the correction
+ * from LOSC. Note the difference to the function energy_correction() that only
+ * calculates the energy correction. The corrected orbital energies are the
+ * expectation values of converged DFA's COs on the LOSC-DFA Hamiltonian,
+ * that is,
+ * \f[
+ * \epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}} | \psi_i \rangle.
+ * \f]
  *
- * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
- * @param [in] C_co: CO coefficient matrix under AO basis with dimension
- * [nbasis, nlo].
- * @param [in] C_lo: LO coefficient matrix under AO basis with dimension
- * [nbasis, nlo]. see losc::LocalizerBase::compute().
- * @param [in] Curvature: Losc curvature matrix with dimension [nlo, nlo].
- * see losc::CurvatureBase::compute().
- * @param [in] LocalOcc: Losc local occupation matrix with dimension [nlo, nlo].
- * see losc::local_occupation_matrix().
- * @return std::vector<double>: the Losc correction to orbital energy. Resulted
- * vector size is `nlo`.
+ * @param [in] H_dfa: The DFA Hamiltonian under AOs with dimension of
+ * [nbasis, nbasis].
+ * @param [in] H_losc: The LOSC effective Hamiltonian under AOs with dimension
+ * of [nbasis, nbasis].
+ * @param [in] C_co: The coefficient matrix of converged DFA's COs under AOs
+ * with dimension of [nbasis, n] (n <= nbasis, which is the number of COs).
  *
- * @note Make sure all the input matrices have the same spin. The returned
- * orbital energy correction is only for input spin.
- * @note If you select only parts of orbitals (not all the orbitals, that is
- * `nlo` is less than `nbasis`) to do localization, the input `C_co` should NO
- * longer be a square matrix. In this case, you need to slice the original
- * squared CO coefficient matrix, and make sure the used \p C_co matrix
- * corresponds to all the COs you used in the localization process.
- * @note The resulted vector is just the Losc correction to orbital energy.
- * To get Losc corrected orbital energies, add it to the corresponding orbital
- * energy from DFA. The order of the correction is aligned to the COs' order
- * in `C_co` matrix.
+ * @return vector<double>: the corrected orbital energies from LOSC with size
+ * of n. The order of orbital energies match the order of input COs (order
+ * of columns in C_co matrix).
+ *
+ * @see
+ * losc::ao_hamiltonian_correction(): obtain the LOSC effective Hamiltonian
+ * under AOs.
+ *
+ * @note
+ * This function is just one of the ways to construct the LOSC corrected orbital
+ * energy in a post-SCF LOSC calculation. It is the way we used to produce
+ * results in the published paper for the post-SCF LOSC calculations. Besides
+ * this way, there are another two ways to calculate corrected orbital energies:
+ * (1) diagonalize the corrected LOSC-DFA Hamiltonian; (2) Follow Eq. 11 to
+ * calculate the corrections to orbital energies. These three ways usually
+ * prouce very similar results. Here, we only provide the commonly used
+ * approach.
  */
-vector<double> losc_orbital_energy_correction(const Matrix &S,
-                                              const Matrix &C_co,
-                                              const Matrix &C_lo,
-                                              const Matrix &Curvature,
-                                              const Matrix &LocalOcc);
-
-/**
- * @brief Calculate Losc corrected orbital energies with projection to CO
- * coefficient.
- *
- * @param [in] H_dfa: DFA Hamiltonian under AO with dimension [nbasis, nbasis].
- * @param [in] H_losc: Losc correcting Hamiltonian under AO with dimension
- * [nbasis, nbasis]. See losc::losc_hamiltonian_correction().
- * @param [in] C_co: CO coefficient matrix under AO basis with dimension
- * [nbasis, n].
- * @return std::vector<double>: the Losc corrected orbital energies for the `n`
- * COs. Resulted vector size is `n`.
- *
- * @note Make sure all the input matrices have the same spin. The returned
- * orbital corrections is only for the input spin.
- * @note The return orbital energies have already been corrected by Losc. No
- * further steps to take.
- * @note The dimension of `C_co` is [n, nbasis], where n <= nbasis. Usually, you
- * will will choose n=nlo for all the localized orbitals, but this is required.
- */
-vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa,
-                                                           const Matrix &H_losc,
-                                                           const Matrix &C_co);
-
-/**
- * @brief Calculate Losc corrected orbital energies by diagonalizing the Losc
- * corrected total Hamiltonian matrix.
- *
- * @param [in] H_dfa: DFA Hamiltonian under AO with dimension [nbasis, nbasis].
- * @param [in] H_losc: Losc correcting Hamiltonian under AO with dimension
- * [nbasis, nbasis]. See losc::losc_hamiltonian_correction().
- * @param [in] S_neg_half: AO overlap matrix to the power of (-1/2).
- * @return std::vector<double>: the Losc corrected orbital energies for the all
- * the COs. Resulted vector size is `nbasis`.
- *
- * @note Make sure all the input matrices have the same spin. The return orbital
- * corrections are only for the input spin.
- * @note The return orbital energies have already been corrected by Losc. No
- * further steps to take.
- */
-vector<double> losc_corrected_orbital_energy_by_diagonalize(
-    const Matrix &H_dfa, const Matrix &H_losc, const Matrix &S_neg_half);
+vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
+                                       ConstRefMat &C_co);
 
 } // namespace losc
 
-#endif // _LOSC_SRC_CORRECTION_H_
+#endif

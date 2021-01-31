@@ -1,86 +1,71 @@
-/**
- * @file
- * @brief definition relates to Losc correction.
- */
 #include "correction.h"
-
-#include "blas_base.h"
+#include "eigen_def.h"
+#include "eigen_helper.h"
 #include "exception.h"
-#include "matrix.h"
 #include <Eigen/Eigenvalues>
 #include <sstream>
+#include <utility>
 
 namespace losc {
 
-/**
- * @par Formula
- * In matrix express, the Losc correcting Hamiltonian matrix under AO
- * is defined as \f[ H_{losc} = S * C  * A * C^T * S, \f]
- * where matrix S is the input `S` matrix, matrix C is the input
- * `C_lo` matrix and matrix A is defined as
- * \f[ A_{ij} = \delta_{ij} 1/2 K_{ii} - K_{ij} \lambda_{ij}, \f]
- * in which  `K` is the input `Curvature` matrix, \f$\lambda\f$ is
- * the input `LocalOcc` matrix.
- */
-shared_ptr<Matrix> losc_hamiltonian_correction(const Matrix &S,
-                                               const Matrix &C_lo,
-                                               const Matrix &Curvature,
-                                               const Matrix &LocalOcc)
+MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                   ConstRefMat &Curvature,
+                                   ConstRefMat &LocalOcc)
 {
     const size_t nlo = C_lo.cols();
     const size_t nbasis = C_lo.rows();
 
     if (nlo > nbasis) {
         throw exception::DimensionError(
-            "wrong dimension for LO coefficient matrix: number of LO is larger "
-            "than the number of AO.");
+            "losc::ao_hamiltonian_correction(): the number of LOs is larger "
+            "than the number of AOs.");
     }
-    if (!S.is_square() || nbasis != S.rows()) {
+    if (!mtx_match_dimension(S, nbasis, nbasis)) {
         throw exception::DimensionError(
-            S, nbasis, nbasis, "wrong dimension for AO overlap matrix.");
+            S, nbasis, nbasis,
+            "losc::ao_hamiltonian_correction(): mismatch AO overlap matrix.");
     }
-    if (!Curvature.is_square() || nlo != Curvature.rows()) {
+    if (!mtx_match_dimension(Curvature, nlo, nlo)) {
         throw exception::DimensionError(
-            Curvature, nlo, nlo, "wrong dimension for curvature matrix.");
+            Curvature, nlo, nlo,
+            "losc::ao_hamiltonian_correction(): mismatch curvature matrix.");
     }
-    if (!LocalOcc.is_square() || nlo != LocalOcc.rows()) {
-        throw exception::DimensionError(
-            LocalOcc, nlo, nlo, "wrong dimension for local occupation matrix.");
+    if (!mtx_match_dimension(LocalOcc, nlo, nlo)) {
+        throw exception::DimensionError(LocalOcc, nlo, nlo,
+                                        "losc::ao_hamiltonian_correction(): "
+                                        "mismatch local occupation matrix.");
     }
 
     // build A matrix.
-    Matrix A(nlo, nlo);
+    MatrixXd A(nlo, nlo);
     for (size_t i = 0; i < nlo; ++i) {
         for (size_t j = 0; j <= i; ++j) {
             const double K_ij = Curvature(i, j);
             const double L_ij = LocalOcc(i, j);
             if (i != j) {
                 A(i, j) = -K_ij * L_ij;
+                A(j, i) = A(i, j);
             } else {
                 A(i, j) = 0.5 * K_ij - K_ij * L_ij;
             }
         }
     }
-    A.to_symmetric("L");
 
-    // calculate Losc correcting Hamiltonian matrix.
-    shared_ptr<Matrix> H = std::make_shared<Matrix>(nbasis, nbasis);
-    (*H).noalias() = S * C_lo * A * C_lo.transpose() * S;
-    return H;
+    return S * C_lo * A * C_lo.transpose() * S;
 }
 
-double losc_total_energy_correction(const Matrix &Curvature,
-                                    const Matrix &LocalOcc)
+double energy_correction(ConstRefMat &Curvature, ConstRefMat &LocalOcc)
 {
     const size_t nlo = Curvature.rows();
-
-    if (!Curvature.is_square() || nlo != Curvature.rows()) {
+    if (!mtx_match_dimension(Curvature, nlo, nlo)) {
         throw exception::DimensionError(
-            Curvature, nlo, nlo, "wrong dimension for curvature matrix.");
+            Curvature, nlo, nlo,
+            "losc::energy_correction(): mismatch curvature matrix.");
     }
-    if (!LocalOcc.is_square() || nlo != LocalOcc.rows()) {
-        throw exception::DimensionError(
-            LocalOcc, nlo, nlo, "wrong dimension for local occupation matrix.");
+    if (!mtx_match_dimension(LocalOcc, nlo, nlo)) {
+        throw exception::DimensionError(LocalOcc, nlo, nlo,
+                                        "losc::energy_correction(): "
+                                        "mismatch local occupation matrix.");
     }
 
     double energy = 0.0;
@@ -94,131 +79,30 @@ double losc_total_energy_correction(const Matrix &Curvature,
     return energy;
 }
 
-vector<double> losc_orbital_energy_correction(const Matrix &S,
-                                              const Matrix &C_co,
-                                              const Matrix &C_lo,
-                                              const Matrix &Curvature,
-                                              const Matrix &LocalOcc)
+vector<double> orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
+                                       ConstRefMat &C_co)
 {
-    // V_ij = <LO_i|CO_j> = C_LO^T x S x C_CO. If the LOs are expanded under
-    // COs, the V matrix is the localization U matrix. Otherwise, V matrix has
-    // to be calculated and used to construct the direct orbital energy
-    // correction. Here, to make code more general, V matrix is always
-    // calculated and used.
-    const size_t nlo = C_lo.cols();
-    const size_t nbasis = C_lo.rows();
-
-    if (nlo > nbasis) {
-        throw exception::DimensionError(
-            "wrong dimension for LO coefficient matrix: number of LO is larger "
-            "than the number of AO.");
-    }
-    if (!S.is_square() || nbasis != S.rows()) {
-        throw exception::DimensionError(
-            S, nbasis, nbasis, "wrong dimension for AO overlap matrix.");
-    }
-    if (nlo != C_co.cols() || nbasis != C_co.rows()) {
-        throw exception::DimensionError(
-            C_co, nbasis, nbasis, "wrong dimension for CO coefficient matrix.");
-    }
-    if (!Curvature.is_square() || nlo != Curvature.rows()) {
-        throw exception::DimensionError(
-            Curvature, nlo, nlo, "wrong dimension for curvature matrix.");
-    }
-    if (!LocalOcc.is_square() || nlo != LocalOcc.cols()) {
-        throw exception::DimensionError(
-            LocalOcc, nlo, nlo, "wrong dimension for local occupation matrix.");
-    }
-
-    Matrix V(nlo, nlo);
-    V = C_lo.transpose() * S * C_co;
-
-    vector<double> eig_correction(nlo, 0.0);
-    // get correction.
-    for (size_t m = 0; m < nlo; ++m) {
-        for (size_t i = 0; i < nlo; ++i) {
-            const double K_ii = Curvature(i, i);
-            const double L_ii = LocalOcc(i, i);
-            const double V_im = V(i, m);
-            eig_correction[m] += K_ii * (0.5 - L_ii) * V_im * V_im;
-            for (size_t j = 0; j < i; j++) {
-                const double V_jm = V(j, m);
-                const double K_ij = Curvature(i, j);
-                const double L_ij = LocalOcc(i, j);
-                eig_correction[m] -= 2.0 * K_ij * L_ij * V_im * V_jm;
-            }
-        }
-    }
-    return eig_correction;
-}
-
-vector<double> losc_corrected_orbital_energy_by_projection(const Matrix &H_dfa,
-                                                           const Matrix &H_losc,
-                                                           const Matrix &C_co)
-{
-    const size_t nlo = C_co.cols();
     const size_t nbasis = C_co.rows();
+    const size_t nlo = C_co.cols();
 
-    if (nlo != C_co.cols() || nbasis != C_co.rows()) {
-        throw exception::DimensionError(
-            C_co, nbasis, nbasis, "wrong dimension for CO coefficient matrix.");
+    if (!mtx_match_dimension(H_dfa, nbasis, nbasis)) {
+        throw exception::DimensionError(H_dfa, nbasis, nbasis,
+                                        "losc::post_scf_orbital_energy(): "
+                                        "mismatch DFA Hamiltonian matrix.");
     }
-    if (!H_dfa.is_square() || nbasis != H_dfa.rows()) {
-        throw exception::DimensionError(
-            H_dfa, nbasis, nbasis,
-            "wrong dimension for DFA Hamiltonian matrix.");
-    }
-    if (!H_losc.is_square() || nbasis != H_losc.rows()) {
+    if (!mtx_match_dimension(H_losc, nbasis, nbasis)) {
         throw exception::DimensionError(
             H_losc, nbasis, nbasis,
-            "wrong dimension for losc correcting Hamiltonian matrix.");
+            "losc::post_scf_orbital_energy(): "
+            "mismatch LOSC effective Hamiltonian matrix.");
     }
 
-    Matrix H_tot(nbasis, nbasis);
-    H_tot.noalias() = H_dfa + H_losc;
-
+    MatrixXd H_tot = H_dfa + H_losc;
     vector<double> eig(nlo, 0.0);
     for (size_t i = 0; i < nlo; ++i) {
         eig[i] = C_co.col(i).transpose() * H_tot * C_co.col(i);
     }
-    return eig;
-}
-
-vector<double> losc_corrected_orbital_energy_by_diagonalize(
-    const Matrix &H_dfa, const Matrix &H_losc, const Matrix &S_neg_half)
-{
-    const size_t nbasis = H_dfa.rows();
-
-    if (!S_neg_half.is_square()) {
-        throw exception::DimensionError(S_neg_half, nbasis, nbasis,
-                                        "wrong dimension for S^(-1/2) matrix");
-    }
-    if (!H_dfa.is_square() || nbasis != H_dfa.rows()) {
-        throw exception::DimensionError(
-            H_dfa, nbasis, nbasis,
-            "wrong dimension for DFA Hamiltonian matrix.");
-    }
-    if (!H_losc.is_square() || nbasis != H_losc.rows()) {
-        throw exception::DimensionError(
-            H_losc, nbasis, nbasis,
-            "wrong dimension for losc correcting Hamiltonian matrix.");
-    }
-
-    // SHS = S^(-1/2) * H * S^(-1/2).
-    Matrix SHS(nbasis, nbasis);
-    SHS.noalias() = S_neg_half * (H_dfa + H_losc) * S_neg_half;
-    Eigen::SelfAdjointEigenSolver<MatrixXd> eigensolver(SHS,
-                                                        Eigen::EigenvaluesOnly);
-    if (eigensolver.info() != Eigen::Success) {
-        std::stringstream msg;
-        msg << "failed to diagonalize losc corrected total Hamiltonian to get "
-               "eigenvalues.\n";
-        throw exception::LoscException(msg.str());
-    }
-    // copy eigenvalues to results.
-    vector<double> eig(eigensolver.eigenvalues().data(),
-                       eigensolver.eigenvalues().data() + nbasis);
-    return eig;
+    return std::move(eig);
 }
 
 } // namespace losc
