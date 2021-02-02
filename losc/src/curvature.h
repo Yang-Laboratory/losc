@@ -76,26 +76,9 @@ class CurvatureBase {
   protected:
     const DFAInfo dfa_info_; /**< DFA information. */
     size_t nlo_;             /**< number of LOs */
-    size_t nbasis_;          /**< number of AOs basis. */
     size_t nfitbasis_; /**< number of fitbasis for density fitting in curvature
                           matrix construction. */
     size_t npts_;      /**< number of grid for numerical integration. */
-
-    /**
-     * @brief LO coefficient matrix under AO.
-     * @details Dimension: [nbasis, nlo]
-     * \f[
-     * \psi_p = C_{\mu p} \phi_{\mu}
-     * \f]
-     * in which $\psi_p$ is the \f$p\f$-th LO, \f$C_{\mu p}\f$ is the LO
-     * coefficient matrix and \f$\phi_{\mu}\f$ is the \f$\mu\f$-th AO.
-     *
-     * This matrix can be obtained from the losc::LocalizerBase::compute() or
-     * any functions overwrite it from the derived localizer class.
-     *
-     * @see losc::LoscLocalizerV2::compute()
-     */
-    ConstRefMat C_lo_;
 
     /**
      * @brief The three-body integral \f$\langle p|ii \rangle\f$ matrix used in
@@ -139,37 +122,14 @@ class CurvatureBase {
     ConstRefMat df_Vpq_inverse_;
 
     /**
-     * @brief AO basis value on grid.
-     * @details Dimension: [npts, nbasis]. \f$V_{\mu \nu}\f$ is the \f$\mu\f$-th
-     * grid point value for the \f$\nu\f$-th AO.
-     *
-     * @par Availability
-     * You have to build the matrix by yourself. To construct the matrix,
-     * you can do as the following,
-     * @code
-     * for (size_t ip = 0; ip < npts; ++ip) {
-     *     for (size_t i = 0; i < nbasis; ++i) {
-     *         // set the value of i-th AO
-     *         // basis on grid point ip as zero.
-     *         (*grid_basis_value_)(ip, i) = 0;
-     *     }
-     * }
-     * @endcode
+     * @brief LOs' value on grid points.
+     * @details Dimension: [npts, nlo].
      */
-    ConstRefMat grid_basis_value_;
+    ConstRefMat grid_lo_;
 
     /**
      * @brief Coefficient for grid points used in numerical integral.
      * @details Dimension: npts
-     *
-     * @par Availability
-     * You have to build the vector by yourself. To construct the vector,
-     * you can do as the following,
-     * @code
-     * for (size_t ip = 0; ip < npts; ++ip) {
-     *     (*grid_weight_)[ip] = 0.0; // set each grid coefficient as zero.
-     * }
-     * @endcode
      */
     ConstRefVec grid_weight_;
 
@@ -178,21 +138,30 @@ class CurvatureBase {
      * @brief Curvature base class constructor.
      *
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO with dimension
-     * [nbasis, nlo]. See CurvatureBase::C_lo_.
      * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
      * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting with dimension [nfitbasis, nfitbasis]. See
      * CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
-     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
+     * @param [in] grid_lo: LOs' value on grid points with dimension
+     * [npts, nlo]. See CurvatureBase::grid_lo_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
+     *
+     * @note
+     * This constructor requires all the pre-allocation of the whole grid matrix
+     * of LOs (grid_lo). This grid_lo matrix could be very large.
      */
-    CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &C_lo,
-                  ConstRefMat &df_pii, ConstRefMat &df_Vpq_inverse,
-                  ConstRefMat &grid_basis_value, ConstRefVec &grid_weight);
+    CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &df_pii,
+                  ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_lo,
+                  ConstRefVec &grid_weight);
+
+    /**
+     * TODO:
+     * Add a constructor that can support block-wise construction of grid_lo to
+     * save memory.
+     */
+
 
     /**
      * @brief Compute the LOSC curvature matrix in place.
@@ -222,11 +191,6 @@ class CurvatureBase {
      * Return number of LOs.
      */
     size_t nlo() const { return nlo_; }
-
-    /**
-     * Return number of AOs.
-     */
-    size_t nbasis() const { return nbasis_; }
 
     /**
      * Return number of fit basis.
@@ -270,23 +234,20 @@ class CurvatureV1 : public CurvatureBase {
      * @details See CurvatureV1::compute() for more details of curvature version
      * 1 matrix.
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO with dimension
-     * [nbasis, nlo]. See CurvatureBase::C_lo_.
      * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
      * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting with dimension [nfitbasis, nfitbasis]. See
      * CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
-     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
+     * @param [in] grid_lo: LOs' value on grid points with dimension
+     * [npts, nlo]. See CurvatureBase::grid_basis_value_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
-    CurvatureV1(const DFAInfo &dfa_info, ConstRefMat &C_lo, ConstRefMat &df_pii,
-                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_basis_value,
+    CurvatureV1(const DFAInfo &dfa_info, ConstRefMat &df_pii,
+                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_lo,
                 ConstRefVec &grid_weight)
-        : CurvatureBase(dfa_info, C_lo, df_pii, df_Vpq_inverse,
-                        grid_basis_value, grid_weight)
+        : CurvatureBase(dfa_info, df_pii, df_Vpq_inverse, grid_lo, grid_weight)
     {
     }
 
@@ -328,22 +289,20 @@ class CurvatureV2 : public CurvatureBase {
     /**
      * @brief Class constructor for curvature version 2.
      * @param [in] dfa: Type of DFA.
-     * @param [in] C_lo: LO coefficient matrix under AO with dimension
-     * [nbasis, nlo]. See CurvatureBase::C_lo_.
      * @param [in] df_pii: Three-body integral <p|ii> used in density fitting
      * with dimension [nfitbasis, nlo]. See CurvatureBase::df_pii_.
      * @param [in] df_Vpq_inverse: Inverse of Vpq matrix used in density
      * fitting with dimension [nfitbasis, nfitbasis]. See
      * CurvatureBase::df_Vpq_inverse_.
-     * @param [in] grid_basis_value: Value of AO basis on grid with dimension
-     * [npts, nbasis]. See CurvatureBase::grid_basis_value_.
+     * @param [in] grid_lo: LOs' value on grid points with dimension
+     * [npts, nlo]. See CurvatureBase::grid_lo_.
      * @param [in] grid_weight: Coefficient vector for numerical integral on
      * grid with size [npts]. See CurvatureBase::grid_weight_.
      */
-    CurvatureV2(const DFAInfo &dfa, ConstRefMat &C_lo, ConstRefMat &df_pii,
-                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_basis_value,
+    CurvatureV2(const DFAInfo &dfa, ConstRefMat &df_pii,
+                ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_lo,
                 ConstRefVec &grid_weight)
-        : CurvatureBase(dfa, C_lo, df_pii, df_Vpq_inverse, grid_basis_value,
+        : CurvatureBase(dfa, df_pii, df_Vpq_inverse, grid_lo,
                         grid_weight)
     {
     }

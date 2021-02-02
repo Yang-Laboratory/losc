@@ -1,8 +1,5 @@
-/**
- * @file
- * @brief LOSC curvature version 1 implementation.
- */
 #include "curvature.h"
+#include "eigen_def.h"
 #include "eigen_helper.h"
 #include "exception.h"
 #include <cmath>
@@ -39,28 +36,20 @@ MatrixXd CurvatureV1::compute_kappa_xc() const
         size_t size = block_size;
         if (n == nBLK - 1 && res != 0)
             size = res;
-        // Calculate LO grid value for each block.
-        // Formula: grid_lo = grid_ao * C_lo
-        // grid_lo: [block_size, nlo]
-        // grid_ao: [block_size, nbasis]
-        // C_lo: [nbasis, nlo]
-        MatrixXd grid_lo_block(size, nlo_);
-        grid_lo_block.noalias() =
-            grid_basis_value_.block(n * block_size, 0, size, nbasis_) * C_lo_;
 
-        // calculate LO grid value to the power of 4/3.
-        grid_lo_block = grid_lo_block.array().square().matrix();
-        grid_lo_block = grid_lo_block.array().pow(2.0 / 3.0).matrix();
+        const auto grid_lo_block =
+            grid_lo_.block(n * block_size, 0, size, nlo_);
+        const auto wt = grid_weight_.segment(n * block_size, size);
 
         // sum over current block contribution to kappa xc.
-        auto wt = grid_weight_.data() + n * block_size;
         for (size_t ip = 0; ip < size; ++ip) {
             const double wt_value = wt[ip];
             for (size_t i = 0; i < nlo_; ++i) {
                 for (size_t j = 0; j <= i; ++j) {
                     const double pi = grid_lo_block(ip, i);
                     const double pj = grid_lo_block(ip, j);
-                    kappa_xc(i, j) += wt_value * pi * pj;
+                    kappa_xc(i, j) += wt_value * std::pow(pi * pi, 2.0 / 3.0) *
+                                      std::pow(pj * pj, 2.0 / 3.0);
                 }
             }
         }

@@ -40,11 +40,6 @@ static size_t losc_curvature_base_nlo(const LoscCurvatureBase *self)
     return self->_p_base->nlo();
 }
 
-static size_t losc_curvature_base_nbasis(const LoscCurvatureBase *self)
-{
-    return self->_p_base->nbasis();
-}
-
 static size_t losc_curvature_base_nfitbasis(const LoscCurvatureBase *self)
 {
     return self->_p_base->nfitbasis();
@@ -66,7 +61,6 @@ static LoscCurvatureBase *create_losc_curvature_base(_CurvatureBase *_p_base)
     auto p_base = new LoscCurvatureBase;
     p_base->_p_base = _p_base;
     p_base->nlo = losc_curvature_base_nlo;
-    p_base->nbasis = losc_curvature_base_nbasis;
     p_base->nfitbasis = losc_curvature_base_nfitbasis;
     p_base->npts = losc_curvature_base_npts;
     p_base->kappa = losc_curvature_base_kappa;
@@ -77,19 +71,17 @@ static LoscCurvatureBase *create_losc_curvature_base(_CurvatureBase *_p_base)
 // ==> Binding `losc::CurvatureV1` methods.
 //**********************************************
 LoscCurvatureV1 *losc_curvature_v1_create(const LoscDFAInfo *dfa_info,
-                                          const losc_matrix *C_lo,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
-                                          const losc_matrix *grid_basis_value,
+                                          const losc_matrix *grid_lo,
                                           const double *grid_weight)
 {
-    const size_t npts = grid_basis_value->row_;
+    const size_t npts = grid_lo->row_;
     // create a real `losc::CurvatureV1` object.
     _CurvatureV1 *_p_v1 =
-        new _CurvatureV1(*dfa_info, losc_matrix_to_eigen_const(C_lo),
-                         losc_matrix_to_eigen_const(df_pii),
+        new _CurvatureV1(*dfa_info, losc_matrix_to_eigen_const(df_pii),
                          losc_matrix_to_eigen_const(df_Vpq_inv),
-                         losc_matrix_to_eigen_const(grid_basis_value),
+                         losc_matrix_to_eigen_const(grid_lo),
                          Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
 
     // create a `LoscCurvatureV1` struct that holds a bunch of function
@@ -122,19 +114,17 @@ void *_losc_curvature_v1_free(LoscCurvatureV1 **pptr_self)
 // ==> Binding `losc::CurvatureV2` methods.
 //**********************************************
 LoscCurvatureV2 *losc_curvature_v2_create(const LoscDFAInfo *dfa_info,
-                                          const losc_matrix *C_lo,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
-                                          const losc_matrix *grid_basis_value,
+                                          const losc_matrix *grid_lo,
                                           const double *grid_weight)
 {
-    const size_t npts = grid_basis_value->row_;
+    const size_t npts = grid_lo->row_;
     // create a real `losc::CurvatureV2` object.
     _CurvatureV2 *_p_v2 =
-        new _CurvatureV2(*dfa_info, losc_matrix_to_eigen_const(C_lo),
-                         losc_matrix_to_eigen_const(df_pii),
+        new _CurvatureV2(*dfa_info, losc_matrix_to_eigen_const(df_pii),
                          losc_matrix_to_eigen_const(df_Vpq_inv),
-                         losc_matrix_to_eigen_const(grid_basis_value),
+                         losc_matrix_to_eigen_const(grid_lo),
                          Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
 
     // create a `LoscCurvatureV2` struct that holds a bunch of function

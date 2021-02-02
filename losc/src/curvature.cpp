@@ -1,7 +1,3 @@
-/**
- * @file
- * @brief definition relates to Losc curvature.
- */
 #include "curvature.h"
 #include "eigen_helper.h"
 #include "exception.h"
@@ -10,32 +6,22 @@ namespace losc {
 
 using exception::DimensionError;
 
-CurvatureBase::CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &C_lo,
-                             ConstRefMat &df_pii, ConstRefMat &df_Vpq_inverse,
-                             ConstRefMat &grid_basis_value,
+CurvatureBase::CurvatureBase(const DFAInfo &dfa_info, ConstRefMat &df_pii,
+                             ConstRefMat &df_Vpq_inverse, ConstRefMat &grid_lo,
                              ConstRefVec &grid_weight)
-    : npts_{grid_weight.size()}, nlo_{C_lo.cols()}, nbasis_{C_lo.rows()},
-      nfitbasis_{df_pii.rows()}, dfa_info_{dfa_info}, C_lo_{C_lo},
+    : npts_{grid_weight.size()}, nlo_{df_pii.cols()},
+      nfitbasis_{df_pii.rows()}, dfa_info_{dfa_info},
       df_pii_{df_pii}, df_Vpq_inverse_{df_Vpq_inverse},
-      grid_basis_value_{grid_basis_value}, grid_weight_{grid_weight}
+      grid_lo_{grid_lo}, grid_weight_{grid_weight}
 {
-    if (!mtx_match_dimension(C_lo_, nlo_, nbasis_)) {
-        throw DimensionError(C_lo_, nlo_, nbasis_,
-                             "wrong dimension for LO's coefficient matrix.");
-    }
-    if (!mtx_match_dimension(df_pii_, nfitbasis_, nlo_)) {
-        throw DimensionError(df_pii_, nfitbasis_, nlo_,
-                             "wrong dimension for density fitting three-body "
-                             "integral matrix <p|ii>.");
-    }
     if (!mtx_match_dimension(df_Vpq_inverse_, nfitbasis_, nfitbasis_)) {
         throw DimensionError(
             df_Vpq_inverse_, nfitbasis_, nfitbasis_,
             "wrong dimension for density fitting Vpq inverse matrix.");
     }
-    if (!mtx_match_dimension(grid_basis_value_, npts_, nbasis_)) {
-        throw DimensionError(grid_basis_value_, npts_, nbasis_,
-                             "wrong dimension for grid value of AO basis.");
+    if (!mtx_match_dimension(grid_lo_, npts_, nlo_)) {
+        throw DimensionError(grid_lo_, npts_, nlo_,
+                             "wrong dimension for grid value of LOs.");
     }
     if (grid_weight_.size() != npts_) {
         throw DimensionError(grid_weight_, npts_, 1,

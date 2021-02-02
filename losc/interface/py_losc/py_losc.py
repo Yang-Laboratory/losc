@@ -104,10 +104,9 @@ class CurvatureV1(core.CurvatureV1):
 
     @_np2eigen
     def __init__(self, dfa_info: DFAInfo,
-                 C_lo: np.ndarray,
                  df_pii: np.ndarray,
                  df_vpq_inv: np.ndarray,
-                 grid_basis_val: np.ndarray,
+                 grid_lo: np.ndarray,
                  grid_weight: list):
         """
         Curvature version 1 class constructor.
@@ -116,19 +115,14 @@ class CurvatureV1(core.CurvatureV1):
         ----------
         dfa_info: DFAInfo
             The information of the associated DFA.
-        C_lo: np.ndarray [nbasis, nlo]
-            LOs' coefficient matrix under AOs. The relation between LOs
-            ($\phi_i$) and AOs ($\psi_\mu$) via the coefficient matrix
-            ($C_{\mu i}$) is the following:
-            $\phi_i = \psi_{\mu} C_{\mu i}$.
         df_pii: np.ndarray [nfitbasis, nlo]
             Three-body integral <p|ii> for density fitting, in which index
             p is for fitting basis and index i is for LOs.
         df_Vpq_inv: np.ndarray [nfitbasis, nfitbasis]
             Inverse matrix of integral <p|1/r|q> for density fitting, in
             which index p and q are for fitting basis.
-        grid_basis_val: np.ndarray [npts, nbasis]
-            Grid values of AOs. grid_basis_val[ip, i] is the i-th AO's value
+        grid_lo: np.ndarray [npts, nbasis]
+            Grid values of LOs. grid_lo[ip, i] is the i-th LO's value
             on ip-th grid point.
         grid_weight: list or np.ndarray [npts, 1]
             Weights of grids.
@@ -140,8 +134,8 @@ class CurvatureV1(core.CurvatureV1):
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
-        core.CurvatureV1.__init__(self, dfa_info, C_lo, df_pii, df_vpq_inv,
-                                  grid_basis_val, grid_weight)
+        core.CurvatureV1.__init__(self, dfa_info, df_pii, df_vpq_inv,
+                                  grid_lo, grid_weight)
 
 
 class CurvatureV2(core.CurvatureV2):
@@ -153,10 +147,9 @@ class CurvatureV2(core.CurvatureV2):
 
     @_np2eigen
     def __init__(self, dfa_info: core.DFAInfo,
-                 C_lo: np.ndarray,
                  df_pii: np.ndarray,
                  df_vpq_inv: np.ndarray,
-                 grid_basis_val: np.ndarray,
+                 grid_lo: np.ndarray,
                  grid_weight: list):
         """
         Curvature version 2 class constructor.
@@ -170,10 +163,12 @@ class CurvatureV2(core.CurvatureV2):
         CurvatureV1: constructor of LOSC curvature version 1.
         LoscLocalizerV2: it can build the LOs.
         """
-        core.CurvatureV2.__init__(self, dfa_info, C_lo, df_pii, df_vpq_inv,
-                                  grid_basis_val, grid_weight)
+        core.CurvatureV2.__init__(self, dfa_info, df_pii, df_vpq_inv,
+                                  grid_lo, grid_weight)
 
 # Interface for localization matrix.
+
+
 class LoscLocalizerV2(core.LoscLocalizerV2):
     """LOSC localization version 2.
 

@@ -58,11 +58,6 @@ typedef struct LoscCurvatureBase {
     size_t (*nlo)(const LoscCurvatureBase *self);
 
     /**
-     * Return the number of AOs.
-     */
-    size_t (*nbasis)(const LoscCurvatureBase *self);
-
-    /**
      * Return the number of nfitbasis.
      */
     size_t (*nfitbasis)(const LoscCurvatureBase *self);
@@ -136,13 +131,6 @@ typedef struct LoscCurvatureV1 {
  * Constructor of LoscCurvatureV1.
  *
  * @param dfa_info: The associated DFA information.
- * @param C_lo: LO coefficient matrix under AO. Dimension is [nbasis, nlo].
- * The relation between LOs and AOs is
- * \f[
- * \psi_p = C_{\mu p} \phi_{\mu}
- * \f]
- * in which $\psi_p$ is the \f$p\f$-th LO, \f$C_{\mu p}\f$ is the LO
- * coefficient matrix and \f$\phi_{\mu}\f$ is the \f$\mu\f$-th AO.
  * @param df_pii: The three-body integral \f$\langle p|ii \rangle\f$ matrix
  * used in density fitting. Dimension is [nfitbasis, nlo].
  * The integral is defined as the following
@@ -154,15 +142,15 @@ typedef struct LoscCurvatureV1 {
  * in which index \f$p\f$ is for fitbasis and index \f$i\f$ is for LOs.
  * @param df_Vpq_inv: Inverse of \f$V_{pq}\f$ matrix used in density fitting.
  * Dimension is [nfitbasis, nfitbasis].
- * @param grid_basis_value: Value of AO basis on grid. Dimension is
- * [npts, nbasis]. You have to build the matrix by yourself. To construct
+ * @param grid_lo: Value of LOs on grid points. Dimension is
+ * [npts, nlo]. You have to build the matrix by yourself. To construct
  * the matrix, you can do as the following,
  * @code
  * for (size_t ip = 0; ip < npts; ++ip) {
- *     for (size_t i = 0; i < nbasis; ++i) {
- *         // set the value of i-th AO
+ *     for (size_t i = 0; i < nlo; ++i) {
+ *         // set the value of i-th LO
  *         // basis on grid point ip as zero.
- *         (*grid_basis_value_)(ip, i) = 0;
+ *         (*grid_lo)(ip, i) = 0;
  *     }
  * }
  * @endcode
@@ -178,10 +166,9 @@ typedef struct LoscCurvatureV1 {
  * @return a pointer to LoscCurvatureV1 struct.
  */
 LoscCurvatureV1 *losc_curvature_v1_create(const LoscDFAInfo *dfa_info,
-                                          const losc_matrix *C_lo,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
-                                          const losc_matrix *grid_basis_value,
+                                          const losc_matrix *grid_lo,
                                           const double *grid_weight);
 
 /**
@@ -236,10 +223,9 @@ typedef struct LoscCurvatureV2 {
  * losc_curvature_v1_create function.
  */
 LoscCurvatureV2 *losc_curvature_v2_create(const LoscDFAInfo *dfa_info,
-                                          const losc_matrix *C_lo,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
-                                          const losc_matrix *grid_basis_value,
+                                          const losc_matrix *grid_lo,
                                           const double *grid_weight);
 
 /**

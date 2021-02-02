@@ -86,28 +86,19 @@ void export_curvature_base(py::module &m)
         m, "CurvatureBase", "LOSC curvature base", py::dynamic_attr())
         // constructor
         .def(py::init<const DFAInfo &, // dfa_info
-                      ConstRefMat &,   // C_lo
                       ConstRefMat &,   // df_pii
                       ConstRefMat &,   // df_Vpq_inv
-                      ConstRefMat &,   // grid_basis_value
+                      ConstRefMat &,   // grid_lo
                       ConstRefVec &    // grid_weight
                       >(),
-             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
-             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
-             "grid_weight"_a.noconvert())
+             "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert())
         // nlo
         .def("nlo", &CurvatureBase::nlo, R"pddoc(
             Returns
             -------
             out: int
                 the number of LOs.
-            )pddoc")
-        // nbasis
-        .def("nbasis", &CurvatureBase::nbasis, R"pddoc(
-            Returns
-            -------
-            out: int
-                the number of AOs.
             )pddoc")
         // nfitbasis
         .def("nfitbasis", &CurvatureBase::nfitbasis, R"pddoc(
@@ -142,15 +133,13 @@ void export_curvature_v1(py::module &m)
         m, "CurvatureV1", "LOSC curvature version 1", py::dynamic_attr())
         // constructor
         .def(py::init<const DFAInfo &, // dfa_info
-                      ConstRefMat &,   // C_lo
                       ConstRefMat &,   // df_pii
                       ConstRefMat &,   // df_Vpq_inv
-                      ConstRefMat &,   // grid_basis_value
+                      ConstRefMat &,   // grid_lo
                       ConstRefVec &    // grid_weight
                       >(),
-             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
-             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
-             "grid_weight"_a.noconvert());
+             "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert());
     // CurvatureV1 class has no new functions compared to CurvatureBase.
     // So no more functions need to be exported here.
 }
@@ -162,15 +151,13 @@ void export_curvature_v2(py::module &m)
         m, "CurvatureV2", "LOSC curvature version 2", py::dynamic_attr())
         // constructor
         .def(py::init<const DFAInfo &, // dfa_info
-                      ConstRefMat &,   // C_lo
                       ConstRefMat &,   // df_pii
                       ConstRefMat &,   // df_Vpq_inv
-                      ConstRefMat &,   // grid_basis_value
+                      ConstRefMat &,   // grid_lo
                       ConstRefVec &    // grid_weight
                       >(),
-             "dfa_info"_a, "C_lo"_a.noconvert(), "df_pii"_a.noconvert(),
-             "df_Vpq_inv"_a.noconvert(), "grid_basis_value"_a.noconvert(),
-             "grid_weight"_a.noconvert());
+             "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert());
     // CurvatureV2 class has no new functions compared to CurvatureBase.
     // So no more functions need to be exported here.
 }

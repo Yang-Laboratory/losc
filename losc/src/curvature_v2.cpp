@@ -1,7 +1,3 @@
-/**
- * @file
- * @brief Losc curvature version 2 implementation.
- */
 #include "curvature.h"
 #include "eigen_helper.h"
 #include "exception.h"
@@ -38,17 +34,12 @@ void CurvatureV2::kappa(RefMat kappa2) const
         size_t size = block_size;
         if (n == nBLK - 1 && res != 0)
             size = res;
-        // Calculate LO grid value for each block.
-        // Formula: grid_lo = grid_ao * C_lo
-        // grid_lo: [block_size, nlo]
-        // grid_ao: [block_size, nbasis]
-        // C_lo: [nbasis, nlo]
-        MatrixXd grid_lo_block(size, nlo_);
-        grid_lo_block.noalias() =
-            grid_basis_value_.block(n * block_size, 0, size, nbasis_) * C_lo_;
+
+        const auto grid_lo_block =
+            grid_lo_.block(n * block_size, 0, size, nlo_);
+        const auto wt = grid_weight_.segment(n * block_size, size);
 
         // sum over current block contribution to the LO overlap.
-        auto wt = grid_weight_.data() + n * block_size;
         for (size_t ip = 0; ip < size; ++ip) {
             const double wt_value = wt[ip];
             for (size_t i = 0; i < nlo_; ++i) {
@@ -63,8 +54,8 @@ void CurvatureV2::kappa(RefMat kappa2) const
     mtx_to_symmetric(S_lo, "L");
 
     // build the curvature version 1.
-    CurvatureV1 kappa1_man(dfa_info_, C_lo_, df_pii_, df_Vpq_inverse_,
-                           grid_basis_value_, grid_weight_);
+    CurvatureV1 kappa1_man(dfa_info_, df_pii_, df_Vpq_inverse_, grid_lo_,
+                           grid_weight_);
     MatrixXd kappa1 = kappa1_man.kappa();
 
     // build LOSC2 kappa matrix:
@@ -83,9 +74,9 @@ void CurvatureV2::kappa(RefMat kappa2) const
             const double K1_jj = kappa1(j, j);
             const double f = zeta_ * S_ij;
             kappa2(i, j) = erf(f) * sqrt(abs(K1_ii * K1_jj)) + erfc(f) * K1_ij;
+            kappa2(j, i) = kappa2(i, j);
         }
     }
-    mtx_to_symmetric(kappa2, "L");
 }
 
 } // namespace losc
