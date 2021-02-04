@@ -21,5 +21,6 @@ extern*/
 **/doxygen*/
 **/Doxyfile
 
-**/__*
 **/*.so
+**/tmp_*
+**/__pycache__

@@ -21,7 +21,7 @@ function interanally.
 """
 
 import numpy as np
-import py_losc_core as core
+from py_losc import py_losc_core as core
 import functools
 from typing import List
 
