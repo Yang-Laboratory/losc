@@ -1,7 +1,0 @@
-
-#ifndef __LOSC_INTERFACE_PY_LOSC_EXPORT_PY_LOSC_H__
-#define __LOSC_INTERFACE_PY_LOSC_EXPORT_PY_LOSC_H__
-
-#define PY_LOSC_MODULE_NAME py_losc_core
-
-#endif

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
+set(project_name losc_lib)
+project(${project_name} C CXX)
+
 # compiler setting: use intel C/C++ compiler.
 find_program(ICC icc)
 if (ICC)
@@ -25,7 +28,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # download googletest if needs
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/extern/googletest")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/external/googletest")
     # copied from google-test readme.md. See
     # https://github.com/google/googletest/blob/master/googletest/README.md.
     # {{{
@@ -50,10 +53,10 @@ endif()
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # Add googletest directly to our build. This defines
 # the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/googletest)
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/googletest)
 
 ## download Matrix if needs
-#if(NOT EXISTS "${CMAKE_SOURCE_DIR}/extern/matrix")
+#if(NOT EXISTS "${CMAKE_SOURCE_DIR}/external/matrix")
 #    # copied from google-test readme.md. See
 #    # https://github.com/google/googletest/blob/master/googletest/README.md.
 #    # {{{
@@ -74,7 +77,10 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/extern/googletest)
 #endif()
 #
 ## Add libmatrix directly to our build. This defines the `matrix` targets.
-#add_subdirectory(${CMAKE_SOURCE_DIR}/extern/matrix)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/external/matrix)
 
-# build localization library
-add_subdirectory(losc)
+# build source
+add_subdirectory(src)
+
+# build tests
+#add_subdirectory(tests)
