@@ -12,7 +12,9 @@ extern "C" {
 // ==> Interface for `losc::DFAInfo`
 //**********************************************
 
+// The incomplete struct in C-side that is `losc::DFAInfo` in C++-side.
 typedef struct LoscDFAInfo LoscDFAInfo;
+
 /**
  * Constructor of DFAInfo struct that stores the information
  * of associated DFA.
@@ -38,7 +40,8 @@ void _losc_dfa_info_free(LoscDFAInfo **pptr_m);
 // ==> Interface for `losc::CurvatureBase`
 //**********************************************
 
-typedef struct _CurvatureBase _CurvatureBase;
+// The incomplete struct in C-side that is `losc::CurvatureBase` in C++-side.
+typedef struct _LoscCurvatureBase _LoscCurvatureBase;
 
 /**
  * @brief The C interface for LOSC curvature base class.
@@ -48,7 +51,8 @@ typedef struct _CurvatureBase _CurvatureBase;
  * create a such struct in practice.
  */
 typedef struct LoscCurvatureBase {
-    _CurvatureBase *_p_base;
+    // points to a real `losc::CurvatureBase` object.
+    _LoscCurvatureBase *_p_base;
 
     // List interface of methods exposed to C users bellow.
 
@@ -82,7 +86,8 @@ typedef struct LoscCurvatureBase {
 // ==> Interface for `losc::CurvatureV1`
 //**********************************************
 
-typedef struct _CurvatureV1 _CurvatureV1;
+// The incomplete struct in C-side that is `losc::CurvatureV1` in C++-side.
+typedef struct _LoscCurvatureV1 _LoscCurvatureV1;
 
 /**
  * @brief The C interface for LOSC curvature class of version 1.
@@ -90,13 +95,8 @@ typedef struct _CurvatureV1 _CurvatureV1;
  * Eq. 3 in the original LOSC paper (https://doi.org/10.1093/nsr/nwx11).
  */
 typedef struct LoscCurvatureV1 {
-    /**
-     * This variable points to a real C++ `losc::CurvatureV1` class object.
-     *
-     * @note
-     * For Internal usage only.
-     */
-    _CurvatureV1 *_p_v1;
+    // points to a real `losc::CurvatureV1` object.
+    _LoscCurvatureV1 *_p_v1;
 
     /**
      * @brief This variable stores a bunch of function pointers that point to
@@ -181,7 +181,8 @@ void *_losc_curvature_v1_free(LoscCurvatureV1 **pptr_self);
 // ==> Interface for `losc::CurvatureV1`
 //**********************************************
 
-typedef struct _CurvatureV2 _CurvatureV2;
+// The incomplete struct in C-side that is `losc::CurvatureV2` in C++-side.
+typedef struct _LoscCurvatureV2 _LoscCurvatureV2;
 
 /**
  * @brief The C interface for LOSC curvature class of version 2.
@@ -189,13 +190,8 @@ typedef struct _CurvatureV2 _CurvatureV2;
  * Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
  */
 typedef struct LoscCurvatureV2 {
-    /**
-     * This variable points to a real C++ `losc::CurvatureV2` class object.
-     *
-     * @note
-     * For Internal usage only.
-     */
-    _CurvatureV2 *_p_v2;
+    // points to a real `losc::CurvatureV2` object.
+    _LoscCurvatureV2 *_p_v2;
 
     /**
      * @brief This variable stores a bunch of function pointers that point to

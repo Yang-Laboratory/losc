@@ -130,7 +130,7 @@ class CurvatureV1(core.CurvatureV1):
         See Also
         --------
         DFAInfo: the DFA information class.
-        LoscLocalizerV2: it can build the LOs.
+        LocalizerV2: it can build the LOs.
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
@@ -161,7 +161,7 @@ class CurvatureV2(core.CurvatureV2):
         See Also
         --------
         CurvatureV1: constructor of LOSC curvature version 1.
-        LoscLocalizerV2: it can build the LOs.
+        LocalizerV2: it can build the LOs.
         """
         core.CurvatureV2.__init__(self, dfa_info, df_pii, df_vpq_inv,
                                   grid_lo, grid_weight)
@@ -169,7 +169,7 @@ class CurvatureV2(core.CurvatureV2):
 # Interface for localization matrix.
 
 
-class LoscLocalizerV2(core.LoscLocalizerV2):
+class LocalizerV2(core.LocalizerV2):
     """LOSC localization version 2.
 
     The LOSC localization version 2 is defined in Eq. 7 of the
@@ -198,4 +198,4 @@ class LoscLocalizerV2(core.LoscLocalizerV2):
         D_ao: list(np.ndarray [nbasis, nbasis])
             The dipole matrix under AOs in the order of x, y and z directions.
         """
-        core.LoscLocalizerV2.__init__(self, C_lo_basis, H_ao, D_ao)
+        core.LocalizerV2.__init__(self, C_lo_basis, H_ao, D_ao)

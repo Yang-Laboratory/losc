@@ -1,5 +1,5 @@
-#ifndef _LOSC_INTERFACE_C_LOSC_MATRIX_INTERNAL_H_
-#define _LOSC_INTERFACE_C_LOSC_MATRIX_INTERNAL_H_
+#ifndef _LOSC_SRC_C_LOSC_MATRIX_IMPL_HPP_
+#define _LOSC_SRC_C_LOSC_MATRIX_IMPL_HPP_
 
 #include <Eigen/Dense>
 #include <losc/exception.hpp>
@@ -40,7 +40,7 @@ class losc_matrix {
 /**
  * Map losc_matrix object to a const Eigen::Ref object.
  */
-Eigen::Ref<const Eigen::MatrixXd>
+inline Eigen::Ref<const Eigen::MatrixXd>
 losc_matrix_to_eigen_const(const losc_matrix *m)
 {
     return Eigen::Map<const Eigen::MatrixXd>(m->data_, m->row_, m->col_);
@@ -49,7 +49,7 @@ losc_matrix_to_eigen_const(const losc_matrix *m)
 /**
  * Map losc_matrix object to a Eigen::Ref object.
  */
-Eigen::Ref<Eigen::MatrixXd> losc_matrix_to_eigen(const losc_matrix *m)
+inline Eigen::Ref<Eigen::MatrixXd> losc_matrix_to_eigen(const losc_matrix *m)
 {
     return Eigen::Map<Eigen::MatrixXd>(m->data_, m->row_, m->col_);
 }

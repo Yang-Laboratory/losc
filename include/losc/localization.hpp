@@ -182,7 +182,7 @@ class LocalizerBase {
  * @note This is the version used in the LOSC2 paper.
  * @see J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535.
  */
-class LoscLocalizerV2 : public LocalizerBase {
+class LocalizerV2 : public LocalizerBase {
   private:
     /**
      * @brief Hamiltonian matrix under AO used in LOSC localization v2.
@@ -227,14 +227,14 @@ class LoscLocalizerV2 : public LocalizerBase {
   public:
     /**
      * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
-     * dimension [nbasis, nlo]. See LoscLocalizerV2::C_lo_basis_.
+     * dimension [nbasis, nlo]. See LocalizerV2::C_lo_basis_.
      * @param [in] H_ao: Hamiltonian matrix under AO used in localization with
      * dimension [nbasis, nbasis].
      * @param [in] Dipole_ao: dipole matrix under AO in x, y and z order with
      * dimension [nbasis, nbasis].
      */
-    LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
-                    const vector<RefConstMat> &Dipole_ao);
+    LocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
+                const vector<RefConstMat> &Dipole_ao);
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the

@@ -2,33 +2,25 @@
 #include <c_losc/curvature.h>
 #include <losc/curvature.hpp>
 
+// To use C++ class defined in a namespace in C code, we need to do typecast
+// between the C struct and C++ class. You can use C-style cast of pointers or
+// use C++ `reinterpret_cast` template function. See some examples here
+// https://stackoverflow.com/questions/18945419/using-c-with-namespace-in-c
+
 extern "C" {
-
-// Don't understand why. If I put the following line behind
-// typedef losc::CurvatureBase losc_CurvatureBase, it will be a error.
-// typedef struct losc_CurvatureBase losc_CurvatureBase;
-
-// Here is the trick to deal with the namespace in C++. Using typedef
-// to create an alias for the class with its full name (including namespace).
-// Make sure the alias is the same as the name in C code. Therefore,
-// The C code can access the C++ class within a namespace.
-typedef losc::CurvatureBase _CurvatureBase;
-typedef losc::CurvatureV1 _CurvatureV1;
-typedef losc::CurvatureV2 _CurvatureV2;
-typedef losc::DFAInfo LoscDFAInfo;
-
 //**********************************************
 // ==> Binding `losc::DFAInfo` methods.
 //**********************************************
 LoscDFAInfo *losc_dfa_info_create(double gga_x, double hf_x, const char *name)
 {
-    return new LoscDFAInfo(gga_x, hf_x, name);
+    return reinterpret_cast<LoscDFAInfo *>(
+        new losc::DFAInfo(gga_x, hf_x, name));
 }
 
 void _losc_dfa_info_free(LoscDFAInfo **pptr_self)
 {
     if (*pptr_self)
-        delete (*pptr_self);
+        delete reinterpret_cast<losc::DFAInfo *>(*pptr_self);
 }
 
 //**********************************************
@@ -37,29 +29,34 @@ void _losc_dfa_info_free(LoscDFAInfo **pptr_self)
 
 static size_t losc_curvature_base_nlo(const LoscCurvatureBase *self)
 {
-    return self->_p_base->nlo();
+    auto base = reinterpret_cast<losc::CurvatureBase *>(self->_p_base);
+    return base->nlo();
 }
 
 static size_t losc_curvature_base_nfitbasis(const LoscCurvatureBase *self)
 {
-    return self->_p_base->nfitbasis();
+    auto base = reinterpret_cast<losc::CurvatureBase *>(self->_p_base);
+    return base->nfitbasis();
 }
 
 static size_t losc_curvature_base_npts(const LoscCurvatureBase *self)
 {
-    return self->_p_base->npts();
+    auto base = reinterpret_cast<losc::CurvatureBase *>(self->_p_base);
+    return base->npts();
 }
 
 static void losc_curvature_base_kappa(const LoscCurvatureBase *self,
                                       losc_matrix *K)
 {
-    self->_p_base->C_API_kappa(losc_matrix_to_eigen(K));
+    auto base = reinterpret_cast<losc::CurvatureBase *>(self->_p_base);
+    base->C_API_kappa(losc_matrix_to_eigen(K));
 }
 
-static LoscCurvatureBase *create_losc_curvature_base(_CurvatureBase *_p_base)
+static LoscCurvatureBase *
+create_losc_curvature_base(losc::CurvatureBase *_p_base)
 {
     auto p_base = new LoscCurvatureBase;
-    p_base->_p_base = _p_base;
+    p_base->_p_base = reinterpret_cast<_LoscCurvatureBase *>(_p_base);
     p_base->nlo = losc_curvature_base_nlo;
     p_base->nfitbasis = losc_curvature_base_nfitbasis;
     p_base->npts = losc_curvature_base_npts;
@@ -76,20 +73,21 @@ LoscCurvatureV1 *losc_curvature_v1_create(const LoscDFAInfo *dfa_info,
                                           const losc_matrix *grid_lo,
                                           const double *grid_weight)
 {
+    auto cpp_dfa = reinterpret_cast<const losc::DFAInfo *>(dfa_info);
     const size_t npts = grid_lo->row_;
     // create a real `losc::CurvatureV1` object.
-    _CurvatureV1 *_p_v1 =
-        new _CurvatureV1(*dfa_info, losc_matrix_to_eigen_const(df_pii),
-                         losc_matrix_to_eigen_const(df_Vpq_inv),
-                         losc_matrix_to_eigen_const(grid_lo),
-                         Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
-
+    losc::CurvatureV1 *p_v1 = new losc::CurvatureV1(
+        *cpp_dfa, losc_matrix_to_eigen_const(df_pii),
+        losc_matrix_to_eigen_const(df_Vpq_inv),
+        losc_matrix_to_eigen_const(grid_lo),
+        Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
     // create a `LoscCurvatureV1` struct that holds a bunch of function
     // pointers.
     auto rst = new LoscCurvatureV1();
     // Assign member variables.
-    rst->_p_v1 = _p_v1;
-    rst->p_base = create_losc_curvature_base(_p_v1);
+    // type cast C++ class into C interface.
+    rst->_p_v1 = reinterpret_cast<_LoscCurvatureV1 *>(p_v1);
+    rst->p_base = create_losc_curvature_base(p_v1);
     // Assign new function pointers here in the future, if we want to export
     // new functions in `losc::CurvatureV1`.
     return rst;
@@ -102,7 +100,7 @@ void *_losc_curvature_v1_free(LoscCurvatureV1 **pptr_self)
         // free `LoscCurvatureBase` struct.
         delete self->p_base;
         // free `losc::CurvatureV1` class.
-        delete self->_p_v1;
+        delete reinterpret_cast<losc::CurvatureV1 *>(self->_p_v1);
         // free `LoscCurvatureV1` struct.
         delete self;
         // set self pointer to null.
@@ -119,20 +117,21 @@ LoscCurvatureV2 *losc_curvature_v2_create(const LoscDFAInfo *dfa_info,
                                           const losc_matrix *grid_lo,
                                           const double *grid_weight)
 {
+    auto cpp_dfa = reinterpret_cast<const losc::DFAInfo *>(dfa_info);
     const size_t npts = grid_lo->row_;
     // create a real `losc::CurvatureV2` object.
-    _CurvatureV2 *_p_v2 =
-        new _CurvatureV2(*dfa_info, losc_matrix_to_eigen_const(df_pii),
-                         losc_matrix_to_eigen_const(df_Vpq_inv),
-                         losc_matrix_to_eigen_const(grid_lo),
-                         Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
-
+    losc::CurvatureV2 *p_v2 = new losc::CurvatureV2(
+        *cpp_dfa, losc_matrix_to_eigen_const(df_pii),
+        losc_matrix_to_eigen_const(df_Vpq_inv),
+        losc_matrix_to_eigen_const(grid_lo),
+        Eigen::Map<const Eigen::VectorXd>(grid_weight, npts));
     // create a `LoscCurvatureV2` struct that holds a bunch of function
     // pointers.
     auto rst = new LoscCurvatureV2();
     // Assign member variables.
-    rst->_p_v2 = _p_v2;
-    rst->p_base = create_losc_curvature_base(_p_v2);
+    // type cast C++ class into C interface.
+    rst->_p_v2 = reinterpret_cast<_LoscCurvatureV2 *>(p_v2);
+    rst->p_base = create_losc_curvature_base(p_v2);
     // Assign new function pointers here in the future, if we want to export
     // new functions in `losc::CurvatureV2`.
     return rst;
@@ -145,7 +144,7 @@ void *_losc_curvature_v2_free(LoscCurvatureV2 **pptr_self)
         // free `LoscCurvatureBase` struct.
         delete self->p_base;
         // free `losc::CurvatureV2` class.
-        delete self->_p_v2;
+        delete reinterpret_cast<losc::CurvatureV2 *>(self->_p_v2);
         // free `LoscCurvatureV1` struct.
         delete self;
         // set self pointer to null.

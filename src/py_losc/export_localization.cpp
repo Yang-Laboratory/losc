@@ -66,7 +66,7 @@ template <class Base> class PyBase : public Base {
 
 template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
     // Derive_L1 is the level 1 derived class from base.
-    // Level 1 derived class includes: LoscLocalizerV2 ...
+    // Level 1 derived class includes: LocalizerV2 ...
   public:
     using PyBase<Derive_L1>::PyBase; // Inherit constructors.
 
@@ -251,9 +251,9 @@ void export_localization_base(py::module &m)
 
 void export_localization_v2(py::module &m)
 {
-    /* losc::LoscLocalizerV2 */
-    py::class_<LoscLocalizerV2, LocalizerBase, PyDerive_L1<LoscLocalizerV2>>(
-        m, "LoscLocalizerV2", "LOSC localization version 2", py::dynamic_attr())
+    /* losc::LocalizerV2 */
+    py::class_<LocalizerV2, LocalizerBase, PyDerive_L1<LocalizerV2>>(
+        m, "LocalizerV2", "LOSC localization version 2", py::dynamic_attr())
         // constructor
         .def(py::init<ConstRefMat &,              // C_lo_basis
                       ConstRefMat &,              // H_ao
@@ -261,6 +261,6 @@ void export_localization_v2(py::module &m)
                       >(),
              "C_lo_basis"_a.noconvert(), "H_ao"_a.noconvert(),
              "D_ao"_a.noconvert());
-    // LoscLocalizerV2 class has no new functions compared to LocalizerBase.
+    // LocalizerV2 class has no new functions compared to LocalizerBase.
     // So no more functions can be exported here.
 }

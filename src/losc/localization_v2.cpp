@@ -15,11 +15,10 @@
 
 namespace losc {
 
-void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
-                                           const vector<MatrixXd> &D_lo,
-                                           const MatrixXd &H_lo,
-                                           double &theta_val,
-                                           double &delta_val) const
+void LocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
+                                       const vector<MatrixXd> &D_lo,
+                                       const MatrixXd &H_lo, double &theta_val,
+                                       double &delta_val) const
 {
     // Spacial part: constant x1 and x2.
     double x1 = 0.0;
@@ -64,10 +63,10 @@ void LoscLocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
     delta_val = delta; // unit in bohr^2.
 }
 
-void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
-                                         const double theta, RefMat U,
-                                         vector<MatrixXd> &D_lo,
-                                         MatrixXd &H_lo) const
+void LocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
+                                     const double theta, RefMat U,
+                                     vector<MatrixXd> &D_lo,
+                                     MatrixXd &H_lo) const
 {
     // rotate U
     rotate_two_vectors(U.row(i), U.row(j), theta);
@@ -84,24 +83,24 @@ void LoscLocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
     rotate_two_vectors(H_lo.col(i), H_lo.col(j), theta);
 }
 
-LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
-                                 const vector<RefConstMat> &Dipole_ao)
+LocalizerV2::LocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
+                         const vector<RefConstMat> &Dipole_ao)
     : LocalizerBase(C_lo_basis), H_ao_{H_ao}, Dipole_ao_{Dipole_ao}
 {
     if (!mtx_match_dimension(H_ao_, nbasis_, nbasis_)) {
         throw exception::DimensionError(H_ao_, nbasis_, nbasis_,
-                                        "LoscLocalizerV2: wrong dimension for "
+                                        "LocalizerV2: wrong dimension for "
                                         "DFA Hamiltonian matrix under AO.");
     }
     if (Dipole_ao_.size() < 3) {
         throw exception::DimensionError(
-            "LoscLocalizerV2: No enough dipole matrices under AO is given: x, "
+            "LocalizerV2: No enough dipole matrices under AO is given: x, "
             "y and z "
             "components are needed.");
         vector<std::string> xyz_name = {"x", "y", "z"};
         for (size_t i = 0; i < 3; ++i) {
             if (!mtx_match_dimension(Dipole_ao_[i], nbasis_, nbasis_)) {
-                std::string msg = "LoscLocalizerV2: wrong dimension for dipole "
+                std::string msg = "LocalizerV2: wrong dimension for dipole "
                                   "matrix under AO for " +
                                   xyz_name[i] + "component.";
                 throw exception::DimensionError(Dipole_ao_[i], nbasis_, nbasis_,
@@ -111,18 +110,18 @@ LoscLocalizerV2::LoscLocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LoscLocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
+void LocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
 {
     // Sanity check of the input.
     if (!mtx_match_dimension(L, nbasis_, nlo_)) {
         throw exception::DimensionError(
             L, nbasis_, nlo_,
-            "LoscLocalizerV2::lo_U: dimension error of LO coefficient matrix.");
+            "LocalizerV2::lo_U: dimension error of LO coefficient matrix.");
     }
     if (!mtx_match_dimension(U, nbasis_, nlo_)) {
         throw exception::DimensionError(
             U, nbasis_, nlo_,
-            "LoscLocalizerV2::lo_U: dimension error of the U matrix.");
+            "LocalizerV2::lo_U: dimension error of the U matrix.");
     }
 
     MatrixXd L_init = C_lo_basis_ * U;
@@ -180,7 +179,7 @@ void LoscLocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
     L.noalias() = C_lo_basis_ * U;
 }
 
-vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess) const
+vector<MatrixXd> LocalizerV2::lo_U(const string &guess) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     RefMat L = rst[0];
@@ -190,8 +189,7 @@ vector<MatrixXd> LoscLocalizerV2::lo_U(const string &guess) const
     return rst;
 }
 
-vector<MatrixXd> LoscLocalizerV2::lo_U(ConstRefMat &U_guess,
-                                       double threshold) const
+vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold) const
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     RefMat L = rst[0];

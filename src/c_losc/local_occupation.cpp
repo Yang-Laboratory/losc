@@ -10,9 +10,9 @@ losc_matrix *losc_local_occupation(const losc_matrix *C_lo,
 {
     const size_t nlo = C_lo->col_;
     losc_matrix *LocalOcc = losc_matrix_create(nlo, nlo);
-    losc::C_API_local_occupation(losc_matrix_to_eigen_const(C_lo),
-                                 losc_matrix_to_eigen_const(S),
-                                 losc_matrix_to_eigen_const(D));
+    losc::C_API_local_occupation(
+        losc_matrix_to_eigen_const(C_lo), losc_matrix_to_eigen_const(S),
+        losc_matrix_to_eigen_const(D), losc_matrix_to_eigen(LocalOcc));
     return LocalOcc;
 }
 }
