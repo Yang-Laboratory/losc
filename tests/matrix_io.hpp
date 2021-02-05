@@ -1,20 +1,15 @@
-/**
- * @file
- * @brief declarations relate to matrix I/O.
- */
-#ifndef _LOSC_TEST_MATRIX_IO_H_
-#define _LOSC_TEST_MATRIX_IO_H_
+#ifndef _LOSC_TESTS_MATRIX_IO_H_
+#define _LOSC_TESTS_MATRIX_IO_H_
 
-#include <losc/losc.h>
-#include <memory>
-#include <vector>
+#include <Eigen/Dense>
 #include <string>
+#include <vector>
 
 namespace test {
 
-using losc::Matrix;
-using std::vector;
+using Eigen::MatrixXd;
 using std::string;
+using std::vector;
 
 /**
  * @brief Write a vector of matrices into a txt file.
@@ -30,8 +25,8 @@ using std::string;
  * @param [in] fname: The name of the output txt file.
  * @param [in] num_per_line: number of matrix elements per line.
  */
-void write_matrices_to_txt(vector<std::shared_ptr<Matrix>> &Mat,
-                           const string &fname, size_t num_per_line = 5);
+void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
+                           size_t num_per_line = 5);
 
 /**
  * @brief Read a vector of matrices from a txt file generated from
@@ -42,8 +37,8 @@ void write_matrices_to_txt(vector<std::shared_ptr<Matrix>> &Mat,
  * @return std::vector<std::shared_ptr<Matrix>>: a vector of matrices.
  * @see matrix::write_matrices_to_txt()
  */
-std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname);
+std::vector<MatrixXd> read_matrices_from_txt(const string &fname);
 
-} // namespace matrix
+} // namespace test
 
-#endif // _LOSC_TEST_MATRIX_IO_H_
+#endif

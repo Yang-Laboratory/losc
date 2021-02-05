@@ -1,17 +1,16 @@
 #include <cmath>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <memory>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
-#include <losc/local_occupation.h>
-#include <losc/losc.h>
-#include "matrix_io.h"
+#include "matrix_helper.hpp"
+#include "matrix_io.hpp"
+#include <losc/local_occupation.hpp>
 
-using losc::Matrix;
-using std::shared_ptr;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 using std::string;
 using std::vector;
 
@@ -37,32 +36,32 @@ TEST_P(LocalOccupationTest, test)
     string C_lo_path = dir_path + "/./data/" + mol + "/lo.txt";
     string D_path = dir_path + "/./data/" + mol + "/dfa_density.txt";
     string L_ref_path = dir_path + "/./data/" + mol + "/localocc.txt";
-    auto S = test::read_matrices_from_txt(S_path);
+    MatrixXd S = test::read_matrices_from_txt(S_path)[0];
     auto C_lo = test::read_matrices_from_txt(C_lo_path);
     auto D = test::read_matrices_from_txt(D_path);
     auto L_ref = test::read_matrices_from_txt(L_ref_path);
 
     for (int is = 0; is < 2; is++) {
-        (*C_lo[is]).transposeInPlace();
+        C_lo[is].transposeInPlace();
     }
 
     for (int is = 0; is < 2; is++) {
         // Do calculation.
-        auto L_calc = losc::local_occupation_matrix(*C_lo[is], *S[0], *D[is]);
+        MatrixXd L_calc = losc::local_occupation(C_lo[is], S, D[is]);
 
         // Testing.
         // True condition is the calculated Losc local occupation matrix matches
         // the reference to the 8-th digit.
-        bool status = L_calc->is_cwise_equal(*L_ref[is], 1e-8);
+        bool status = test::mtx_is_cwise_equal(L_calc, L_ref[is], 1e-8);
         if (!status) {
             std::cout << "Mol: " << mol << std::endl;
             std::cout << "data dir path: " << dir_path << std::endl;
             printf("%s, Reference Local occupation matrix: spin=%d\n", mol_str,
                    is);
-            L_ref[is]->show_full();
+            test::mtx_show_full(L_ref[is]);
             printf("%s, Calculated Local occupation matrix: spin=%d\n", mol_str,
                    is);
-            L_calc->show_full();
+            test::mtx_show_full(L_calc);
         }
         EXPECT_TRUE(status);
     }

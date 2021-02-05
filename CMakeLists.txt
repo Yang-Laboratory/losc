@@ -83,4 +83,4 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/googletest)
 add_subdirectory(src)
 
 # build tests
-#add_subdirectory(tests)
+add_subdirectory(tests)

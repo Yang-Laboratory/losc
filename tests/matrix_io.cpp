@@ -1,7 +1,3 @@
-/**
- * @file
- * @brief definition relates to matrix I/O.
- */
 #include <assert.h>
 #include <fstream>
 #include <iostream>
@@ -9,15 +5,15 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "matrix_io.h"
-#include <losc/losc.h>
+#include "matrix_io.hpp"
+#include <losc/exception.hpp>
 
 namespace test {
 /**
  * @note The txt file `fname` will always be overwritten if `Mat` is not empty.
  */
-void write_matrices_to_txt(vector<std::shared_ptr<Matrix>> &Mat,
-                           const string &fname, size_t num_per_line)
+void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
+                           size_t num_per_line)
 {
     if (Mat.size() == 0)
         return;
@@ -27,7 +23,7 @@ void write_matrices_to_txt(vector<std::shared_ptr<Matrix>> &Mat,
         throw losc::exception::LoscException(
             "Cannot open file to write matrices:" + fname);
     for (size_t i = 0; i < Mat.size(); ++i) {
-        const Matrix &A = *(Mat[i]);
+        const MatrixXd &A = Mat[i];
         if (i == 0)
             fprintf(f, "Dimension,%zu,%zu\n", A.rows(), A.cols());
         else
@@ -71,7 +67,7 @@ static void str_split(std::string &str, const char delim,
     }
 }
 
-std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
+std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
 {
     std::ifstream fin;
     fin.open(fname);
@@ -82,8 +78,8 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
     bool is_first_line = true;
     std::string line;
     std::vector<std::string> line_split;
-    std::vector<std::shared_ptr<Matrix>> rst;
-    std::shared_ptr<Matrix> current_matrix;
+    std::vector<MatrixXd> rst;
+    MatrixXd current_matrix;
     std::size_t n_row = 0;
     std::size_t n_col = 0;
     std::size_t count = 0;
@@ -98,7 +94,7 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
             // Before that, check if the last matrix is read successfully or
             // not.
             if (!is_first_line) {
-                if (count != current_matrix->size()) {
+                if (count != current_matrix.size()) {
                     throw losc::exception::LoscException(
                         "Error in read matrix, unmatched element size: file "
                         "name = " +
@@ -118,8 +114,8 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
                     "Failed to read matrix dimension. file name = " + fname);
             }
             // create a new matrix and push it back to matrix vector.
-            current_matrix = std::make_shared<Matrix>(n_row, n_col);
-            current_matrix->setZero();
+            current_matrix = MatrixXd(n_row, n_col);
+            current_matrix.setZero();
             rst.push_back(current_matrix);
             p_data += 3;
             count = 0; // set matrix element count as zero.
@@ -129,8 +125,8 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
             try {
                 const size_t i = count / n_col;
                 const size_t j = count % n_col;
-                //current_matrix->data()[count] = std::stod(*p_data);
-                (*current_matrix)(i, j) = std::stod(*p_data);
+                // current_matrix->data()[count] = std::stod(*p_data);
+                current_matrix(i, j) = std::stod(*p_data);
                 ++count;
             } catch (...) {
                 std::stringstream msg;

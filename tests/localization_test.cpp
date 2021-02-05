@@ -1,22 +1,21 @@
 #include <cmath>
 #include <gtest/gtest.h>
-#include <memory>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
-#include "matrix_io.h"
-#include <losc/localization.h>
-#include <losc/losc.h>
+#include "matrix_io.hpp"
+#include "matrix_helper.hpp"
+#include <losc/localization.hpp>
 
-using losc::Matrix;
-using std::shared_ptr;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 using std::string;
 using std::vector;
 
-bool is_permutation_matrix(Matrix &A, double threshold = 1e-10)
+bool is_permutation_matrix(MatrixXd &A, double threshold = 1e-10)
 {
-    if (!A.is_square()) {
+    if (!test::mtx_is_square(A)) {
         return false;
     }
 
@@ -78,20 +77,21 @@ TEST_P(LocalizationTest, H2)
     auto C_lo_basis = test::read_matrices_from_txt(lo_basis_path);
     auto C_lo_ref = test::read_matrices_from_txt(lo_ref_path);
     auto H_ao = test::read_matrices_from_txt(H_ao_path);
-    auto D_ao = test::read_matrices_from_txt(D_ao_path);
+    auto D_ao_tmp = test::read_matrices_from_txt(D_ao_path);
     auto S_ao = test::read_matrices_from_txt(S_ao_path);
+    vector<losc::RefConstMat> D_ao(D_ao_tmp.begin(), D_ao_tmp.end());
 
     for (int is = 0; is < 2; is++) {
-        (*C_lo_ref[is]).transposeInPlace();
-        (*C_lo_basis[is]).transposeInPlace();
+        C_lo_ref[is].transposeInPlace();
+        C_lo_basis[is].transposeInPlace();
     }
 
     for (int is = 0; is < 2; is++) {
         // Do localization.
-        losc::LoscLocalizerV2 localizer(C_lo_basis[is], H_ao[is], D_ao);
+        losc::LocalizerV2 localizer(C_lo_basis[is], H_ao[is], D_ao);
         localizer.set_random_permutation(false);
         // localizer.set_print(losc::kPrintLevelNormal);
-        auto C_lo_calc = localizer.compute();
+        MatrixXd C_lo_calc = localizer.lo();
 
         // Test.
         // True condition:
@@ -100,24 +100,24 @@ TEST_P(LocalizationTest, H2)
         // 2. Try to check if the calculated one is related to reference with
         // a permutation transformation (negative sign is also okay, since it
         // will change the physical observables).
-        bool is_equal = C_lo_calc->is_cwise_equal(*C_lo_ref[is], 1e-8);
-        shared_ptr<Matrix> P;
+        bool is_equal = test::mtx_is_cwise_equal(C_lo_calc, C_lo_ref[is], 1e-8);
+        size_t nlo = C_lo_basis[is].cols();
+        MatrixXd P(nlo, nlo);
         bool is_permutation = false;
         if (!is_equal) {
-            size_t nlo = C_lo_basis[is]->cols();
-            size_t nbasis = C_lo_basis[is]->rows();
-            Matrix &C1 = *C_lo_calc;
-            Matrix &C2 = *C_lo_ref[is];
-            Matrix &S = *S_ao[0];
-            Matrix C1SC1 = C1.transpose() * S * C1;
+            size_t nlo = C_lo_basis[is].cols();
+            size_t nbasis = C_lo_basis[is].rows();
+            MatrixXd &C1 = C_lo_calc;
+            MatrixXd &C2 = C_lo_ref[is];
+            MatrixXd &S = S_ao[0];
+            MatrixXd C1SC1 = C1.transpose() * S * C1;
             EXPECT_TRUE(C1SC1.isIdentity(1e-8));
 
-            P = std::make_shared<Matrix>(nlo, nlo);
-            (*P).noalias() = C1.transpose() * S * C2;
+            P.noalias() = C1.transpose() * S * C2;
 
             // P = abs(P)
-            *P = (*P).array().abs().matrix();
-            is_permutation = is_permutation_matrix(*P, 1e-8);
+            P = P.array().abs().matrix();
+            is_permutation = is_permutation_matrix(P, 1e-8);
         }
         EXPECT_TRUE(is_equal || is_permutation);
 
@@ -137,25 +137,25 @@ TEST_P(LocalizationTest, H2)
             std::cout << "Dipole under AO: " << D_ao_path << std::endl;
             std::cout << "AO overlap: " << S_ao_path << std::endl;
             printf("%s: AO overlap matrix:\n", mol_str);
-            S_ao[0]->show_full();
+            test::mtx_show_full(S_ao[0]);
             for (int xyz = 0; xyz < 3; xyz++) {
                 printf("%s: Dipole matrix under AO: xyz=[%d]\n", mol_str, xyz);
-                D_ao[xyz]->show_full();
+                test::mtx_show_full(D_ao[xyz]);
             }
             printf("%s: LO basis coefficient matrix: spin=%d\n", mol_str, is);
-            C_lo_basis[is]->show_full();
+            test::mtx_show_full(C_lo_basis[is]);
             printf("%s: Hamiltonian under AO: spin=%d\n", mol_str, is);
-            H_ao[is]->show_full();
+            test::mtx_show_full(H_ao[is]);
             printf("%s: LO coefficient matrix: reference. spin=%d\n", mol_str,
                    is);
-            C_lo_ref[is]->show_full();
+            test::mtx_show_full(C_lo_ref[is]);
             printf("%s: LO coefficient matrix: calculated. spin=%d\n", mol_str,
                    is);
-            C_lo_calc->show_full();
+            test::mtx_show_full(C_lo_calc);
             if (!is_permutation) {
                 printf("%s: Permutation matrix: calculated. spin=%d\n", mol_str,
                        is);
-                P->show_full();
+                test::mtx_show_full(P);
             }
         }
     }
