@@ -8,6 +8,7 @@ import psi4
 import numpy as np
 from psi4.driver.p4util.exceptions import ValidationError
 from py_losc import py_losc
+from qcelemental import constants
 
 if parse_version(psi4.__version__) >= parse_version('1.3a1'):
     build_superfunctional = psi4.driver.dft.build_superfunctional
@@ -177,7 +178,7 @@ def form_grid_w(wfn):
     return grid_w
 
 
-def post_scf_losc(dfa_wfn):
+def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
     """
     Perform the post-SCF-LOSC calculation.
 
@@ -185,6 +186,11 @@ def post_scf_losc(dfa_wfn):
     ----------
     dfa_wfn: psi4.core.HF like psi4 object
         The converged wavefunction from a parent DFA.
+    orbital_energy_unit: str, default to 'eV'
+        The units of orbital energies used to print in the output.
+        Valid choices are ['au', 'eV'].
+        'au': atomic unit, hartree.
+        'eV': electronvolt.
 
     Returns
     -------
@@ -196,6 +202,9 @@ def post_scf_losc(dfa_wfn):
     """
     # sanity-check of input dfa wfn.
     _validate_dfa_wfn(dfa_wfn)
+    if orbital_energy_unit not in ['eV', 'au']:
+        raise Exception('Invalid input for "orbital_energy_unit". Choices are ["eV", "au"].')
+    eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
 
     _print_header(scf_losc=False)
     is_rks = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_ab_dens()
@@ -264,13 +273,33 @@ def post_scf_losc(dfa_wfn):
         # calculate losc energy correction
         E_losc[s] = py_losc.energy_correction(curvature[s], local_occ[s])
         # calculate corrected orbital energy from LOSC.
-        losc_eig[s] = py_losc.orbital_energy_post_scf(
-            H_ao[s], H_losc[s], C_co[s])
+        losc_eig[s] = np.array(py_losc.orbital_energy_post_scf(
+            H_ao[s], H_losc[s], C_co[s])) * eig_factor
+
+    # ==> Print energies to output <==
+    psi4.core.print_out('\n\n=> Total Energy <=\n')
+    psi4.core.print_out('DFA SCF energy: {:.8f} hartree\n'.format(dfa_wfn.energy()))
+    psi4.core.print_out('LOSC energy: {:.8f} hartree\n'.format(sum(E_losc)))
+    psi4.core.print_out('LOSC-DFA energy: {:.8f} hartree\n'.format(dfa_wfn.energy() + sum(E_losc)))
+
+    # print orbital energies
+    psi4.core.print_out('\n\n=> Orbital Energy <=\n')
+    dfa_eigs = [np.asarray(dfa_wfn.epsilon_a()) * eig_factor,
+                np.asarray(dfa_wfn.epsilon_b()) * eig_factor]
+    for spin in range(nspin):
+        psi4.core.print_out(
+            f'\n{"Alpha" if spin == 0 else "Beta"} orbital energies in {orbital_energy_unit}\n')
+        header = "{:<6s} {:>20s} {:>20s}\n".format(
+            "Index", "DFA", "LOSC-DFA")
+        psi4.core.print_out(header)
+        for i in range(len(dfa_eigs[spin])):
+            psi4.core.print_out('{:<6d} {:>20.8f} {:>20.8f}\n'.format(
+                i, dfa_eigs[spin][i], losc_eig[spin][i]))
 
     return dfa_wfn.energy() + sum(E_losc), losc_eig
 
 
-def scf_losc(dfa_wfn, inplace=True):
+def scf_losc(dfa_wfn, inplace=True, orbital_energy_unit='eV'):
     """
     Perform the SCF-LOSC (frozen-LO) calculation.
 
@@ -281,6 +310,11 @@ def scf_losc(dfa_wfn, inplace=True):
         `inplace` is set to True.
     inplace: bool, default to True.
         Modify the `dfa_wfn` in place.
+    orbital_energy_unit: str, default to 'eV'
+        The units of orbital energies used to print in the output.
+        Valid choices are ['au', 'eV'].
+        'au': atomic unit, hartree.
+        'eV': electronvolt.
 
     Returns
     -------
@@ -303,6 +337,10 @@ def scf_losc(dfa_wfn, inplace=True):
     """
     # ==> Sanity-check of input dfa_wfn <==
     _validate_dfa_wfn(dfa_wfn)
+    if orbital_energy_unit not in ['eV', 'au']:
+        raise Exception('Invalid input for "orbital_energy_unit". Choices are ["eV", "au"].')
+    eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
+
     _print_header(scf_losc=True)
     if inplace:
         wfn = dfa_wfn
@@ -371,7 +409,7 @@ def scf_losc(dfa_wfn, inplace=True):
         # create losc localizer object
         localizer = py_losc.LocalizerV2(C[s], F[s], D_ao)
         # compute LOs
-        C_lo[s] = localizer.lo("identity")
+        C_lo[s] = localizer.lo()
 
     # => step2: build frozen curvature matrix <==
     # build DFA information object for py_losc module
@@ -492,15 +530,16 @@ def scf_losc(dfa_wfn, inplace=True):
 
     # print orbital energies
     psi4.core.print_out('\n\n=> Orbital Energy <=\n')
-    dfa_eigs = [np.asarray(dfa_wfn.epsilon_a()),
-                np.asarray(dfa_wfn.epsilon_b())]
+    dfa_eigs = [np.asarray(dfa_wfn.epsilon_a()) * eig_factor,
+                np.asarray(dfa_wfn.epsilon_b()) * eig_factor]
+    losc_eigs = [i * eig_factor for i in eig]
     for spin in range(nspin):
         psi4.core.print_out(
-            f'\n{"Alpha" if spin == 0 else "Beta"} orbital energies in a.u.\n')
+            f'\n{"Alpha" if spin == 0 else "Beta"} orbital energies in {orbital_energy_unit}.\n')
         header = "{:<6s} {:>20s} {:>20s}\n".format(
             "Index", "DFA", "LOSC-DFA")
         psi4.core.print_out(header)
         for i in range(len(dfa_eigs[spin])):
             psi4.core.print_out('{:<6d} {:>20.8f} {:>20.8f}\n'.format(
-                i, dfa_eigs[spin][i], eig[spin][i]))
+                i, dfa_eigs[spin][i], losc_eigs[spin][i]))
     return wfn

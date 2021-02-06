@@ -164,6 +164,7 @@ void export_localization_base(py::module &m)
         .def("lo_U",
              static_cast<vector<MatrixXd> (LocalizerBase::*)(const string &)
                              const>(&LocalizerBase::lo_U),
+             "guess"_a = "identity",
              R"pddoc(
         Calculate the LOs and the unitary transformation matrix.
 
@@ -187,6 +188,7 @@ void export_localization_base(py::module &m)
         .def("lo_U",
              static_cast<vector<MatrixXd> (LocalizerBase::*)(
                  ConstRefMat &, double) const>(&LocalizerBase::lo_U),
+             "U_guess"_a, "threshold"_a = 1.e-8,
              R"pddoc(
         Calculate the LOs and the unitary transformation matrix with a given
         U matrix as the initial guess.
@@ -210,6 +212,7 @@ void export_localization_base(py::module &m)
         .def("lo",
              static_cast<MatrixXd (LocalizerBase::*)(const string &) const>(
                  &LocalizerBase::lo),
+             "guess"_a = "identity",
              R"pddoc(
         Calculate the LOs' coefficient matrix under AO.
 
@@ -230,6 +233,7 @@ void export_localization_base(py::module &m)
         .def("lo",
              static_cast<MatrixXd (LocalizerBase::*)(ConstRefMat &, double)
                              const>(&LocalizerBase::lo),
+            "U_guess"_a, "threshold"_a = 1.e-8,
              R"pddoc(
         Calculate the LOs' coefficient matrix under AO with a given U matrix as
         the initial guess.

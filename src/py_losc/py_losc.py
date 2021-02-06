@@ -25,36 +25,17 @@ from py_losc import py_losc_core as core
 import functools
 from typing import List
 
+# ==> Interface for LOSC corrections <==
+from py_losc.py_losc_core import ao_hamiltonian_correction
+from py_losc.py_losc_core import orbital_energy_post_scf
+from py_losc.py_losc_core import energy_correction
 
-def _np2eigen(func):
-    """Decorator function that implicitly convert arguments of `func` that
-    are `np.ndarray` type into fortran-style, in order to make the storage
-    type in python side compatible with `Eigen::MatrixXd` used in LOSC library.
-    """
-    def to_fortran(t):
-        "Convert the variable into a fortran-style np.array if it is np.ndarray."
-        if isinstance(t, np.ndarray):
-            if not t.flags['F_CONTIGUOUS']:
-                t = np.asfortranarray(t)
-        elif isinstance(t, list):
-            for i in range(len(t)):
-                if not t[i].flags['F_CONTIGUOUS']:
-                    t[i] = np.asfortranarray(t[i])
-        return t
+# ==> Interface for LOSC local occupation <==
+from py_losc.py_losc_core import local_occupation
 
-    @functools.wraps(func)
-    def wrapper(*args, **kargs):
-        n_args = []
-        for i in range(len(args)):
-            n_args.append(to_fortran(args[i]))
-        n_kargs = {}
-        for k in kargs:
-            n_kargs[k] = to_fortran(kargs[k])
-        return func(*n_args, **n_kargs)
-    return wrapper
+# ==> Interface for LOSC curvature matrix <==
 
 
-# Interface for curvature matrix.
 class DFAInfo(core.DFAInfo):
     def __init__(self, gga_x, hf_x, name=''):
         """
@@ -102,12 +83,11 @@ class CurvatureV1(core.CurvatureV1):
     LOSC paper (https://doi.org/10.1093/nsr/nwx11).
     """
 
-    @_np2eigen
     def __init__(self, dfa_info: DFAInfo,
                  df_pii: np.ndarray,
                  df_vpq_inv: np.ndarray,
                  grid_lo: np.ndarray,
-                 grid_weight: list):
+                 grid_weight: np.ndarray):
         """
         Curvature version 1 class constructor.
 
@@ -134,8 +114,14 @@ class CurvatureV1(core.CurvatureV1):
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
-        core.CurvatureV1.__init__(self, dfa_info, df_pii, df_vpq_inv,
-                                  grid_lo, grid_weight)
+        self._df_pii = np.asfortranarray(df_pii)
+        self._df_vpq_inv = np.asfortranarray(df_vpq_inv)
+        self._grid_lo = np.asfortranarray(grid_lo)
+        self._grid_wt = np.asarray(grid_weight)
+        self._grid_wt = np.asfortranarray(self._grid_wt)
+        core.CurvatureV1.__init__(self, dfa_info, self._df_pii,
+                                  self._df_vpq_inv, self._grid_lo,
+                                  self._grid_weight)
 
 
 class CurvatureV2(core.CurvatureV2):
@@ -145,12 +131,12 @@ class CurvatureV2(core.CurvatureV2):
     LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
     """
 
-    @_np2eigen
+    # @_np2eigen
     def __init__(self, dfa_info: core.DFAInfo,
                  df_pii: np.ndarray,
                  df_vpq_inv: np.ndarray,
                  grid_lo: np.ndarray,
-                 grid_weight: list):
+                 grid_weight: np.ndarray):
         """
         Curvature version 2 class constructor.
 
@@ -163,12 +149,17 @@ class CurvatureV2(core.CurvatureV2):
         CurvatureV1: constructor of LOSC curvature version 1.
         LocalizerV2: it can build the LOs.
         """
-        core.CurvatureV2.__init__(self, dfa_info, df_pii, df_vpq_inv,
-                                  grid_lo, grid_weight)
+        self._df_pii = np.asfortranarray(df_pii)
+        self._df_vpq_inv = np.asfortranarray(df_vpq_inv)
+        self._grid_lo = np.asfortranarray(grid_lo)
+        self._grid_wt = np.asarray(grid_weight)
+        self._grid_wt = np.asfortranarray(self._grid_wt)
+        core.CurvatureV2.__init__(self, dfa_info, self._df_pii,
+                                  self._df_vpq_inv, self._grid_lo,
+                                  self._grid_wt)
 
-# Interface for localization matrix.
 
-
+# ==> Interface for LOSC localization <==
 class LocalizerV2(core.LocalizerV2):
     """LOSC localization version 2.
 
@@ -176,7 +167,6 @@ class LocalizerV2(core.LocalizerV2):
     LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
     """
 
-    @_np2eigen
     def __init__(self, C_lo_basis: np.ndarray,
                  H_ao: np.ndarray,
                  D_ao: List[np.ndarray]):
@@ -198,4 +188,8 @@ class LocalizerV2(core.LocalizerV2):
         D_ao: list(np.ndarray [nbasis, nbasis])
             The dipole matrix under AOs in the order of x, y and z directions.
         """
-        core.LocalizerV2.__init__(self, C_lo_basis, H_ao, D_ao)
+        self._C_lo_basis = np.asfortranarray(C_lo_basis)
+        self._H_ao = np.asfortranarray(H_ao)
+        self._D_ao = [np.asfortranarray(x) for x in D_ao]
+        core.LocalizerV2.__init__(
+            self, self._C_lo_basis, self._H_ao, self._D_ao)

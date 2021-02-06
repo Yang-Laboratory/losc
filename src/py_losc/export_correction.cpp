@@ -1,6 +1,7 @@
 #include "export_correction.hpp"
 #include <losc/correction.hpp>
 #include <pybind11/eigen.h>
+#include <pybind11/stl.h>
 
 void export_correction(py::module &m)
 {
@@ -87,7 +88,7 @@ void export_correction(py::module &m)
 
     Returns
     -------
-    out: double
+    out: list
         The corrected orbital energies from LOSC with size of n. The order of
         orbital energies match the order of input COs (order of columns in
         C_co matrix).
