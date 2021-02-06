@@ -64,8 +64,13 @@ template <typename T> inline void rotate_two_vectors(T &&x, T &&y, double theta)
 {
     const double c = cos(theta);
     const double s = sin(theta);
-    x = x * c + y * s;
+    // Eigen by defaul use lazy evaluation, which means preferring expression
+    // rather than evaluation of the expression. Here, we need to turn off the
+    // lazy evaluation and force it to evalate into a temporary vector to store
+    // in variable `t`.
+    auto t = (x * c + y * s).eval();
     y = x * -s + y * c;
+    x = t;
 }
 
 } // namespace losc

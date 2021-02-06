@@ -3,7 +3,7 @@ Integrate py_losc module with psi4 package to perform LOSC calculation.
 """
 
 from pkg_resources import parse_version
-import diis
+from psi4_losc import diis
 import psi4
 import numpy as np
 from psi4.driver.p4util.exceptions import ValidationError
@@ -213,7 +213,7 @@ def post_scf_losc(dfa_wfn):
     C_lo = [None] * nspin
     for s in range(nspin):
         # create losc localizer object
-        localizer = py_losc.LoscLocalizerV2(C_co[s], H_ao[s], D_ao)
+        localizer = py_losc.LocalizerV2(C_co[s], H_ao[s], D_ao)
         # compute LOs
         C_lo[s] = localizer.lo()
 
@@ -369,7 +369,7 @@ def scf_losc(dfa_wfn, inplace=True):
     C_lo = [None] * nspin
     for s in range(nspin):
         # create losc localizer object
-        localizer = py_losc.LoscLocalizerV2(C[s], F[s], D_ao)
+        localizer = py_losc.LocalizerV2(C[s], F[s], D_ao)
         # compute LOs
         C_lo[s] = localizer.lo("identity")
 

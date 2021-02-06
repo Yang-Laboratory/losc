@@ -51,12 +51,9 @@ void LocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
     // derivative of U to be stable.
     // Then U should not jump from -pi/4 to pi/4 (or pi/4 to -pi/4).
     theta = 0.5 * atan2(-a1 - sqrt(a1 * a1 + a2 * a2), a2);
-    // try not to get too large rotation angles.
-    // however we don't want restrict it in [-pi/4, pi/4],
-    // as that will cause derivative discontinuity for numerical dU/dP.
-    if (theta > 3. * M_PI / 8.)
+    if (theta > M_PI / 4.)
         theta -= M_PI / 2.;
-    if (theta < -3. * M_PI / 8.)
+    if (theta < -M_PI / 4.)
         theta += M_PI / 2.;
     theta_val = theta;
     double delta = a1 * cos(4 * theta) + a2 * sin(4 * theta) - a1;
@@ -69,7 +66,7 @@ void LocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
                                      MatrixXd &H_lo) const
 {
     // rotate U
-    rotate_two_vectors(U.row(i), U.row(j), theta);
+    rotate_two_vectors(U.col(i), U.col(j), theta);
 
     // rotate D_lo
     for (int xyz = 0; xyz < 3; ++xyz) {
@@ -118,9 +115,9 @@ void LocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
             L, nbasis_, nlo_,
             "LocalizerV2::lo_U: dimension error of LO coefficient matrix.");
     }
-    if (!mtx_match_dimension(U, nbasis_, nlo_)) {
+    if (!mtx_match_dimension(U, nlo_, nlo_)) {
         throw exception::DimensionError(
-            U, nbasis_, nlo_,
+            U, nlo_, nlo_,
             "LocalizerV2::lo_U: dimension error of the U matrix.");
     }
 
@@ -129,12 +126,12 @@ void LocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
     // D_lo = U^T * C_lo_basis^T * D_ao * C_lo_basis * U
     vector<MatrixXd> D_lo;
     for (size_t xyz = 0; xyz < 3; xyz++) {
-        D_lo.push_back(L_init.transpose() * Dipole_ao_[xyz] * L);
+        D_lo.push_back(L_init.transpose() * Dipole_ao_[xyz] * L_init);
     }
 
     // calculate Hamiltonian matrix on LO initial guess.
     // H_lo = U^T * C_lo_basis^T * H_ao * C_lo_basis * U
-    MatrixXd H_lo = L_init.transpose() * H_ao_ * L;
+    MatrixXd H_lo = L_init.transpose() * H_ao_ * L_init;
 
     // using jacobi sweep for localization.
     std::mt19937 g(0);
@@ -186,7 +183,7 @@ vector<MatrixXd> LocalizerV2::lo_U(const string &guess) const
     RefMat U = rst[1];
     set_u_guess(U, guess);
     C_API_lo_U(L, U);
-    return rst;
+    return std::move(rst);
 }
 
 vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold) const
@@ -196,7 +193,7 @@ vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold) const
     RefMat U = rst[1];
     set_u_guess(U, U_guess, threshold);
     C_API_lo_U(L, U);
-    return rst;
+    return std::move(rst);
 }
 
 } // namespace losc

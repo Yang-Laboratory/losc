@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <unistd.h>
+#include <utility>
 
 #include "matrix_io.hpp"
 #include <losc/exception.hpp>
@@ -79,7 +80,6 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
     std::string line;
     std::vector<std::string> line_split;
     std::vector<MatrixXd> rst;
-    MatrixXd current_matrix;
     std::size_t n_row = 0;
     std::size_t n_col = 0;
     std::size_t count = 0;
@@ -94,7 +94,7 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
             // Before that, check if the last matrix is read successfully or
             // not.
             if (!is_first_line) {
-                if (count != current_matrix.size()) {
+                if (count != rst.back().size()) {
                     throw losc::exception::LoscException(
                         "Error in read matrix, unmatched element size: file "
                         "name = " +
@@ -114,9 +114,9 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
                     "Failed to read matrix dimension. file name = " + fname);
             }
             // create a new matrix and push it back to matrix vector.
-            current_matrix = MatrixXd(n_row, n_col);
-            current_matrix.setZero();
-            rst.push_back(current_matrix);
+            MatrixXd t(n_row, n_col);
+            t.setZero();
+            rst.push_back(std::move(t));
             p_data += 3;
             count = 0; // set matrix element count as zero.
         }
@@ -126,7 +126,7 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
                 const size_t i = count / n_col;
                 const size_t j = count % n_col;
                 // current_matrix->data()[count] = std::stod(*p_data);
-                current_matrix(i, j) = std::stod(*p_data);
+                rst.back()(i, j) = std::stod(*p_data);
                 ++count;
             } catch (...) {
                 std::stringstream msg;

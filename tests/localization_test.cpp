@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "matrix_io.hpp"
 #include "matrix_helper.hpp"
+#include "matrix_io.hpp"
 #include <losc/localization.hpp>
 
 using Eigen::MatrixXd;
@@ -78,7 +78,7 @@ TEST_P(LocalizationTest, H2)
     auto C_lo_ref = test::read_matrices_from_txt(lo_ref_path);
     auto H_ao = test::read_matrices_from_txt(H_ao_path);
     auto D_ao_tmp = test::read_matrices_from_txt(D_ao_path);
-    auto S_ao = test::read_matrices_from_txt(S_ao_path);
+    MatrixXd S_ao = test::read_matrices_from_txt(S_ao_path)[0];
     vector<losc::RefConstMat> D_ao(D_ao_tmp.begin(), D_ao_tmp.end());
 
     for (int is = 0; is < 2; is++) {
@@ -91,7 +91,9 @@ TEST_P(LocalizationTest, H2)
         losc::LocalizerV2 localizer(C_lo_basis[is], H_ao[is], D_ao);
         localizer.set_random_permutation(false);
         // localizer.set_print(losc::kPrintLevelNormal);
-        MatrixXd C_lo_calc = localizer.lo();
+        vector<MatrixXd> rst = localizer.lo_U();
+        MatrixXd &C_lo_calc = rst[0];
+        MatrixXd &U_calc = rst[1];
 
         // Test.
         // True condition:
@@ -109,11 +111,9 @@ TEST_P(LocalizationTest, H2)
             size_t nbasis = C_lo_basis[is].rows();
             MatrixXd &C1 = C_lo_calc;
             MatrixXd &C2 = C_lo_ref[is];
-            MatrixXd &S = S_ao[0];
-            MatrixXd C1SC1 = C1.transpose() * S * C1;
+            MatrixXd C1SC1 = C1.transpose() * S_ao * C1;
             EXPECT_TRUE(C1SC1.isIdentity(1e-8));
-
-            P.noalias() = C1.transpose() * S * C2;
+            P.noalias() = C1.transpose() * S_ao * C2;
 
             // P = abs(P)
             P = P.array().abs().matrix();
@@ -137,7 +137,7 @@ TEST_P(LocalizationTest, H2)
             std::cout << "Dipole under AO: " << D_ao_path << std::endl;
             std::cout << "AO overlap: " << S_ao_path << std::endl;
             printf("%s: AO overlap matrix:\n", mol_str);
-            test::mtx_show_full(S_ao[0]);
+            test::mtx_show_full(S_ao);
             for (int xyz = 0; xyz < 3; xyz++) {
                 printf("%s: Dipole matrix under AO: xyz=[%d]\n", mol_str, xyz);
                 test::mtx_show_full(D_ao[xyz]);
@@ -152,11 +152,19 @@ TEST_P(LocalizationTest, H2)
             printf("%s: LO coefficient matrix: calculated. spin=%d\n", mol_str,
                    is);
             test::mtx_show_full(C_lo_calc);
+            printf("%s: U matrix: spin=%d\n", mol_str, is);
+            test::mtx_show_full(U_calc);
             if (!is_permutation) {
                 printf("%s: Permutation matrix: calculated. spin=%d\n", mol_str,
                        is);
                 test::mtx_show_full(P);
             }
+            printf("%s: calc U * UT: spin=%d\n", mol_str, is);
+            test::mtx_show_full(U_calc * U_calc.transpose());
+            printf("%s: calc UT * U: spin=%d\n", mol_str, is);
+            test::mtx_show_full(U_calc.transpose() * U_calc);
+            printf("%s: Final U matrix: spin=%d\n", mol_str, is);
+            test::mtx_show_full(U_calc);
         }
     }
 }

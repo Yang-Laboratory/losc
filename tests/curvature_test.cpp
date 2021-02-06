@@ -45,7 +45,7 @@ TEST_P(CurvatureTest, non_block_Kappa_J)
     MatrixXd df_Vpq_inverse = test::read_matrices_from_txt(df_Vpq_inv_path)[0];
     MatrixXd grid_basis_value =
         test::read_matrices_from_txt(grid_basis_value_path)[0];
-    VectorXd grid_weight = test::read_matrices_from_txt(grid_weight_path)[0];
+    VectorXd grid_weight = test::read_matrices_from_txt(grid_weight_path)[0].transpose();
     vector<MatrixXd> grid_lo;
 
     for (int is = 0; is < 2; is++) {
@@ -106,7 +106,7 @@ TEST_P(CurvatureTest, block_Kappa_J)
     MatrixXd df_Vpq_inverse = test::read_matrices_from_txt(df_Vpq_inv_path)[0];
     MatrixXd grid_basis_value =
         test::read_matrices_from_txt(grid_basis_value_path)[0];
-    VectorXd grid_weight = test::read_matrices_from_txt(grid_weight_path)[0];
+    VectorXd grid_weight = test::read_matrices_from_txt(grid_weight_path)[0].transpose();
     vector<MatrixXd> grid_lo;
     for (int is = 0; is < 2; is++) {
         C_lo[is].transposeInPlace();
