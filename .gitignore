@@ -24,3 +24,8 @@ extern*/
 **/*.so
 **/tmp_*
 **/__pycache__
+
+# psi4
+**/*.out
+**/*.clean
+**/*.dat
