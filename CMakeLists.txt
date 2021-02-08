@@ -1,25 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(project_name losc_lib)
-project(${project_name} C CXX)
-
-# compiler setting: use intel C/C++ compiler.
-find_program(ICC icc)
-if (ICC)
-    message(STATUS "icc found: ${ICC}")
-    set(CMAKE_C_COMPILER "${ICC}" CACHE FILEPATH "Intel C compiler" FORCE)
-else()
-    message(WARNING "icc not found.")
-endif()
-find_program(ICPC icpc)
-if (ICPC)
-    message(STATUS "icpc found: ${ICPC}")
-    set(CMAKE_CXX_COMPILER "${ICPC}" CACHE FILEPATH "Intel C++ compiler" FORCE)
-else()
-    message(WARNING "icpc not found.")
-endif()
-
-enable_testing()
+# names of projects
+set(PROJECT_LOSC losc)
+project(${PROJECT_LOSC} C CXX)
 
 # C/C++ standard setting
 set(CMAKE_C_STANDARD 99)
@@ -27,60 +10,60 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# download googletest if needs
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/external/googletest")
-    # copied from google-test readme.md. See
-    # https://github.com/google/googletest/blob/master/googletest/README.md.
-    # {{{
-    # Download and unpack googletest at configure time
-    configure_file(cmake/cmake_gtest.in ${CMAKE_CURRENT_BINARY_DIR}/download/googletest/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/googletest )
-    if(result)
-      message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-    endif()
-    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/googletest )
-    if(result)
-      message(FATAL_ERROR "Build step for googletest failed: ${result}")
-    endif()
+# Download pybind11 library
+set(PYBIND11_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/pybind11")
+if(NOT EXISTS "${PYBIND11_SOURCE_DIR}")
+    message(STATUS "Download external library: pybind11.")
+    configure_file(cmake/download_pybind11.in download/pybind11/CMakeLists.txt)
+    execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/pybind11"
+    )
+    execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/pybind11"
+    )
 endif()
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/googletest)
+# find Eigen3 library.
+find_package (Eigen3 REQUIRED NO_MODULE)
+if(Eigen3_FOUND)
+    message(STATUS "Eigen3 library found.")
+else()
+    message(FETAL_ERROR "Not found Eigen3 library. Please install Eigen3 library.")
+endif()
 
-## download Matrix if needs
-#if(NOT EXISTS "${CMAKE_SOURCE_DIR}/external/matrix")
-#    # copied from google-test readme.md. See
-#    # https://github.com/google/googletest/blob/master/googletest/README.md.
-#    # {{{
-#    # Download and unpack matrix at configure time
-#    configure_file(cmake/cmake_matrix.in ${CMAKE_CURRENT_BINARY_DIR}/download/matrix/CMakeLists.txt)
-#    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-#      RESULT_VARIABLE result
-#      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/matrix)
-#    if(result)
-#      message(FATAL_ERROR "CMake step for libmatrix failed: ${result}")
-#    endif()
-#    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-#      RESULT_VARIABLE result
-#      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/download/matrix)
-#    if(result)
-#      message(FATAL_ERROR "Build step for libmatrix failed: ${result}")
-#    endif()
-#endif()
-#
-## Add libmatrix directly to our build. This defines the `matrix` targets.
-#add_subdirectory(${CMAKE_SOURCE_DIR}/external/matrix)
+# ==> build pybind11 <==
+add_subdirectory("${PYBIND11_SOURCE_DIR}")
 
-# build source
+# ==> build source <==
 add_subdirectory(src)
 
-# build tests
-add_subdirectory(tests)
+# ==> build tests <==
+option(DO_TEST "Run test or not." OFF)
+if (DO_TEST)
+    enable_testing()
+    # Download googletest library
+    set(GOOGLE_TEST_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/googletest")
+    if(NOT EXISTS "${GOOGLE_TEST_SOURCE_DIR}")
+        message(STATUS "Download external library: googletest.")
+        configure_file(cmake/download_gtest.in download/googletest/CMakeLists.txt)
+        execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/googletest"
+        )
+        execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/googletest"
+        )
+    endif()
+
+    # build google test
+    # Prevent overriding the parent project's compiler/linker
+    # settings on Windows
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    # Add googletest directly to our build. This defines
+    # the gtest and gtest_main targets.
+    add_subdirectory("${GOOGLE_TEST_SOURCE_DIR}")
+
+    # build test source
+    add_subdirectory(tests)
+else()
+    message(STATUS "Note: Tests are disabled. Use \"-DDO_TEST=On\" to build tests.")
+endif()

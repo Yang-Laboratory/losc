@@ -1,25 +1,19 @@
-cmake_minimum_required(VERSION 3.8)
+set(PROJECT_NAME losc_test)
+project(${PROJECT_NAME} C CXX)
 
-set(project_name losc_test)
-project(${project_name} C CXX)
-
-file(GLOB Sources
+file(GLOB SOURCE
     "*.cpp"
     "*.cc")
-file(GLOB Headers
-    "*.hpp"
-    "*.h")
 
 add_executable(
-    ${project_name}
-    ${Sources}
-    ${Headers})
+    ${PROJECT_NAME}
+    ${SOURCE})
 
 target_link_libraries(
-    ${project_name} PUBLIC
-    losc
+    ${PROJECT_NAME} PUBLIC
+    ${PROJECT_LOSC}
     gtest_main)
 
 add_test(
-    NAME ${project_name}
-    COMMAND ${project_name})
+    NAME ${PROJECT_NAME}
+    COMMAND ${PROJECT_NAME})

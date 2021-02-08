@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.8)
+set(PROJECT_NAME ${PROJECT_LOSC})
 
 # build Losc documentation file at configure time.
 # first we can indicate the documentation build as an option and set it to ON by
 # default
 option(BUILD_DOC "Build documentation for Losc library" OFF)
-
 if (BUILD_DOC)
     if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
         # check if Doxygen is installed
@@ -32,41 +31,9 @@ if (BUILD_DOC)
         message(STATUS "Documentations need to be build under release compliation.")
     endif ()
 else (BUILD_DOC)
-   message("NOte: If you want to build documentation, use `-DBUILD_DOC=On -DCMAKE_BUILD_TYPE=Release`. "
+   message("Note: If you want to build documentation, use `-DBUILD_DOC=On -DCMAKE_BUILD_TYPE=Release`. "
     "Doxygen will be required.")
 endif (BUILD_DOC)
-
-# compiler setting: use intel C/C++ compiler.
-find_program(ICC icc)
-if (ICC)
-    message(STATUS "icc found: ${ICC}")
-    set(CMAKE_C_COMPILER "${ICC}" CACHE FILEPATH "Intel C compiler" FORCE)
-else()
-    message(WARNING "icc not found.")
-endif()
-find_program(ICPC icpc)
-if (ICPC)
-    message(STATUS "icpc found: ${ICPC}")
-    set(CMAKE_CXX_COMPILER "${ICPC}" CACHE FILEPATH "Intel C++ compiler" FORCE)
-else()
-    message(WARNING "icpc not found.")
-endif()
-
-# C/C++ standard setting
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set(project_name losc)
-project(${project_name} C CXX)
-
-enable_testing()
-
-file(GLOB Headers
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-file(GLOB Sources
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 # enable openmp or not.
 if (OPENMP)
@@ -82,60 +49,34 @@ else()
     message(STATUS "openmp for CXX is not used. If you want to enable openmp, use `cmake -DOPENMP=on`.")
 endif()
 
-find_package (Eigen3 REQUIRED NO_MODULE)
-if(Eigen3_FOUND)
-    message(STATUS "Eigen3 library found.")
-else()
-    message(WARNING "Can not found library Eigen3, which will be used for testing.\
-        Test code will be skipped until Eigen3 is installed.")
-    return()
-endif()
+# sources
+file(GLOB SOURCES "*.cpp")
+set(LOSC_PUBLIC_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 
-# blas library
-find_library(
-    BLAS_LIBRARY
-    NAMES blas
-    PATHS "/usr/lib")
-if (BLAS_LIBRARY)
-    message(STATUS "libblas: ${BLAS_LIBRARY}")
-else()
-    message(FATAL_ERROR "libblas not found")
-endif()
-
-# lapack library
-find_library(
-    LAPACK_LIBRARY
-    NAMES lapack
-    PATHS "/usr/lib")
-if (BLAS_LIBRARY)
-    message(STATUS "liblapack: ${LAPACK_LIBRARY}")
-else()
-    message(FATAL_ERROR "liblapack not found")
-endif()
-
-
+# ==> build losc library <==
 add_library(
-    ${project_name} SHARED
-    ${Sources}
-    ${Headers})
+    ${PROJECT_NAME} SHARED
+    ${SOURCES})
 
 target_link_libraries(
-    ${project_name}
+    ${PROJECT_NAME}
     PUBLIC
-    ${BLAS_LIBRARY}
-    ${LAPAK_LIBRARY}
     Eigen3::Eigen)
 
 if (OPENMP)
     if(OpenMP_CXX_FOUND)
         target_link_libraries(
-            ${project_name}
+            ${PROJECT_NAME}
             PUBLIC
             OpenMP::OpenMP_CXX)
     endif()
 endif()
 
 target_include_directories(
-    ${project_name}
+    ${PROJECT_NAME}
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/include)
+    ${LOSC_PUBLIC_INCLUDE_DIR})
+
+# ==> install losc library <==
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(DIRECTORY "${LOSC_PUBLIC_INCLUDE_DIR}/losc" DESTINATION include)
