@@ -1,0 +1,33 @@
+$qm
+xyz    mol.xyz
+spin   2
+charge 0
+mult   1
+method  dft
+xcfunc b3lyp
+guess  atom
+iter      300
+dentol    1.0E-004
+etol      1.0E-008
+print     1
+diis      12  0.30
+directvee
+basis    H H.6-31G
+basis    O O.6-31G
+fitbasis H H.6-31GSS
+fitbasis O O.6-31GSS
+dolosc
+end
+
+$setlosc
+print 1
+losc_2_2 gamma 0
+post
+localize window index 0 7
+write lo_coef           lo.gamma=0.win=0_7.bin
+write lo_basis_coef     lo_basis.gamma=0.win=0_7.bin
+write umatrix           u.gamma=0.win=0_7.bin
+
+end
+
+$doqm

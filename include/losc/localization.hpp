@@ -237,6 +237,11 @@ class LocalizerV2 : public LocalizerBase {
                 const vector<RefConstMat> &Dipole_ao);
 
     /**
+     * set the localization parameter gamma.
+     */
+    void set_gamma(double gamma) { gamma_ = gamma; }
+
+    /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
      * LOSC localization v2.
      *

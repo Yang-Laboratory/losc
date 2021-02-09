@@ -1,0 +1,45 @@
+
+$qm
+xyz    mol.xyz
+spin   2
+charge 0
+mult   1
+method  dft
+xcfunc b3lyp
+guess  atom
+iter      300
+dentol    1.0E-004
+etol      1.0E-008
+print     1
+diis      12  0.30
+directvee
+basis    H H.6-31G
+basis    O O.6-31G
+fitbasis H H.6-31GSS
+fitbasis O O.6-31GSS
+dolosc
+end
+
+$setlosc
+print 1
+losc_2_2 
+post
+write dipole_ao         dipole_ao.bin
+write ao_overlap        ao_overlap.bin
+write dfa_h             dfa_h.bin
+write dfa_density       dfa_density.bin
+write df_pmn_matrix     df_pmn.bin
+write df_Vpq_inverse    df_Vpq_inv.bin
+write grid_weight       grid_wt.bin
+write grid_basis_value  grid_basis.bin
+write lo_coef           lo.bin
+write umatrix           u.bin
+write lo_basis_coef     lo_basis.bin
+write localocc          localocc.bin
+write losc_eig_proj     losc_eig.bin
+write kappa             kappa.bin
+write losc_hamiltonian_correction losc_H_corr.bin
+
+end
+
+$doqm
