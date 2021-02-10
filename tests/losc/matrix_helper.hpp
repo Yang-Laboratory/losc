@@ -1,5 +1,5 @@
 #ifndef _LOSC_TESTS_MATRIX_HELPER_HPP_
-#define _LOSC_TESTS_MATRIX_H_
+#define _LOSC_TESTS_MATRIX_HELPER_HPP_
 
 #include <Eigen/Dense>
 #include <iostream>

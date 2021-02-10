@@ -65,7 +65,8 @@ def form_df_basis_matrix(wfn):
     zero_bas = psi4.core.BasisSet.zero_ao_basis_set()
     # auxiliary basis for density fitting. TODO: let user choose the fitbasis.
     aux_bas = psi4.core.BasisSet.build(
-        wfn.molecule(), "DF_BASIS_SCF", "", "JKFIT", "aug-cc-pVDZ")
+        wfn.molecule(), "ORBITAL", "my_aug-cc-pVTZ")
+    aux_bas.print_out()
     # psi4.mintshelper object to help building AO integrals.
     mints = wfn.mintshelper()
     # build three-center integral <fitbasis|lo, lo>
@@ -99,14 +100,18 @@ def form_grid_lo(wfn, C_lo):
     # psi4.VBase object to help building grid.
     Vpot = wfn.V_potential()
     # number of grid points
-    npts = 0
+    npts = Vpot.grid().npoints()
     # number of LOs.
     nlo = C_lo.shape[1]
     # Get the psi4.potential object for help
-    # TODO: check if points_func is related to threads.
+    # Note:
+    # Vpot.properties() returns `nthread` number of pointer functions
+    # (psi4 core object). These multiple pointer functions work in parallel
+    # in psi4 core.
+    # Here, we work in the python layer and do not use parallel construction
+    # of grid yet. So we always use the first pointer function object to
+    # build grid.
     points_func = Vpot.properties()[0]
-    for b in range(Vpot.nblocks()):
-        npts += Vpot.get_block(b).npoints()
 
     # allocate grid_lo matrices.
     grid_lo = np.zeros((npts, nlo))
@@ -127,8 +132,9 @@ def form_grid_lo(wfn, C_lo):
         # block.
         grid_ao = np.array(points_func.basis_values()["PHI"])[:npoints, :lpos.shape[0]]
         grid_lo_blk = grid_lo[npts_count:npts_count+npoints, :]
-        grid_lo_blk[:] = grid_ao.dot(C_lo[lpos, :]) # npoints x nlo
+        grid_lo_blk[:] = grid_ao.dot(C_lo[lpos, :])  # npoints x nlo
 
+        # update block starting position
         npts_count += npoints
 
     return grid_lo
@@ -156,29 +162,20 @@ def form_grid_w(wfn):
     # psi4.VBase object to help building grid.
     Vpot = wfn.V_potential()
     # number of grid points
-    npts = 0
-    # Get the psi4.potential object for help
-    # TODO: check if points_func is related to threads.
-    points_func = Vpot.properties()[0]
-    for b in range(Vpot.nblocks()):
-        npts += Vpot.get_block(b).npoints()
+    npts = Vpot.grid().npoints()
 
     # build grid_w vector
     grid_w = np.zeros((npts,))
     npts_count = 0
     # loop over the blocks to build grid_w
     for b in range(Vpot.nblocks()):
-        # Obtain block information
+        # Obtain block of weights
         block = Vpot.get_block(b)
-        # TODO: check do we need compute points to get weights?
-        points_func.compute_points(block)
         npoints = block.npoints()
+        grid_w[npts_count:npts_count+npoints] = np.asarray(block.w())
 
-        # view of the grid_w block
-        grid_w_blk = grid_w[npts_count:npts_count+npoints]
-
-        # Obtain the grid weight
-        grid_w_blk[:] = np.array(block.w())
+        # update block starting position
+        npts_count += npoints
 
     return grid_w
 
@@ -208,7 +205,8 @@ def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
     # sanity-check of input dfa wfn.
     _validate_dfa_wfn(dfa_wfn)
     if orbital_energy_unit not in ['eV', 'au']:
-        raise Exception('Invalid input for "orbital_energy_unit". Choices are ["eV", "au"].')
+        raise Exception(
+            'Invalid input for "orbital_energy_unit". Choices are ["eV", "au"].')
     eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
 
     _print_header(scf_losc=False)
@@ -243,7 +241,6 @@ def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
     df_pii = [None] * nspin
     for s in range(nspin):
         # build three-center integral <fitbasis|lo, lo>
-        # TODO: check if I use np.einsum right.
         df_pii[s] = np.einsum('pmn,mi,ni->pi', df_pmn,
                               C_lo[s], C_lo[s], optimize=True)
 
@@ -430,9 +427,7 @@ def scf_losc(dfa_wfn, inplace=True, orbital_energy_unit='eV'):
     df_pii = [None] * nspin
     for s in range(nspin):
         # build three-center integral <fitbasis|lo, lo>
-        # TODO: check if I use np.einsum right.
-        df_pii[s] = np.einsum('pmn,mi,ni->pi', df_pmn,
-                              C_lo[s], C_lo[s], optimize=True)
+        df_pii[s] = np.einsum('pmn,mi,ni->pi', df_pmn, C_lo[s], C_lo[s], optimize=True)
 
     # build weights of grid points
     grid_w = form_grid_w(dfa_wfn)
