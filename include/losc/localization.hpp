@@ -21,8 +21,10 @@ using std::vector;
  */
 class LocalizerBase {
   protected:
-    size_t nlo_;    /**<number of LO. */
-    size_t nbasis_; /**< number of AO basis. */
+    size_t nlo_;     /**< The number of LO. */
+    size_t nbasis_;  /**< The number of AO basis. */
+    size_t nsteps_;  /**< The number of iteration steps for the localization. */
+    bool converged_; /**< The convergence of the localization. */
 
     /**
      * @brief LO basis coefficient matrix under AOs.
@@ -84,6 +86,23 @@ class LocalizerBase {
     virtual ~LocalizerBase();
 
     /**
+     * Return the number of iteration steps for the most recent localization
+     * performed by calling the `lo_U()` and `lo()` functions.
+     */
+    size_t steps() const { return nsteps_; }
+
+    /**
+     * Return the convergence of the most recent localization performed by
+     * calling the `lo_U()` and `lo()` functions.
+     */
+    bool is_converged() const { return converged_; }
+
+    /**
+     * Return the localization cost function value for the given LOs.
+     */
+    virtual double cost_func(ConstRefMat &lo) const = 0;
+
+    /**
      * @brief Set the maximum iteration number for localization.
      */
     void set_max_iter(size_t max_iter) { js_max_iter_ = max_iter; }
@@ -129,7 +148,7 @@ class LocalizerBase {
      * @return a size 2 vector of matrix `rst`. `rst[0]` is the LO coefficient
      * matrix. `rst[1]` is the corresponding U matrix.
      */
-    virtual vector<MatrixXd> lo_U(const string &guess = "identity") const = 0;
+    virtual vector<MatrixXd> lo_U(const string &guess = "identity") = 0;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix.
@@ -141,7 +160,7 @@ class LocalizerBase {
      * 1e-8.
      */
     virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) const = 0;
+                                  double threshold = 1e-8) = 0;
 
     /**
      * @brief The C interface to calculate the LOs and the unitary
@@ -152,7 +171,7 @@ class LocalizerBase {
      * of the input U matrix is not verified. At exit, it is updated by the
      * localization process.
      */
-    virtual void C_API_lo_U(RefMat L, RefMat U) const = 0;
+    virtual void C_API_lo_U(RefMat L, RefMat U) = 0;
 
     /**
      * @brief Calculate the LOs' coefficient matrix under AO.
@@ -160,7 +179,7 @@ class LocalizerBase {
      * @param guess: a string represents the initial guess. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(const string &guess = "identity") const
+    virtual MatrixXd lo(const string &guess = "identity")
     {
         return lo_U(guess)[0];
     }
@@ -171,7 +190,7 @@ class LocalizerBase {
      * @param U_guess: the initial guess of U matrix. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8) const
+    virtual MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8)
     {
         return lo_U(U_guess, threshold)[0];
     }
@@ -242,6 +261,24 @@ class LocalizerV2 : public LocalizerBase {
     void set_gamma(double gamma) { gamma_ = gamma; }
 
     /**
+     * set the localization parameter c.
+     */
+    void set_c(double c) { c_ = c; }
+
+    /**
+     * Return the relative cost function of LOSC localization v2.
+     *
+     * @note
+     * The cost function is defined as:
+     * F = (1 - gamma) (<r^2> - <r>^2) + gamma * C (<h^2> - <h>^2).
+     * Since the unitary transformation does not change the trace of a matrix,
+     * the contributions from <r^2> and <h^2> are ignored. So it is the relative
+     * cost function as:
+     * F = (1 - gamma) <r>^2 + gamma * C <h>^2.
+     */
+    double cost_func(ConstRefMat &lo) const override;
+
+    /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
      * LOSC localization v2.
      *
@@ -251,7 +288,7 @@ class LocalizerV2 : public LocalizerBase {
      * @see LocalizerBase::lo_U()
      */
     virtual vector<MatrixXd>
-    lo_U(const string &guess = "identity") const override;
+    lo_U(const string &guess = "identity") override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
@@ -263,7 +300,7 @@ class LocalizerV2 : public LocalizerBase {
      * @see LocalizerBase::lo_U()
      */
     virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) const override;
+                                  double threshold = 1e-8) override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix in an
@@ -272,7 +309,7 @@ class LocalizerV2 : public LocalizerBase {
      * @see
      * LocalizerBase::lo_U
      */
-    virtual void C_API_lo_U(RefMat L, RefMat U) const override;
+    virtual void C_API_lo_U(RefMat L, RefMat U) override;
 };
 
 } // namespace losc

@@ -19,7 +19,7 @@ template <class Base> class PyBase : public Base {
     // Here, all the virtual functions means virtual functions in LocalizerBase
     // class.
     // It looks like virtual deconstructor can be ignored.
-    vector<MatrixXd> lo_U(const string &guess = "identity") const override
+    vector<MatrixXd> lo_U(const string &guess = "identity") override
     {
         PYBIND11_OVERRIDE_PURE(vector<MatrixXd>, /* Return type */
                                Base,             /* Parent class */
@@ -28,7 +28,7 @@ template <class Base> class PyBase : public Base {
         );
     }
     vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                          double threshold = 1e-8) const override
+                          double threshold = 1e-8) override
     {
         PYBIND11_OVERRIDE_PURE(vector<MatrixXd>, /* Return type */
                                Base,             /* Parent class */
@@ -37,7 +37,7 @@ template <class Base> class PyBase : public Base {
                                threshold         /* Arguments */
         );
     }
-    void C_API_lo_U(RefMat L, RefMat U) const override
+    void C_API_lo_U(RefMat L, RefMat U) override
     {
         PYBIND11_OVERRIDE_PURE(void,       /* Return type */
                                Base,       /* Parent class */
@@ -46,7 +46,7 @@ template <class Base> class PyBase : public Base {
                                U           /* Arguments */
         );
     }
-    MatrixXd lo(const string &guess = "identity") const override
+    MatrixXd lo(const string &guess = "identity") override
     {
         PYBIND11_OVERRIDE(MatrixXd, /* Return type */
                           Base,     /* Parent class */
@@ -54,12 +54,20 @@ template <class Base> class PyBase : public Base {
                           guess     /* Arguments */
         );
     }
-    MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8) const override
+    MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8) override
     {
         PYBIND11_OVERRIDE(MatrixXd, /* Return type */
                           Base,     /* Parent class */
                           lo,       /* Name of function */
                           U_guess   /* Arguments */
+        );
+    }
+    double cost_func(ConstRefMat &lo) const override
+    {
+        PYBIND11_OVERRIDE_PURE(double,    /* Return type */
+                               Base,      /* Parent class */
+                               cost_func, /* Name of function */
+                               lo         /* Arguments */
         );
     }
 };
@@ -82,7 +90,7 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
     // overode in PyBase<Derive_L1> class.
     // Now, the only thing left is that we can just look at the Derive_L1
     // class, and override ALL the virtual functions showing in Derive_L1 class.
-    vector<MatrixXd> lo_U(const string &guess = "identity") const override
+    vector<MatrixXd> lo_U(const string &guess = "identity") override
     {
         PYBIND11_OVERRIDE(vector<MatrixXd>, /* Return type */
                           Derive_L1,        /* Parent class */
@@ -91,7 +99,7 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
         );
     }
     vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                          double threshold = 1e-8) const override
+                          double threshold = 1e-8) override
     {
         PYBIND11_OVERRIDE(vector<MatrixXd>, /* Return type */
                           Derive_L1,        /* Parent class */
@@ -100,13 +108,21 @@ template <class Derive_L1> class PyDerive_L1 : public PyBase<Derive_L1> {
                           threshold         /* Arguments */
         );
     }
-    void C_API_lo_U(RefMat L, RefMat U) const override
+    void C_API_lo_U(RefMat L, RefMat U) override
     {
         PYBIND11_OVERRIDE(void,       /* Return type */
                           Derive_L1,  /* Parent class */
                           C_API_lo_U, /* Name of function */
                           L,          /* Arguments */
                           U           /* Arguments */
+        );
+    }
+    double cost_func(ConstRefMat &lo) const override
+    {
+        PYBIND11_OVERRIDE(double,    /* Return type */
+                          Derive_L1, /* Parent class */
+                          cost_func, /* Name of function */
+                          lo         /* Arguments */
         );
     }
 };
@@ -162,8 +178,8 @@ void export_localization_base(py::module &m)
         )pddoc")
         // lo_U: overload 1
         .def("lo_U",
-             static_cast<vector<MatrixXd> (LocalizerBase::*)(const string &)
-                             const>(&LocalizerBase::lo_U),
+             static_cast<vector<MatrixXd> (LocalizerBase::*)(const string &)>(
+                 &LocalizerBase::lo_U),
              "guess"_a = "identity",
              R"pddoc(
         Calculate the LOs and the unitary transformation matrix.
@@ -187,7 +203,7 @@ void export_localization_base(py::module &m)
         // lo_U: overload 2
         .def("lo_U",
              static_cast<vector<MatrixXd> (LocalizerBase::*)(
-                 ConstRefMat &, double) const>(&LocalizerBase::lo_U),
+                 ConstRefMat &, double)>(&LocalizerBase::lo_U),
              "U_guess"_a, "threshold"_a = 1.e-8,
              R"pddoc(
         Calculate the LOs and the unitary transformation matrix with a given
@@ -210,7 +226,7 @@ void export_localization_base(py::module &m)
         )pddoc")
         // lo: overload 1
         .def("lo",
-             static_cast<MatrixXd (LocalizerBase::*)(const string &) const>(
+             static_cast<MatrixXd (LocalizerBase::*)(const string &)>(
                  &LocalizerBase::lo),
              "guess"_a = "identity",
              R"pddoc(
@@ -231,9 +247,9 @@ void export_localization_base(py::module &m)
         )pddoc")
         // lo: overload 2
         .def("lo",
-             static_cast<MatrixXd (LocalizerBase::*)(ConstRefMat &, double)
-                             const>(&LocalizerBase::lo),
-            "U_guess"_a, "threshold"_a = 1.e-8,
+             static_cast<MatrixXd (LocalizerBase::*)(ConstRefMat &, double)>(
+                 &LocalizerBase::lo),
+             "U_guess"_a, "threshold"_a = 1.e-8,
              R"pddoc(
         Calculate the LOs' coefficient matrix under AO with a given U matrix as
         the initial guess.
@@ -250,6 +266,43 @@ void export_localization_base(py::module &m)
         See Also
         --------
         lo_U: return both LOs and the U matrix.
+        )pddoc")
+        // cost_func
+        .def("cost_func", &LocalizerBase::cost_func, "lo"_a,
+             R"pddoc(
+        Return the localization cost function value for the given LOs.
+
+        Parameters
+        ----------
+        lo: np.ndarray [nbasis, nlo]
+            The LOs coefficient matrix under AOs.
+
+        Returns
+        -------
+        out: float
+            The cost function value.
+        )pddoc")
+        // nsteps
+        .def("steps", &LocalizerBase::steps,
+             R"pddoc(
+        Return the number of iteration steps for the most recent localization
+        performed by calling the `lo_U()` and `lo()` functions.
+
+        Returns
+        -------
+        out: int
+            The number of iterations.
+        )pddoc")
+        // is_converged
+        .def("is_converged", &LocalizerBase::is_converged,
+             R"pddoc(
+        Return the convergence of the most recent localization performed by
+        calling the `lo_U()` and `lo()` functions.
+
+        Returns
+        -------
+        out: bool
+            The convergence of localization.
         )pddoc");
 }
 
@@ -264,7 +317,23 @@ void export_localization_v2(py::module &m)
                       const vector<RefConstMat> & // D_ao
                       >(),
              "C_lo_basis"_a.noconvert(), "H_ao"_a.noconvert(),
-             "D_ao"_a.noconvert());
-    // LocalizerV2 class has no new functions compared to LocalizerBase.
-    // So no more functions can be exported here.
+             "D_ao"_a.noconvert())
+        // set_gamma
+        .def("set_gamma", &LocalizerV2::set_gamma, "gamma"_a,
+             R"pddoc(
+        Set the localization parameter gamma.
+
+        Returns
+        -------
+        out: None
+        )pddoc")
+        // set_c
+        .def("set_c", &LocalizerV2::set_c, "c"_a,
+             R"pddoc(
+        Set the localization parameter c.
+
+        Returns
+        -------
+        out: None
+        )pddoc");
 }

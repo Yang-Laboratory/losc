@@ -32,8 +32,8 @@ void LocalizerBase::set_u_guess(RefMat U, ConstRefMat &U_guess,
 }
 
 LocalizerBase::LocalizerBase(ConstRefMat &C_lo_basis)
-    : nbasis_{C_lo_basis.rows()}, nlo_{C_lo_basis.cols()}, C_lo_basis_{
-                                                               C_lo_basis}
+    : nbasis_{C_lo_basis.rows()}, nlo_{C_lo_basis.cols()},
+      C_lo_basis_{C_lo_basis}, nsteps_{0}, converged_{false}
 {
     if (!mtx_match_dimension(C_lo_basis_, nbasis_, nlo_)) {
         throw exception::DimensionError(C_lo_basis_, nbasis_, nlo_,

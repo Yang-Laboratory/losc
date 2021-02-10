@@ -6,7 +6,6 @@
 #include "eigen_helper.hpp"
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <losc/exception.hpp>
 #include <losc/localization.hpp>
 #include <random>
@@ -107,7 +106,7 @@ LocalizerV2::LocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
     }
 }
 
-void LocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
+void LocalizerV2::C_API_lo_U(RefMat L, RefMat U)
 {
     // Sanity check of the input.
     if (!mtx_match_dimension(L, nbasis_, nlo_)) {
@@ -167,16 +166,20 @@ void LocalizerV2::C_API_lo_U(RefMat L, RefMat U) const
         ++iter;
     }
 
+    // modify the localization flags.
     if (iter >= js_max_iter_ && abs(cycle_delta) > js_tol_) {
-        std::cout << "Warning: localization is not convergened.\n";
+        converged_ = false;
+    } else {
+        converged_ = true;
     }
+    nsteps_ = iter;
 
     // calculate the LO coefficient matrix.
     // C_lo = C_lo_basis * U
     L.noalias() = C_lo_basis_ * U;
 }
 
-vector<MatrixXd> LocalizerV2::lo_U(const string &guess) const
+vector<MatrixXd> LocalizerV2::lo_U(const string &guess)
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     RefMat L = rst[0];
@@ -186,7 +189,7 @@ vector<MatrixXd> LocalizerV2::lo_U(const string &guess) const
     return std::move(rst);
 }
 
-vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold) const
+vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
 {
     vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
     RefMat L = rst[0];
@@ -194,6 +197,22 @@ vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold) const
     set_u_guess(U, U_guess, threshold);
     C_API_lo_U(L, U);
     return std::move(rst);
+}
+
+double LocalizerV2::cost_func(ConstRefMat &lo) const
+{
+    vector<MatrixXd> D;
+    for (size_t xyz = 0; xyz < 3; ++xyz) {
+        D.push_back(lo.transpose() * Dipole_ao_[xyz] * lo);
+    }
+    MatrixXd H(lo.transpose() * H_ao_ * lo);
+
+    double rst = 0;
+    for (size_t xyz = 0; xyz < 3; ++xyz) {
+        rst -= (1 - gamma_) * D[xyz].diagonal().array().square().sum();
+    }
+    rst -= gamma_ * c_ * H.diagonal().array().square().sum();
+    return rst;
 }
 
 } // namespace losc
