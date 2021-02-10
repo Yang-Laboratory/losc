@@ -118,11 +118,16 @@ def form_grid_lo(wfn, C_lo):
         block = Vpot.get_block(b)
         points_func.compute_points(block)
         npoints = block.npoints()
+        lpos = np.array(block.functions_local_to_global())
 
-        # compute grid_ao on the fly to build grid_lo
-        grid_ao = np.array(points_func.basis_values()["PHI"])[:npoints, :]
+        # Compute grid_ao on the fly to build grid_lo.
+        # The full matrix of grid_ao is [npts, nbasis]. Since the grid is very
+        # sparse on atoms, we do not always need the full matrix. `lpos`
+        # represents the AOs that have non-zero grid values for the given grid
+        # block.
+        grid_ao = np.array(points_func.basis_values()["PHI"])[:npoints, :lpos.shape[0]]
         grid_lo_blk = grid_lo[npts_count:npts_count+npoints, :]
-        grid_lo_blk[:] = grid_ao.dot(C_lo)
+        grid_lo_blk[:] = grid_ao.dot(C_lo[lpos, :]) # npoints x nlo
 
         npts_count += npoints
 
@@ -207,7 +212,7 @@ def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
     eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
 
     _print_header(scf_losc=False)
-    is_rks = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_ab_dens()
+    is_rks = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
     nspin = 1 if is_rks else 2
 
     # map needed matrices to DFA wfn.
@@ -276,11 +281,13 @@ def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
         losc_eig[s] = np.array(py_losc.orbital_energy_post_scf(
             H_ao[s], H_losc[s], C_co[s])) * eig_factor
 
+    E_losc_tot = 2 * E_losc[0] if nspin == 1 else sum(E_losc)
+
     # ==> Print energies to output <==
     psi4.core.print_out('\n\n=> Total Energy <=\n')
     psi4.core.print_out('DFA SCF energy: {:.8f} hartree\n'.format(dfa_wfn.energy()))
-    psi4.core.print_out('LOSC energy: {:.8f} hartree\n'.format(sum(E_losc)))
-    psi4.core.print_out('LOSC-DFA energy: {:.8f} hartree\n'.format(dfa_wfn.energy() + sum(E_losc)))
+    psi4.core.print_out('LOSC energy: {:.8f} hartree\n'.format(E_losc_tot))
+    psi4.core.print_out('LOSC-DFA energy: {:.8f} hartree\n'.format(dfa_wfn.energy() + E_losc_tot))
 
     # print orbital energies
     psi4.core.print_out('\n\n=> Orbital Energy <=\n')
@@ -296,7 +303,7 @@ def post_scf_losc(dfa_wfn, orbital_energy_unit='eV'):
             psi4.core.print_out('{:<6d} {:>20.8f} {:>20.8f}\n'.format(
                 i, dfa_eigs[spin][i], losc_eig[spin][i]))
 
-    return dfa_wfn.energy() + sum(E_losc), losc_eig
+    return dfa_wfn.energy() + E_losc_tot, losc_eig
 
 
 def scf_losc(dfa_wfn, inplace=True, orbital_energy_unit='eV'):
