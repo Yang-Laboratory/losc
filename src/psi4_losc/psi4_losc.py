@@ -2,10 +2,12 @@
 Integrate py_losc module with psi4 package to perform LOSC calculation.
 """
 
-from pkg_resources import parse_version
-from psi4_losc import diis
-import psi4
 import numpy as np
+from psi4_losc import jk
+from psi4_losc import diis
+
+import psi4
+from pkg_resources import parse_version
 from psi4.driver.p4util.exceptions import ValidationError
 from py_losc import py_losc
 from qcelemental import constants
@@ -544,4 +546,442 @@ def scf_losc(dfa_wfn, inplace=True, orbital_energy_unit='eV'):
         for i in range(len(dfa_eigs[spin])):
             psi4.core.print_out('{:<6d} {:>20.8f} {:>20.8f}\n'.format(
                 i, dfa_eigs[spin][i], losc_eigs[spin][i]))
+    return wfn
+
+
+def _scf(name, guess_wfn=None, losc_ref_wfn=None, occ={}, verbose=1):
+    """
+    Perform the SCF calculation for systems that may have fractional occupations.
+
+    Parameters
+    ----------
+    name: str
+        The name of the DFT functional or HF method. The same style as
+        psi4.energy() function.
+    guess_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
+        The wfn used to set the initial guess of the SCF calculation. This is
+        equivalent to copy guess_wfn.C (coefficient matrix) and guess_wfn.D
+        (density matrix) to the scf wavefunction object to initialize the SCF
+        calculation. Setting this variable will overwrite the psi4 global guess
+        setting.
+        !!!
+        Note: if you use this variable, make sure you are passing a reasonable
+        guess wfn to the function. We do not check the validity the input.
+    occ: dict, default to an empty dict.
+        A dictionary that specifies the customized occupation number. This
+        variable is used to modify the aufbau occupation number of current
+        molecule to give the final set of occupation numbers for the SCF
+        calculation.
+
+        The structure of the dict:
+        {
+            "alpha": # for alpha spin
+            {
+                int or str: float,
+            }
+            "beta": # for beta spin
+            {
+                int or str: float,
+            }
+        }
+        The key-value pair (int: float): int refers to orbital index (0-based);
+        float refers to the customized occupation number (in the range of [0, 1]).
+        The key-value pair (str: float): str can be either ['homo', 'lumo'],
+        which refers to HOMO and LUMO orbital respectively; float refers to the
+        customized occupation number (in the range of [0, 1]).
+
+        Example:
+        >> H2 system: charge=0, mult=1
+        aufbau occupation numbers are:
+        alpha occ: 1, 0, 0, 0, ...
+        beta occ: 1, 0, 0, 0, ...
+
+        >> customized occ:
+        occ = {
+            "alpha": {"homo": 0.5}
+            "beta": {"3": 0.7}
+        }
+
+        >> resulted occ:
+        alpha occ: 0.5, 0, 0, 0, ...
+        beta occ:  1,   0, 0, 0.7, ...
+
+        Note:
+        All the str in this dictionary is case-insensitive.
+
+    verbose: int, default to 1
+        print level. 0 means print nothing. 1 means normal print level. A larger
+        number means more details.
+
+    Returns
+    -------
+    wfn: psi4.core.RHF or psi4.core.UHF
+        The SCF wavefunction.
+        1. Updated data for the returned wfn object:
+            wfn.S(): AO overlap matrix.
+            wfn.H(): Core matrix.
+            wfn.Ca(), wfn.Cb(): CO coefficient matrix.
+            wfn.Fa(), wfn.Fb(): Fock matrix.
+            wfn.Da(), wfn.Db(): density matrix.
+            wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc matrix.
+            wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.
+            wfn.energy(): total energy.
+
+        2. Other members may not be initialized. Accessing and using other members
+        in the returned wfn is a undefined behavior.
+
+        3. New attributes added to the returned wfn object:
+            wfn.elec_a, wfn.elec_b: the total number of electrons.
+                Note: if it is a fractional system, these two attributes will
+                differ to the returned value of wfn.nalpha() and wfn.nbeta().
+
+
+    Notes
+    -----
+    1. Connections to psi4 global setting:
+    This function only relies on the GLOBAL settings in psi4, NOT any local
+    settings for any psi4 modules!
+
+    2. To build J and K matrices, we directly transforms AO ERI into J and K
+    matrix with density matrix. We can not used psi4.JK object to help, because
+    psi4.JK object does not provide interface to accept density matrix as input
+    (it only accept coefficient matrix so far). Therefore, this function is very
+    memory consuming (in N^4 for AO ERI). Only use this function for small
+    systems. This is enough, because you will only care the fractional
+    calculations for small systems.
+
+    3. AO ERI is constructed by psi4.mintshelper.ao_eri(). So the SCF type is
+    always `direct`.
+
+    4. Ignored psi4 global setting:
+        scf_type: always ignored.
+        guess: ignored when `guess_wfn` is provided and not None.
+
+    5. For the updated matrices/vectors in returned wfn (such as C, D, F matrices),
+    although psi4.wfn objects provide interface to interact with the internal
+    data (such the interface wfn.Fa() that returns a shared_ptr to internal Fock
+    matrix), we do not map wfn internal matrices into python to modify these
+    matrices in place in python. The reason is that the lifetime of the internal
+    psi4.Matrix object managed by the shared_ptr is hard to track in python.
+    Take wfn.Fa matrix as example.
+    >>>
+    # 1. Map internal Fock matrix into python. Now `F` in python refers to the
+    # wfn.Fa matrix.
+    F = np.asarray(wfn.Fa())
+
+    # 2. psi4.core code internally changes the Fock matrix by doing something
+    # like
+    # wfn.Fa = std::make_shared(Matrix(nbf, nbf)); # this is in c++ psi4.core.
+
+    # 3. Now `F` in python no longer refers to `wfn.Fa()`, since wfn.Fa is
+    # updated.
+    >>>
+    Because of this issue, all the matrices those will be used to update wfn
+    are allocated and managed in python. I know this doubles the memory cost
+    (same matrix, such as Fock matrix, is allocated in both python and psi4.core),
+    but this makes the logic clearer and less chances to have bug.
+    At the return, the python matrix will be copied into wfn through the
+    interface. I know we don't copy, but this is the price we have to pay.
+    """
+    def update_C(occ_idx, occ_val, Cin, C, Cocc, D):
+        """
+        Update C, Cocc and D matrices.
+        """
+        C[:] = Cin
+        Cocc[:] = Cin[:, occ_idx]
+        D[:] = np.einsum('i,ui,vi->uv', np.asarray(occ_val), Cocc, Cocc)
+
+
+    def update_occ(wfn, occ):
+        nbf = wfn.basisset().nbf()
+        nelec = [wfn.nalpha(), wfn.nbeta()]
+        is_aufbau = True
+        is_integer = True
+        # Build aufbau occupation.
+        rst_occ = [{i: 1 for i in range(n)} for n in nelec]
+        for k, v in occ.items():
+            k = k.lower()
+            spin_chanel = ['alpha', 'beta']
+            if k not in spin_chanel:
+                raise Exception(f"invalid customized occupation spin chanel: {k}.")
+            s = spin_chanel.index(k)
+            for orb_i, occ_i in v.items():
+                if isinstance(orb_i, str):
+                    orb_i = orb_i.lower()
+                    if orb_i not in ['homo', 'lumo']:
+                        raise Exception(f"unknown customized occupation index: {orb_i}.")
+                    if orb_i == 'homo':
+                        orb_i = nelec[s] - 1
+                    else:
+                        orb_i = nelec[s]
+                if orb_i >= nbf:
+                    raise Exception(f"customized occupation index is out-of-range: {orb_i} (orbital index) > {nbf} (basis size).")
+                if not 0 <= occ_i <= 1:
+                    raise Exception(f"customized occupation number is invalid: occ={occ_i}.")
+                rst_occ[s][orb_i] = occ_i
+
+                if int(occ_i) != float(occ_i):
+                    is_integer = False
+
+        occ_idx = []
+        occ_val = []
+        for d in rst_occ:
+            idx_occ = list(d.items())
+            idx_occ.sort()
+            idx, occ = zip(*idx_occ)
+            occ_idx.append(idx)
+            occ_val.append(occ)
+
+        nocc = [len(x) for x in occ_idx]
+
+        for s in range(nspin):
+            if occ_idx and occ_idx[s][-1] >= nocc[s]:
+                is_aufbau = False
+
+        return is_integer, is_aufbau, nocc, occ_idx, occ_val
+
+    def local_print(level, *args):
+        if verbose >= level:
+            t = [f'{i}' for i in args]
+            psi4.core.print_out(f'{" ".join(t)}\n')
+
+    # If we do DFT, we the global reference should be either 'rks' or 'uks'.
+    # Using 'rhf` or `uhf` for DFT calculation will lead to error in
+    # psi4.core.HF constructor.
+    if name.upper not in ['HF', 'SCF']:
+        reference = psi4.core.get_global_option('REFERENCE')
+        if reference == 'RHF':
+            psi4.set_options({'reference': 'rks'})
+        elif reference == 'UHF':
+            psi4.set_options({'reference': 'uks'})
+
+    mol = psi4.core.get_active_molecule()
+    # TODO:
+    # Currenty only support c1 symmetry.
+    if mol.schoenflies_symbol() != 'c1':
+        raise Exception('Current SCF code only supports C1 symmetry')
+
+    local_print(0, "-----------------------")
+    local_print(0, "          SCF")
+    local_print(0, "    by Yuncai Mei")
+    local_print(0, "-----------------------")
+
+    # Get global settings
+    maxiter = psi4.core.get_global_option('MAXITER')
+    E_conv = psi4.core.get_global_option('E_CONVERGENCE')
+    D_conv = psi4.core.get_global_option('D_CONVERGENCE')
+    reference = psi4.core.get_global_option('REFERENCE')
+    basis = psi4.core.get_global_option('BASIS')
+
+    is_rks = True if reference == 'RKS' else False
+    nspin = 1 if is_rks else 2
+
+    # Build an SCF wavefunction with the corresponding DFT functional.
+    optstash = psi4.driver.p4util.OptionsState(
+        ['SCF', 'PRINT'])
+    psi4.core.set_local_option('SCF', 'PRINT', 0)
+    psi4.core.set_global_option('PRINT', 0)
+    wfn = psi4.core.Wavefunction.build(mol, basis)
+    wfn = psi4.proc.scf_wavefunction_factory(name, wfn, reference)
+
+    supfunc = wfn.functional()
+    nbf = wfn.basisset().nbf()
+
+    # Create the occupation number, including the fractional cases.
+    is_integer, is_aufbau, nocc, occ_idx, occ_val = update_occ(wfn, occ)
+    local_print(1, "=> Occupation Number <=")
+    local_print(1, f"Is integer system: {is_integer}")
+    local_print(1, f"Is aufbau occupation: {is_aufbau}")
+    for s in range(nspin):
+        if not is_rks:
+            local_print(1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
+        for i in range(nocc[s]):
+            local_print(1, 'spin={:<2d} idx={:<5d} occ={:<10f}'
+                        .format(s, occ_idx[s][i], occ_val[s][i]))
+        local_print(1, "")
+
+    # ==> Set up matrices <==
+    # S, H matrix
+    if guess_wfn:
+        S = np.asarray(guess_wfn.S())
+        H = np.asarray(guess_wfn.H())
+    else:
+        S = np.asarray(wfn.mintshelper().ao_overlap())
+        V = np.asarray(wfn.mintshelper().ao_potential())
+        T = np.asarray(wfn.mintshelper().ao_kinetic())
+        H = V + T
+    # S^(-1/2)
+    A = psi4.core.Matrix(nbf, nbf).from_array(S)
+    A.power(-0.5, 1.e-16)
+    A = np.asarray(A)
+
+    # D, F, C, Cocc, eigenvalue matrices/vectors.
+    D_psi = [psi4.core.Matrix(nbf, nbf) for s in range(nspin)]
+    D = [np.asarray(m) for m in D_psi]
+    F = [np.zeros((nbf, nbf)) for s in range(nspin)]
+    C_psi = [psi4.core.Matrix(nbf, nbf) for s in range(nspin)]
+    C = [np.asarray(m) for m in C_psi]
+    Cocc = [np.zeros((nbf, nocc[s])) for s in range(nspin)]
+    eig = [np.zeros(nbf) for s in range(nspin)]
+    if supfunc.needs_xc():
+        Vpot = wfn.V_potential()
+        Vpot.initialize()
+        Vxc_psi = [psi4.core.Matrix(nbf, nbf) for s in range(nspin)]
+        Vxc = [np.asarray(m) for m in Vxc_psi]
+
+    # Set up DIIS helper object
+    diis_helper = [diis.diis() for s in range(nspin)]
+    diis_error = [np.zeros((nbf, nbf)) for s in range(nspin)]
+
+    # Set up JK builder
+    if is_integer and is_aufbau:
+        local_print(0, "Use psi4.JK to calculate JK matrix.")
+        jk_helper = jk.JK_psi4_jk(wfn, C_psi)
+    else:
+        # To make fractional or non-aufbau calculation available, we need to
+        # transform J and K matrices based on density matrix (explicitly
+        # constructed based on occupation number). psi4 JK class does not
+        # provide interface to accept density matrix as input to build J and K
+        # matrices. So here we only the choice to transform from AO ERI to MO
+        # ERI for J and K with help of psi4.MinsHelper library.
+        local_print(0, "Use psi4.MintsHelper to calculate JK matrix.")
+        jk_helper = jk.JK_psi4_mints(wfn, occ_val[:nspin], Cocc[:nspin])
+
+    # ==> Set up initial guess <==
+    # Build the initial C matrix as the initial guess.
+    C_guess = []
+    if guess_wfn:
+        local_print(0, "Set initial guess from a reference wavefunction.")
+        C_guess = [np.asarray(guess_wfn.Ca()), np.asarray(guess_wfn.Cb())]
+    else:
+        local_print(0, "Set initial guess from psi4 setting.")
+        wfn.form_Shalf()
+        wfn.guess()
+        C_guess = [np.asarray(wfn.Ca()), np.asarray(wfn.Cb())]
+    # Use the initial C guess to update Cocc, C, D matrix.
+    for s in range(nspin):
+        update_C(occ_idx[s], occ_val[s], C_guess[s], C[s], Cocc[s], D[s])
+
+    # ==> SCF <==
+    local_print(0, '\n=> Start SCF iterations <=')
+    Eold = 0.0
+    Enuc = wfn.molecule().nuclear_repulsion_energy()
+    reference_factor = 2.0 if is_rks else 1.0
+    Exc = 0.0
+    for SCF_ITER in range(1, maxiter + 1):
+        # Build Vxc by using psi4.potential object. So we need to feed the
+        # psi4.potential object with density matrix in psi4 matrix type.
+        if supfunc.needs_xc():
+            Vpot.set_D(D_psi)
+            Vpot.compute_V(Vxc_psi)
+
+        # Build J and K matrices.
+        jk_helper.compute()
+        J = jk_helper.J()
+        K = jk_helper.K()
+        J_tot = 2 * J[0] if nspin == 1 else J[0] + J[1]
+
+        # Build Fock and diis helper object.
+        G = []
+        E_losc = 0
+        for i in range(nspin):
+            # build DFA Fock matrix
+            G_tmp = J_tot - supfunc.x_alpha() * K[i]
+            G.append(G_tmp)
+            F[i][:] = H + G_tmp
+            if supfunc.needs_xc():
+                F[i][:] += Vxc[i]
+
+            # DIIS error build and update
+            diis_error[i] = F[i].dot(D[i]).dot(S) - S.dot(D[i]).dot(F[i])
+            diis_error[i] = (A.T).dot(diis_error[i]).dot(A)
+            diis_helper[i].add(F[i], diis_error[i])
+
+        # Calculate SCF energy.
+        if supfunc.needs_xc():
+            Exc = Vpot.quadrature_values()['FUNCTIONAL']
+        SCF_E = 0
+        for i in range(nspin):
+            SCF_E += reference_factor * \
+                np.einsum('pq,pq->', D[i], H + 0.5 * G[i])
+        SCF_E += Enuc + Exc + E_losc
+
+        # Print iteration steps
+        dRMS = 0.5 * sum([np.mean(m ** 2) ** 0.5 for m in diis_error])
+        local_print(0, '@%3s iter  %3d: Energy = %4.16f   dE = % 1.5E   dRMS = %1.5E  DIIS'
+                    % (reference, SCF_ITER, SCF_E, (SCF_E - Eold), dRMS))
+
+        # Check convergence
+        if (abs(SCF_E - Eold) < E_conv) and (dRMS < D_conv):
+            break
+
+        # Extrapolate Fock matrices and update C, Cocc, D and eigenvalues.
+        for s in range(nspin):
+            # Form the extrapolated Fock matrix
+            F_tmp = diis_helper[s].extrapolate()
+            # Diagonalize Fock matrix and update C related variables including
+            # wfn.epsilon, wfn.C, Cocc, wfn.D.
+            H_tmp = A.dot(F_tmp).dot(A)
+            eig[s][:], C2 = np.linalg.eigh(H_tmp)
+            C_new = A.dot(C2)
+            update_C(occ_idx[s], occ_val[s], C_new, C[s], Cocc[s], D[s])
+
+        # Save scf energy
+        Eold = SCF_E
+
+        if SCF_ITER == maxiter:
+            psi4.core.clean()
+            raise Exception("Maximum number of SCF cycles exceeded.")
+
+    # print total energies
+    local_print(0, "\n=> SCF Energy <=")
+    local_print(0, "SCF energy: {:.10f}".format(SCF_E))
+
+    # print orbital energies
+    local_print(0, "\n=> Orbital Energy <=")
+    for s in range(nspin):
+        if not is_rks:
+            local_print(0, f"{'Alpha' if s == 0 else 'Beta'} orbital energy:")
+        local_print(0, "{:<5s}  {:<8s}  {:<14s}".format("Index", "Occ", "DFA(eV)"))
+        for i in range(nocc[s]):
+            local_print(0, "{:<5d}  {:<8.5f}  {:<14.6f}"
+                        .format(occ_idx[s][i], occ_val[s][i],
+                        eig[s][i] * constants.hartree2ev))
+        local_print(0, "")
+
+    # ==> update wfn <==
+    # Update energy.
+    wfn.set_energy(SCF_E)
+    # Update matrices.
+    # S: AO overlap matrix.
+    # H: core matrix.
+    # F: Fock matrix.
+    # D: Density matrix.
+    # Vxc: DFA Vxc matrix.
+    # eig: orbital energy vector.
+    wfn_S = np.asarray(wfn.S())
+    wfn_H = np.asarray(wfn.H())
+    wfn_F = [np.asarray(wfn.Fa()), np.asarray(wfn.Fb())]
+    wfn_C = [np.asarray(wfn.Ca()), np.asarray(wfn.Cb())]
+    wfn_D = [np.asarray(wfn.Da()), np.asarray(wfn.Db())]
+    wfn_Vxc = [np.asarray(wfn.Va()), np.asarray(wfn.Vb())]
+    wfn_eig = [np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b())]
+
+    wfn_S[:] = S
+    wfn_H[:] = H
+    for s in range(nspin):
+        wfn_F[s][:] = F[s]
+        wfn_D[s][:] = D[s]
+        wfn_C[s][:] = C[s]
+        wfn_eig[s][:] = eig[s]
+        if supfunc.needs_xc():
+            wfn_Vxc[s][:] = Vxc[s]
+
+    # Add new attributes to the returned wfn.
+    # elec_a: number of alpha electrons.
+    # elec_b: number of beta electrons.
+    wfn.elec_a, wfn.elec_b = [sum(x) for x in occ_val]
+
+    # restore psi4 options.
+    optstash.restore()
     return wfn
