@@ -2,6 +2,8 @@ from numpy.lib.function_base import unwrap
 import psi4
 import numpy as np
 
+from psi4.driver.driver import optimize
+
 
 class JK_psi4_jk:
     """
@@ -16,27 +18,29 @@ class JK_psi4_jk:
     matrices.
     """
 
-    def __init__(self, wfn, C):
+    def __init__(self, wfn, Cocc):
         """
         Parameters
         ----------
         wfn: psi4.core.wavefunction
             The wavefunction object.
-        C: [psi4.core.Matrix, ...], list of psi4.core.Matrix
-            The CO coefficient matrices.
+        Cocc: [psi4.core.Matrix, ...], list of psi4.core.Matrix
+            The occupied CO coefficient matrices.
         """
         jk = psi4.core.JK.build(wfn.basisset())
         jk.initialize()
-        for Ci in C:
-            jk.C_left_add(Ci)
+        self._Cocc = Cocc
         self._jk = jk
-        self._nspin = len(C)
+        self._nspin = len(Cocc)
 
     def compute(self):
         """
         Compute the JK matrices based on current coefficient matrix.
         """
+        for Ci in self._Cocc:
+            self._jk.C_left_add(Ci)
         self._jk.compute()
+        self._jk.C_clear()
 
     def J(self):
         """
@@ -147,7 +151,7 @@ class JK_psi4_mints:
         Compute the density matrix based on current Cocc.
         """
         self._D = [np.einsum('i,ui,vi->uv', np.asarray(self._occ_val[s]),
-                             self._Cocc[s], self._Cocc[s])
+                             self._Cocc[s], self._Cocc[s], optimize=True)
                    for s in range(self._nspin)]
 
     def J(self):
@@ -158,11 +162,11 @@ class JK_psi4_mints:
             The J matrices. The size of list is the same as the input Cocc.
         """
         if self._algo == 'DIRECT':
-            J = [np.einsum('pqrs,rs->pq', self._uvst, self._D[s])
+            J = [np.einsum('pqrs,rs->pq', self._uvst, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         elif self._algo == 'DF':
             J = [np.einsum('pqm,mn,nrs,rs->pq', self._df_pmn, self._df_Vpq_inv,
-                           self._df_pmn, self._D[s])
+                           self._df_pmn, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         else:
             raise Exception(f"SCF type not support: {self._algo}")
@@ -176,11 +180,11 @@ class JK_psi4_mints:
             The K matrices. The size of list is the same as the input Cocc.
         """
         if self._algo == 'DIRECT':
-            K = [np.einsum('prqs,rs->pq', self._uvst, self._D[s])
+            K = [np.einsum('prqs,rs->pq', self._uvst, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         elif self._algo == 'DF':
             K = [np.einsum('prm,mn,nqs,rs->pq', self._df_pmn, self._df_Vpq_inv,
-                           self._df_pmn, self._D[s])
+                           self._df_pmn, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         else:
             raise Exception(f"SCF type not support: {self._algo}")
