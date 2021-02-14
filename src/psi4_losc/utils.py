@@ -170,11 +170,15 @@ def form_occ(wfn, occ={}):
     occ_idx = []
     occ_val = []
     for d in rst_occ:
-        idx_occ = list(d.items())
-        idx_occ.sort()
-        idx, occ = zip(*idx_occ)
-        occ_idx.append(idx)
-        occ_val.append(occ)
+        if d:
+            idx_occ = list(d.items())
+            idx_occ.sort()
+            idx, occ = zip(*idx_occ)
+            occ_idx.append(idx)
+            occ_val.append(occ)
+        else:
+            occ_idx.append([])
+            occ_val.append([])
 
     nocc = [len(x) for x in occ_idx]
 

@@ -19,7 +19,7 @@ else:
     build_superfunctional = psi4.driver.dft.build_superfunctional
 
 B3LYP = py_losc.DFAInfo(0.8, 0.2, 'B3LYP')
-LDA = py_losc.DFAInfo(1.0, 0, 'LDA')
+SVWN = py_losc.DFAInfo(1.0, 0, 'SVWN')
 BLYP = py_losc.DFAInfo(1.0, 0, 'BLYP')
 PBE = py_losc.DFAInfo(1.0, 0, 'PBE')
 PBE0 = py_losc.DFAInfo(0.75, 0.25, 'PBE0')
@@ -197,6 +197,12 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     D_conv = psi4.core.get_global_option('D_CONVERGENCE')
     reference = psi4.core.get_global_option('REFERENCE')
     basis = psi4.core.get_global_option('BASIS')
+    local_print(1, '\n==> SCF settings <==')
+    local_print(1, f'Reference: {reference}')
+    local_print(1, f'Basis set: {basis}')
+    local_print(1, f'MaxIter: {maxiter}')
+    local_print(1, f'Energy convergence: {E_conv}')
+    local_print(1, f'Density matrix convergence: {D_conv}\n')
 
     is_rks = True if reference == 'RKS' else False
     nspin = 1 if is_rks else 2
