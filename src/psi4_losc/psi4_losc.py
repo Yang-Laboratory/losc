@@ -154,7 +154,9 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     # If we do DFT, we the global reference should be either 'rks' or 'uks'.
     # Using 'rhf` or `uhf` for DFT calculation will lead to error in
     # psi4.core.HF constructor.
-    if name.upper not in ['HF', 'SCF']:
+    is_hf = True
+    if name.upper() not in ['HF', 'SCF']:
+        is_hf = False
         reference = psi4.core.get_global_option('REFERENCE')
         if reference == 'RHF':
             psi4.set_options({'reference': 'rks'})
@@ -162,6 +164,9 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
             psi4.set_options({'reference': 'uks'})
 
     mol = psi4.core.get_active_molecule()
+    # print out molecule information
+    if verbose >= 1:
+        mol.print_out()
 
     # ==> Sanity checks <==
     # TODO:
@@ -222,15 +227,20 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
 
     # Create the occupation number, including the fractional cases.
     nocc, occ_idx, occ_val = utils.form_occ(wfn, occ)
+    nelec = [sum(x) for x in occ_val]
     is_integer = is_integer(occ_val)
     is_aufbau = is_aufbau(nocc, occ_idx)
     local_print(1, "=> Occupation Number <=")
     local_print(1, f"Is integer system: {is_integer}")
     local_print(1, f"Is aufbau occupation: {is_aufbau}")
+    local_print(1, f"nelec_a: {nelec[0]} {f' ! update and differ to wfn.nalpha(): nalpha={wfn.nalpha()}.' if nelec[0] != wfn.nalpha() else ''}")
+    local_print(1, f"nelec_b: {nelec[1]} {f' ! update and differ to wfn.nbeta(): nbeta={wfn.nbeta()}.' if nelec[1] != wfn.nbeta() else ''}")
+    local_print(1, "")
     for s in range(nspin):
         if not is_rks:
-            local_print(
-                1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
+            local_print(1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
+        else:
+            local_print(1, 'Occupation Number:')
         for i in range(nocc[s]):
             local_print(1, 'spin={:<2d} idx={:<5d} occ={:<10f}'
                         .format(s, occ_idx[s][i], occ_val[s][i]))
@@ -364,28 +374,40 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         # Calculate SCF energy.
         if supfunc.needs_xc():
             Exc = Vpot.quadrature_values()['FUNCTIONAL']
-        hf_E = 0
+        E_J = 0
+        E_K = 0
+        E_H = 0
         for i in range(nspin):
-            hf_E += reference_factor * \
-                np.einsum('pq,pq->', D[i], H + 0.5 * G[i], optimize=True)
-        SCF_E = Enuc + hf_E + Exc + E_losc
+            E_J += reference_factor * \
+                np.einsum('pq,pq->', D[i], 0.5 * J_tot, optimize=True)
+            E_K += reference_factor * \
+                np.einsum('pq,pq->', D[i], -0.5 *
+                          supfunc.x_alpha() * K[i], optimize=True)
+            E_H += reference_factor * \
+                np.einsum('pq,pq->', D[i], H, optimize=True)
+        SCF_E = Enuc + E_H + E_J + E_K + Exc + E_losc
         energy_table['E_total'] = SCF_E
+        energy_table['E_H'] = E_H
+        energy_table['E_J'] = E_J
+        energy_table['E_K'] = E_K
         energy_table['E_xc'] = Exc
+        energy_table['E_G'] = E_J + E_K
+        energy_table['E_hf'] = E_H + E_J + E_K
         energy_table['E_losc'] = E_losc
         energy_table['E_nuc'] = Enuc
-        energy_table['E_dfa'] = Enuc + hf_E + Exc
+        energy_table['E_dfa'] = Enuc + E_H + E_J + E_K + Exc
 
         # Print iteration steps
         D_error = 0
-        if is_diis_rms: # rms type error
+        if is_diis_rms:  # rms type error
             rms = [np.sqrt(np.mean(np.square(m))) for m in diis_error]
             D_error = np.sqrt(np.mean(np.square(rms)))
-        else: # max type error
+        else:  # max type error
             D_error = max([np.max(np.abs(m)) for m in diis_error])
         local_print(1,
-            "   @%s%s iter %3s: %20.14f   %12.5e   %-11.5e %s" %
-            ("DF-" if is_dfjk else "", reference, SCF_ITER,
-             SCF_E, (SCF_E - Eold), D_error, '/'.join(scf_status)))
+                    "   @%s%s iter %3s: %20.14f   %12.5e   %-11.5e %s" %
+                    ("DF-" if is_dfjk else "", reference, SCF_ITER,
+                     SCF_E, (SCF_E - Eold), D_error, '/'.join(scf_status)))
 
         # Check convergence
         if (abs(SCF_E - Eold) < E_conv) and (D_error < D_conv):
@@ -405,18 +427,31 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         # Save scf energy
         Eold = SCF_E
 
-        if SCF_ITER == maxiter:
-            psi4.core.clean()
-            raise Exception("Maximum number of SCF cycles exceeded.")
+        #if SCF_ITER == maxiter:
+        #    psi4.core.clean()
+        #    raise Exception("Maximum number of SCF cycles exceeded.")
 
     # print total energies
+    func_type = "HF" if is_hf else "DFA"
     local_print(1, "\n=> Total Energy <=")
-    local_print(1, "Nuclear potential energy: {:.10f}".format(energy_table['E_nuc']))
-    local_print(1, "DFA total energy: {:.10f}".format(energy_table['E_dfa']))
+    local_print(1, "Nuclear potential energy: {:.10f}".format(
+        energy_table['E_nuc']))
+    local_print(1, "{:s} core energy: {:.10f}".format(
+        func_type, energy_table['E_H']))
+    local_print(1, "{:s} J energy: {:.10f}".format(
+        func_type, energy_table['E_J']))
+    local_print(1, "{:s} K energy: {:.10f}".format(
+        func_type, energy_table['E_K']))
+    local_print(1, "{:s} G energy: {:.10f}".format(
+        func_type, energy_table['E_G']))
     if supfunc.needs_xc():
-        local_print(1, "Exchange-Correlation energy: {:.10f}".format(energy_table['E_xc']))
+        local_print(1, "{:s} XC energy: {:.10f}".format(
+            func_type, energy_table['E_xc']))
+    local_print(1, "{:s} total energy: {:.10f}".format(
+        func_type, energy_table['E_dfa']))
     if losc_ref_wfn:
-        local_print(1, "LOSC correction energy: {:.10f}".format(energy_table['E_losc']))
+        local_print(1, "LOSC correction energy: {:.10f}".format(
+            energy_table['E_losc']))
     local_print(1, "SCF total energy: {:.10f}".format(SCF_E))
 
     # print orbital energies
