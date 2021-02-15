@@ -3,8 +3,7 @@ from psi4_losc.psi4_losc import scf
 import psi4
 import numpy as np
 
-# psi4.core.be_quiet()
-
+psi4.core.be_quiet()
 
 class TestSCFFractional(unittest.TestCase):
     def setUp(self):

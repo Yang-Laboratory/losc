@@ -12,7 +12,7 @@ class diis(object):
     Algorithms adapted from [Sherrill:1998] & [Pulay:1980:393]
     """
 
-    def __init__(self, max_vec=6):
+    def __init__(self):
         """
         Intializes the DIIS class.
 
@@ -23,7 +23,7 @@ class diis(object):
         """
         self.error = []
         self.vector = []
-        self.max_vec = max_vec
+        self.max_vec = psi4.core.get_global_option('DIIS_MAX_VECS')
 
     def add(self, state, error):
         """
@@ -94,15 +94,41 @@ class diis(object):
                 B[num1, num2] = B[num2, num1] = val
 
         # normalize
-        B[abs(B) < 1.e-14] = 1.e-14
-        B[:-1, :-1] /= np.abs(B[:-1, :-1]).max()
+        #B[abs(B) < 1.e-14] = 1.e-14
+        #B[:-1, :-1] /= np.abs(B[:-1, :-1]).max()
 
         # Build residual vector
         resid = np.zeros(diis_count + 1)
         resid[-1] = -1
 
+        S = np.zeros(diis_count+1)
+        is_zero = False
+        for i in range(diis_count):
+            if B[i, i] <= 0:
+                is_zero = True
+                break
+
+        if is_zero:
+            S[:] = 1.0
+        else:
+            S[:diis_count] = np.power(np.diag(B[:diis_count, :diis_count]), -1.0/2.0)
+            S[diis_count] = 1.0
+
+        for i in range(diis_count + 1):
+            for j in range(diis_count + 1):
+                B[i, j] *= S[i] * S[j]
+
+        N = diis_count + 1
+        B_psi = psi4.core.Matrix(N, N).from_array(B)
+        B_psi.power(-1.0, 1.0e-12)
+        B_inv = np.asarray(B_psi)
+
+
         # Solve pulay equations
-        ci = np.dot(np.linalg.pinv(B), resid)
+        #ci = np.dot(np.linalg.pinv(B), resid)
+        ci = np.dot(B_inv, resid)
+        for i in range(diis_count + 1):
+            ci[i] *= S[i]
 
         # combination of previous fock matrices
         V = np.zeros_like(self.vector[-1])

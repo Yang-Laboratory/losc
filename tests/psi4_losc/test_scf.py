@@ -60,7 +60,7 @@ class TestSCFIntegerAufbau(unittest.TestCase):
         Three representative DFAs, svwn, blyp and b3lyp, are used for test.
         """
         psi4.core.set_active_molecule(mol)
-        for dfa in 'svwn blyp b3lyp'.split():
+        for dfa in 'hf svwn blyp b3lyp'.split():
             print(f'    Test mol {mol.name()}:  dfa={dfa}')
             E_ref = psi4.energy(dfa)
             wfn = scf(dfa)

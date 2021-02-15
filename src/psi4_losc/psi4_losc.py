@@ -196,6 +196,8 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     E_conv = psi4.core.get_global_option('E_CONVERGENCE')
     D_conv = psi4.core.get_global_option('D_CONVERGENCE')
     reference = psi4.core.get_global_option('REFERENCE')
+    is_diis_rms = psi4.core.get_global_option('DIIS_RMS_ERROR')
+    is_dfjk = psi4.core.get_global_option('SCF_TYPE').endswith('DF')
     basis = psi4.core.get_global_option('BASIS')
     local_print(1, '\n==> SCF settings <==')
     local_print(1, f'Reference: {reference}')
@@ -242,8 +244,12 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     else:
         S = np.asarray(wfn.mintshelper().ao_overlap())
         V = np.asarray(wfn.mintshelper().ao_potential())
-        T = np.asarray(wfn.mintshelper().ao_kinetic())
-        H = V + T
+        if losc_ref_wfn:
+            T = np.asarray(wfn.mintshelper().ao_kinetic())
+            H = V + T
+        else:
+            wfn.form_H()
+            H = np.array(wfn.H())
     # S^(-1/2)
     A = psi4.core.Matrix(nbf, nbf).from_array(S)
     A.power(-0.5, 1.e-16)
@@ -305,11 +311,15 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
 
     # ==> SCF <==
     local_print(1, '\n=> SCF iterations <=')
+    local_print(1, "%s                        Total Energy        Delta E     %s |[F,P]|\n" %
+                ("   " if is_dfjk else "", "RMS" if is_diis_rms else "MAX"))
+
     Eold = 0.0
     Enuc = wfn.molecule().nuclear_repulsion_energy()
     reference_factor = 2.0 if is_rks else 1.0
     Exc = 0.0
     energy_table = {}
+    scf_status = ['DIIS']
     for SCF_ITER in range(1, maxiter + 1):
         # Build Vxc by using psi4.potential object. So we need to feed the
         # psi4.potential object with density matrix in psi4 matrix type.
@@ -366,12 +376,19 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         energy_table['E_dfa'] = Enuc + hf_E + Exc
 
         # Print iteration steps
-        dRMS = 0.5 * sum([np.mean(m ** 2) ** 0.5 for m in diis_error])
-        local_print(1, '@%3s iter  %3d: Energy = %4.16f   dE = % 1.5E   dRMS = %1.5E  DIIS'
-                    % (reference, SCF_ITER, SCF_E, (SCF_E - Eold), dRMS))
+        D_error = 0
+        if is_diis_rms: # rms type error
+            rms = [np.sqrt(np.mean(np.square(m))) for m in diis_error]
+            D_error = np.sqrt(np.mean(np.square(rms)))
+        else: # max type error
+            D_error = max([np.max(np.abs(m)) for m in diis_error])
+        local_print(1,
+            "   @%s%s iter %3s: %20.14f   %12.5e   %-11.5e %s" %
+            ("DF-" if is_dfjk else "", reference, SCF_ITER,
+             SCF_E, (SCF_E - Eold), D_error, '/'.join(scf_status)))
 
         # Check convergence
-        if (abs(SCF_E - Eold) < E_conv) and (dRMS < D_conv):
+        if (abs(SCF_E - Eold) < E_conv) and (D_error < D_conv):
             break
 
         # Extrapolate Fock matrices and update C, Cocc, D and eigenvalues.
