@@ -165,7 +165,7 @@ class JK_psi4_mints:
             J = [np.einsum('pqrs,rs->pq', self._uvst, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         elif self._algo == 'DF':
-            J = [np.einsum('pqm,mn,nrs,rs->pq', self._df_pmn, self._df_Vpq_inv,
+            J = [np.einsum('mpq,mn,nrs,rs->pq', self._df_pmn, self._df_Vpq_inv,
                            self._df_pmn, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         else:
@@ -183,7 +183,7 @@ class JK_psi4_mints:
             K = [np.einsum('prqs,rs->pq', self._uvst, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         elif self._algo == 'DF':
-            K = [np.einsum('prm,mn,nqs,rs->pq', self._df_pmn, self._df_Vpq_inv,
+            K = [np.einsum('mpr,mn,nqs,rs->pq', self._df_pmn, self._df_Vpq_inv,
                            self._df_pmn, self._D[s], optimize=True)
                  for s in range(self._nspin)]
         else:
