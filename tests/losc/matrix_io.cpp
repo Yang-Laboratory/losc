@@ -7,13 +7,15 @@
 #include <utility>
 
 #include "matrix_io.hpp"
+#include <losc/eigen_def.hpp>
 #include <losc/exception.hpp>
 
+using namespace losc;
 namespace test {
 /**
  * @note The txt file `fname` will always be overwritten if `Mat` is not empty.
  */
-void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
+void write_matrices_to_txt(vector<LOSCMatrix> &Mat, const string &fname,
                            size_t num_per_line)
 {
     if (Mat.size() == 0)
@@ -24,7 +26,7 @@ void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
         throw losc::exception::LoscException(
             "Cannot open file to write matrices:" + fname);
     for (size_t i = 0; i < Mat.size(); ++i) {
-        const MatrixXd &A = Mat[i];
+        const LOSCMatrix &A = Mat[i];
         if (i == 0)
             fprintf(f, "Dimension,%zu,%zu\n", A.rows(), A.cols());
         else
@@ -68,7 +70,7 @@ static void str_split(std::string &str, const char delim,
     }
 }
 
-std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
+std::vector<LOSCMatrix> read_matrices_from_txt(const string &fname)
 {
     std::ifstream fin;
     fin.open(fname);
@@ -79,7 +81,7 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
     bool is_first_line = true;
     std::string line;
     std::vector<std::string> line_split;
-    std::vector<MatrixXd> rst;
+    std::vector<LOSCMatrix> rst;
     std::size_t n_row = 0;
     std::size_t n_col = 0;
     std::size_t count = 0;
@@ -114,7 +116,7 @@ std::vector<MatrixXd> read_matrices_from_txt(const string &fname)
                     "Failed to read matrix dimension. file name = " + fname);
             }
             // create a new matrix and push it back to matrix vector.
-            MatrixXd t(n_row, n_col);
+            LOSCMatrix t(n_row, n_col);
             t.setZero();
             rst.push_back(std::move(t));
             p_data += 3;

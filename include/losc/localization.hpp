@@ -148,7 +148,7 @@ class LocalizerBase {
      * @return a size 2 vector of matrix `rst`. `rst[0]` is the LO coefficient
      * matrix. `rst[1]` is the corresponding U matrix.
      */
-    virtual vector<MatrixXd> lo_U(const string &guess = "identity") = 0;
+    virtual vector<LOSCMatrix> lo_U(const string &guess = "identity") = 0;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix.
@@ -159,8 +159,8 @@ class LocalizerBase {
      * @param threshold: the threshold used to check the unitarity. Default to
      * 1e-8.
      */
-    virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) = 0;
+    virtual vector<LOSCMatrix> lo_U(ConstRefMat &U_guess,
+                                    double threshold = 1e-8) = 0;
 
     /**
      * @brief The C interface to calculate the LOs and the unitary
@@ -179,7 +179,7 @@ class LocalizerBase {
      * @param guess: a string represents the initial guess. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(const string &guess = "identity")
+    virtual LOSCMatrix lo(const string &guess = "identity")
     {
         return lo_U(guess)[0];
     }
@@ -190,7 +190,7 @@ class LocalizerBase {
      * @param U_guess: the initial guess of U matrix. See `lo_U`.
      * @return the LOs' coefficient matrix under AO.
      */
-    virtual MatrixXd lo(ConstRefMat &U_guess, double threshold = 1e-8)
+    virtual LOSCMatrix lo(ConstRefMat &U_guess, double threshold = 1e-8)
     {
         return lo_U(U_guess, threshold)[0];
     }
@@ -232,16 +232,16 @@ class LocalizerV2 : public LocalizerBase {
      * Internal function to calculate the optimal rotation angle.
      */
     void js_optimize_one_pair(const size_t i, const size_t j,
-                              const vector<MatrixXd> &D_lo,
-                              const MatrixXd &H_lo, double &theta_val,
+                              const vector<LOSCMatrix> &D_lo,
+                              const LOSCMatrix &H_lo, double &theta_val,
                               double &delta_val) const;
     /**
      * Internal function to rotate two orbitals: rotate D_lo, H_lo and U
      * matrices.
      */
     void js_rotate_one_pair(const size_t i, const size_t j, const double theta,
-                            RefMat U, vector<MatrixXd> &D_lo,
-                            MatrixXd &H_lo) const;
+                            RefMat U, vector<LOSCMatrix> &D_lo,
+                            LOSCMatrix &H_lo) const;
 
   public:
     /**
@@ -287,8 +287,7 @@ class LocalizerV2 : public LocalizerBase {
      * @return the LOs' coefficient matrix under AO.
      * @see LocalizerBase::lo_U()
      */
-    virtual vector<MatrixXd>
-    lo_U(const string &guess = "identity") override;
+    virtual vector<LOSCMatrix> lo_U(const string &guess = "identity") override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
@@ -299,8 +298,8 @@ class LocalizerV2 : public LocalizerBase {
      * 1e-8.
      * @see LocalizerBase::lo_U()
      */
-    virtual vector<MatrixXd> lo_U(ConstRefMat &U_guess,
-                                  double threshold = 1e-8) override;
+    virtual vector<LOSCMatrix> lo_U(ConstRefMat &U_guess,
+                                    double threshold = 1e-8) override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix in an

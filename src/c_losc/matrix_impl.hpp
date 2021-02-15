@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <losc/exception.hpp>
+#include <losc/eigen_def.hpp>
 
 /**
  * A simple matrix struct that is used to communicate matrix data between
@@ -40,18 +41,18 @@ class losc_matrix {
 /**
  * Map losc_matrix object to a const Eigen::Ref object.
  */
-inline Eigen::Ref<const Eigen::MatrixXd>
+inline losc::RefConstMat
 losc_matrix_to_eigen_const(const losc_matrix *m)
 {
-    return Eigen::Map<const Eigen::MatrixXd>(m->data_, m->row_, m->col_);
+    return losc::MapConstMat(m->data_, m->row_, m->col_);
 }
 
 /**
  * Map losc_matrix object to a Eigen::Ref object.
  */
-inline Eigen::Ref<Eigen::MatrixXd> losc_matrix_to_eigen(const losc_matrix *m)
+inline losc::RefMat losc_matrix_to_eigen(const losc_matrix *m)
 {
-    return Eigen::Map<Eigen::MatrixXd>(m->data_, m->row_, m->col_);
+    return losc::MapMat(m->data_, m->row_, m->col_);
 }
 
 #endif

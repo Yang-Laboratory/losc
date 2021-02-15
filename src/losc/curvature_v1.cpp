@@ -6,15 +6,15 @@
 
 namespace losc {
 
-MatrixXd CurvatureV1::compute_kappa_J() const
+LOSCMatrix CurvatureV1::compute_kappa_J() const
 {
     // K_ij = <ii|p> V_{pq}^-1 <q|jj>
     return df_pii_.transpose() * df_Vpq_inverse_ * df_pii_;
 }
 
-MatrixXd CurvatureV1::compute_kappa_xc() const
+LOSCMatrix CurvatureV1::compute_kappa_xc() const
 {
-    MatrixXd kappa_xc(nlo_, nlo_);
+    LOSCMatrix kappa_xc(nlo_, nlo_);
     kappa_xc.setZero();
 
     // The LO grid value matrix has dimension of (npts, nlo), which could be
@@ -65,8 +65,8 @@ void CurvatureV1::C_API_kappa(RefMat K) const
             K, nlo_, nlo_,
             "CurvatureV1::kappa(): wrong dimension of the input kappa matrix.");
     }
-    MatrixXd kappa_J = compute_kappa_J();
-    MatrixXd kappa_xc = compute_kappa_xc();
+    LOSCMatrix kappa_J = compute_kappa_J();
+    LOSCMatrix kappa_xc = compute_kappa_xc();
     K.noalias() = (1 - dfa_info_.hf_x()) * kappa_J -
                   dfa_info_.gga_x() * (2.0 * tau_ * cx_ / 3.0) * kappa_xc;
 }

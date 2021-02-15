@@ -1,11 +1,11 @@
 #include "matrix_helper.hpp"
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
+#include <losc/eigen_def.hpp>
 #include <vector>
 
-using Eigen::MatrixXd;
 using std::vector;
-
+using namespace losc;
 using namespace test;
 
 /**
@@ -13,7 +13,7 @@ using namespace test;
  */
 TEST(MatrixCheckerTest, is_symmetric_test)
 {
-    MatrixXd A = MatrixXd::Zero(10, 10);
+    LOSCMatrix A = LOSCMatrix::Zero(10, 10);
     // zero matrix should be regarded as symmetric.
     EXPECT_TRUE(mtx_is_symmetric(A));
     EXPECT_TRUE(mtx_is_symmetric(A, 1e-16));
@@ -35,7 +35,7 @@ TEST(MatrixCheckerTest, is_symmetric_test)
     EXPECT_TRUE(mtx_is_symmetric(A, thred * 10));
 
     // non-square matrix.
-    MatrixXd B(2, 3);
+    LOSCMatrix B(2, 3);
     EXPECT_FALSE(mtx_is_symmetric(B));
     EXPECT_FALSE(mtx_is_symmetric(B, 100));
     EXPECT_FALSE(mtx_is_symmetric(B, 1e-300));
@@ -46,8 +46,8 @@ TEST(MatrixCheckerTest, is_symmetric_test)
  */
 TEST(MatrixCheckerTest, is_cwise_equal_test)
 {
-    MatrixXd A = MatrixXd::Zero(10, 8);
-    MatrixXd B = MatrixXd::Zero(10, 8);
+    LOSCMatrix A = LOSCMatrix::Zero(10, 8);
+    LOSCMatrix B = LOSCMatrix::Zero(10, 8);
     // real zero matrix should be equal.
     EXPECT_TRUE(mtx_is_cwise_equal(A, B));
     EXPECT_TRUE(mtx_is_cwise_equal(A, B, 1e-16));

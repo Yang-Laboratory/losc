@@ -2,12 +2,13 @@
 #define _LOSC_TESTS_MATRIX_IO_H_
 
 #include <Eigen/Dense>
+#include <losc/eigen_def.hpp>
 #include <string>
 #include <vector>
 
 namespace test {
 
-using Eigen::MatrixXd;
+using losc::LOSCMatrix;
 using std::string;
 using std::vector;
 
@@ -25,7 +26,7 @@ using std::vector;
  * @param [in] fname: The name of the output txt file.
  * @param [in] num_per_line: number of matrix elements per line.
  */
-void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
+void write_matrices_to_txt(vector<LOSCMatrix> &Mat, const string &fname,
                            size_t num_per_line = 5);
 
 /**
@@ -37,7 +38,7 @@ void write_matrices_to_txt(vector<MatrixXd> &Mat, const string &fname,
  * @return std::vector<std::shared_ptr<Matrix>>: a vector of matrices.
  * @see matrix::write_matrices_to_txt()
  */
-std::vector<MatrixXd> read_matrices_from_txt(const string &fname);
+std::vector<LOSCMatrix> read_matrices_from_txt(const string &fname);
 
 } // namespace test
 

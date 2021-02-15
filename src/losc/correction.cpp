@@ -35,7 +35,7 @@ void C_API_ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
     }
 
     // build A matrix.
-    MatrixXd A(nlo, nlo);
+    LOSCMatrix A(nlo, nlo);
     for (size_t i = 0; i < nlo; ++i) {
         for (size_t j = 0; j <= i; ++j) {
             const double K_ij = Curvature(i, j);
@@ -52,12 +52,12 @@ void C_API_ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
     H_losc = S * C_lo * A * C_lo.transpose() * S;
 }
 
-MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
-                                   ConstRefMat &Curvature,
-                                   ConstRefMat &LocalOcc)
+LOSCMatrix ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                     ConstRefMat &Curvature,
+                                     ConstRefMat &LocalOcc)
 {
     const size_t nbasis = S.cols();
-    MatrixXd H_losc(nbasis, nbasis);
+    LOSCMatrix H_losc(nbasis, nbasis);
     C_API_ao_hamiltonian_correction(S, C_lo, Curvature, LocalOcc, H_losc);
     return std::move(H_losc);
 }
@@ -105,7 +105,7 @@ void C_API_orbital_energy_post_scf(ConstRefMat &H_dfa, ConstRefMat &H_losc,
             "mismatch LOSC effective Hamiltonian matrix.");
     }
 
-    MatrixXd H_tot = H_dfa + H_losc;
+    LOSCMatrix H_tot = H_dfa + H_losc;
     for (size_t i = 0; i < nlo; ++i) {
         eig[i] = C_co.col(i).transpose() * H_tot * C_co.col(i);
     }

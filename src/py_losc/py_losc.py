@@ -15,9 +15,8 @@ Notes
 -----
 1. All the matrices are represented and stored in 2-dimensional
 `np.ndarray` object. The storage order of matrices is required to be
-Fortran-style (column major). If the input matrix is not Fortran-style,
-it will be converted into Fortran-style with calling `np.asfortranarray()`
-function interanally.
+C-style (row major). If the input matrix is not C-style, it will be converted
+interanally.
 """
 
 import numpy as np
@@ -35,6 +34,29 @@ from py_losc.py_losc_core import local_occupation
 
 # ==> Interface for LOSC curvature matrix <==
 
+def _convert_mat(m, order='C'):
+    """
+    Convert input np.array into the specified order.
+
+    Parameters
+    ----------
+    m: np.array
+        The array to convert.
+    order: str, choices = ['C', 'F'], default to 'C'.
+        'C': C-style row major order.
+        'F': Fortran-style column major order.
+
+    Returns
+    -------
+    out: np.array
+        The array with storage order equaling to `order`.
+    """
+    if order == 'C':
+        return np.ascontiguousarray(m)
+    elif order == 'F':
+        return np.asfortranarray(m)
+    else:
+        raise Exception(f'Unknown storage order: {order}')
 
 class DFAInfo(core.DFAInfo):
     def __init__(self, gga_x, hf_x, name=''):
@@ -114,14 +136,13 @@ class CurvatureV1(core.CurvatureV1):
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
-        self._df_pii = np.asfortranarray(df_pii)
-        self._df_vpq_inv = np.asfortranarray(df_vpq_inv)
-        self._grid_lo = np.asfortranarray(grid_lo)
-        self._grid_wt = np.asarray(grid_weight)
-        self._grid_wt = np.asfortranarray(self._grid_wt)
+        self._df_pii = _convert_mat(df_pii)
+        self._df_vpq_inv = _convert_mat(df_vpq_inv)
+        self._grid_lo = _convert_mat(grid_lo)
+        self._grid_wt = _convert_mat(grid_weight)
         core.CurvatureV1.__init__(self, dfa_info, self._df_pii,
                                   self._df_vpq_inv, self._grid_lo,
-                                  self._grid_weight)
+                                  self._grid_wt)
 
 
 class CurvatureV2(core.CurvatureV2):
@@ -149,11 +170,10 @@ class CurvatureV2(core.CurvatureV2):
         CurvatureV1: constructor of LOSC curvature version 1.
         LocalizerV2: it can build the LOs.
         """
-        self._df_pii = np.asfortranarray(df_pii)
-        self._df_vpq_inv = np.asfortranarray(df_vpq_inv)
-        self._grid_lo = np.asfortranarray(grid_lo)
-        self._grid_wt = np.asarray(grid_weight)
-        self._grid_wt = np.asfortranarray(self._grid_wt)
+        self._df_pii = _convert_mat(df_pii)
+        self._df_vpq_inv = _convert_mat(df_vpq_inv)
+        self._grid_lo = _convert_mat(grid_lo)
+        self._grid_wt = _convert_mat(grid_weight)
         core.CurvatureV2.__init__(self, dfa_info, self._df_pii,
                                   self._df_vpq_inv, self._grid_lo,
                                   self._grid_wt)
@@ -188,8 +208,8 @@ class LocalizerV2(core.LocalizerV2):
         D_ao: list(np.ndarray [nbasis, nbasis])
             The dipole matrix under AOs in the order of x, y and z directions.
         """
-        self._C_lo_basis = np.asfortranarray(C_lo_basis)
-        self._H_ao = np.asfortranarray(H_ao)
-        self._D_ao = [np.asfortranarray(x) for x in D_ao]
+        self._C_lo_basis = _convert_mat(C_lo_basis)
+        self._H_ao = _convert_mat(H_ao)
+        self._D_ao = [_convert_mat(x) for x in D_ao]
         core.LocalizerV2.__init__(
             self, self._C_lo_basis, self._H_ao, self._D_ao)

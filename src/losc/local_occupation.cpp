@@ -5,10 +5,10 @@
 
 namespace losc {
 
-MatrixXd local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D)
+LOSCMatrix local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D)
 {
     const size_t nlo = C_lo.cols();
-    MatrixXd local_occ(nlo, nlo);
+    LOSCMatrix local_occ(nlo, nlo);
     C_API_local_occupation(C_lo, S, D, local_occ);
     return std::move(local_occ);
 }

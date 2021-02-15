@@ -14,7 +14,7 @@ void CurvatureV2::C_API_kappa(RefMat kappa2) const
     }
 
     // construct absolute overlap under LO.
-    MatrixXd S_lo(nlo_, nlo_);
+    LOSCMatrix S_lo(nlo_, nlo_);
     S_lo.setZero();
     // The LO grid value matrix has dimension of (npts, nlo), which could be
     // very large. To limit the memory usage on LO grid value, we build it by
@@ -56,7 +56,7 @@ void CurvatureV2::C_API_kappa(RefMat kappa2) const
     // build the curvature version 1.
     CurvatureV1 kappa1_man(dfa_info_, df_pii_, df_Vpq_inverse_, grid_lo_,
                            grid_weight_);
-    MatrixXd kappa1 = kappa1_man.kappa();
+    LOSCMatrix kappa1 = kappa1_man.kappa();
 
     // build LOSC2 kappa matrix:
     // K2[ij] = erf(tau * S[ij]) * sqrt(abs(K1[ii] * K1[jj])) + erfc(tau *

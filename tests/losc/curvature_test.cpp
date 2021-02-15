@@ -11,10 +11,9 @@
 #include "matrix_io.hpp"
 #include <losc/curvature.hpp>
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
 using std::string;
 using std::vector;
+using namespace losc;
 
 // input matrices data.
 typedef struct Data {
@@ -26,13 +25,13 @@ typedef struct Data {
     string lo_path;
     string kappa_ref_path;
 
-    MatrixXd df_pmn;
-    MatrixXd df_Vpq_inv;
-    MatrixXd grid_basis_value;
-    VectorXd grid_weight;
-    MatrixXd grid_lo;
-    MatrixXd C_lo;
-    MatrixXd kappa_ref;
+    LOSCMatrix df_pmn;
+    LOSCMatrix df_Vpq_inv;
+    LOSCMatrix grid_basis_value;
+    LOSCVector grid_weight;
+    LOSCMatrix grid_lo;
+    LOSCMatrix C_lo;
+    LOSCMatrix kappa_ref;
 } Data;
 
 // load input matrices data from txt file.
@@ -78,7 +77,7 @@ TEST_P(CurvatureTest, non_block_kappa)
     for (size_t i = 0; i < nfitbasis; ++i) {
         p_index[i] = i;
     }
-    MatrixXd df_pii(nfitbasis, nlo);
+    LOSCMatrix df_pii(nfitbasis, nlo);
     losc::utils::convert_df_pmn2pii_blockwise(p_index, data.df_pmn, data.C_lo,
                                               df_pii);
 
@@ -86,7 +85,7 @@ TEST_P(CurvatureTest, non_block_kappa)
     losc::DFAInfo b3lyp(0.8, 0.2, "b3lyp");
     losc::CurvatureV2 kappa_man(b3lyp, df_pii, data.df_Vpq_inv, data.grid_lo,
                                 data.grid_weight);
-    MatrixXd kappa_calc = kappa_man.kappa();
+    LOSCMatrix kappa_calc = kappa_man.kappa();
 
     // Test.
     // True consition is that the calculated curvature matrix matches the
@@ -114,7 +113,7 @@ TEST_P(CurvatureTest, block_kappa)
     const size_t nfitbasis = data.df_Vpq_inv.rows();
     const size_t nbasis = data.C_lo.rows();
     const size_t nlo = data.C_lo.cols();
-    MatrixXd df_pii(nfitbasis, nlo);
+    LOSCMatrix df_pii(nfitbasis, nlo);
     const size_t block_size = 3;
     size_t nblock = nfitbasis / block_size;
     size_t block_tail_size = nfitbasis % block_size;
@@ -129,7 +128,7 @@ TEST_P(CurvatureTest, block_kappa)
         for (size_t i = 0; i < size; ++i) {
             index[i] = block_i * block_size + i;
         }
-        MatrixXd pmn_block =
+        LOSCMatrix pmn_block =
             data.df_pmn.block(index[0], 0, size, nbasis * (nbasis + 1) / 2);
 
         losc::utils::convert_df_pmn2pii_blockwise(index, pmn_block, data.C_lo,
@@ -140,7 +139,7 @@ TEST_P(CurvatureTest, block_kappa)
     losc::DFAInfo b3lyp(0.8, 0.2, "b3lyp");
     losc::CurvatureV2 kappa_man(b3lyp, df_pii, data.df_Vpq_inv, data.grid_lo,
                                 data.grid_weight);
-    MatrixXd kappa_calc = kappa_man.kappa();
+    LOSCMatrix kappa_calc = kappa_man.kappa();
 
     // Test.
     // True consition is that the calculated curvature matrix matches the

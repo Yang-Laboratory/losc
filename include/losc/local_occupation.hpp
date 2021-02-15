@@ -26,12 +26,12 @@ namespace losc {
  * @param [in] S: AO overlap matrix with dimension [nbasis, nbasis].
  * @param [in] D: Spin density matrix under AO with dimension [nbasis, nbasis].
  *
- * @return MatrixXd: The local occupation matrix with dimension [nlo, nlo].
+ * @return LOSCMatrix: The local occupation matrix with dimension [nlo, nlo].
  *
  * @see
  * LocalizerBase::lo(): Obtain the LOs' coefficient matrix.
  */
-MatrixXd local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D);
+LOSCMatrix local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D);
 void C_API_local_occupation(ConstRefMat &C_lo, ConstRefMat &S, ConstRefMat &D,
                             RefMat LocalOcc);
 

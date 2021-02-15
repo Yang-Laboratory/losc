@@ -21,14 +21,14 @@ template <class Base> class PyBase : public Base {
                                K            /* Arguments */
         );
     }
-    MatrixXd kappa() const override
+    LOSCMatrix kappa() const override
     {
-        PYBIND11_OVERRIDE(MatrixXd, /* Return type */
-                          Base,     /* Parent class */
-                          kappa,    /* Name of function */
-                                    /* This function has no argument. We need
-                                     * to keep the comma as suggested by
-                                     * pybind11.*/
+        PYBIND11_OVERRIDE(LOSCMatrix, /* Return type */
+                          Base,       /* Parent class */
+                          kappa,      /* Name of function */
+                                      /* This function has no argument. We need
+                                       * to keep the comma as suggested by
+                                       * pybind11.*/
         );
     }
 };
@@ -116,7 +116,7 @@ void export_curvature_base(py::module &m)
             )pddoc")
         // kappa: only export the version of creating a kappa matrix.
         .def("kappa",
-             static_cast<MatrixXd (CurvatureBase::*)() const>(
+             static_cast<LOSCMatrix (CurvatureBase::*)() const>(
                  &CurvatureBase::kappa),
              R"pddoc(
             Returns

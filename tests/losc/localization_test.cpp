@@ -11,20 +11,19 @@
 #include "matrix_io.hpp"
 #include <losc/localization.hpp>
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
 using std::move;
 using std::string;
 using std::vector;
+using namespace losc;
 
-bool is_unitary(const MatrixXd &U, double prec = 1.e-8)
+bool is_unitary(const LOSCMatrix &U, double prec = 1.e-8)
 {
-    MatrixXd UUT = U * U.transpose();
-    MatrixXd UTU = U.transpose() * U;
+    LOSCMatrix UUT = U * U.transpose();
+    LOSCMatrix UTU = U.transpose() * U;
     return UUT.isIdentity(prec) && UTU.isIdentity(prec);
 }
 
-bool is_permutation_matrix(MatrixXd &A, double threshold = 1e-10)
+bool is_permutation_matrix(LOSCMatrix &A, double threshold = 1e-10)
 {
     if (!test::mtx_is_square(A)) {
         return false;
@@ -88,8 +87,8 @@ TEST_P(LocalizationTest, localizer)
     string H_ao_path = dir_path + "/data/" + dir + "/dfa_h.txt";
     string D_ao_path = dir_path + "/data/" + dir + "/dipole_ao.txt";
     string S_ao_path = dir_path + "/data/" + dir + "/ao_overlap.txt";
-    MatrixXd H_ao = move(test::read_matrices_from_txt(H_ao_path)[0]);
-    MatrixXd S_ao = move(test::read_matrices_from_txt(S_ao_path)[0]);
+    LOSCMatrix H_ao = move(test::read_matrices_from_txt(H_ao_path)[0]);
+    LOSCMatrix S_ao = move(test::read_matrices_from_txt(S_ao_path)[0]);
     auto D_ao_tmp = test::read_matrices_from_txt(D_ao_path);
     vector<losc::RefConstMat> D_ao(D_ao_tmp.begin(), D_ao_tmp.end());
 
@@ -105,20 +104,20 @@ TEST_P(LocalizationTest, localizer)
     string lo_basis_path = dir_path + "/data/" + dir + "/" + lo_basis_file;
     string lo_ref_path = dir_path + "/data/" + dir + "/" + lo_ref_file;
     string U_ref_path = dir_path + "/data/" + dir + "/" + U_ref_file;
-    MatrixXd C_lo_basis =
+    LOSCMatrix C_lo_basis =
         test::read_matrices_from_txt(lo_basis_path)[0].transpose();
-    MatrixXd C_lo_ref =
+    LOSCMatrix C_lo_ref =
         test::read_matrices_from_txt(lo_ref_path)[0].transpose();
-    MatrixXd U_ref = test::read_matrices_from_txt(U_ref_path)[0];
+    LOSCMatrix U_ref = test::read_matrices_from_txt(U_ref_path)[0];
 
     // Do localization.
     losc::LocalizerV2 localizer(C_lo_basis, H_ao, D_ao);
     localizer.set_random_permutation(false);
     localizer.set_gamma(test_case.gamma);
     // localizer.set_print(losc::kPrintLevelNormal);
-    vector<MatrixXd> rst = localizer.lo_U();
-    MatrixXd &C_lo_calc = rst[0];
-    MatrixXd &U_calc = rst[1];
+    vector<LOSCMatrix> rst = localizer.lo_U();
+    LOSCMatrix &C_lo_calc = rst[0];
+    LOSCMatrix &U_calc = rst[1];
 
     // Test.
     // True condition:
@@ -129,14 +128,14 @@ TEST_P(LocalizationTest, localizer)
     // will change the physical observables).
     bool is_equal = test::mtx_is_cwise_equal(C_lo_calc, C_lo_ref, 1e-8);
     size_t nlo = C_lo_basis.cols();
-    MatrixXd P(nlo, nlo);
+    LOSCMatrix P(nlo, nlo);
     bool is_permutation = false;
     if (!is_equal) {
         size_t nlo = C_lo_basis.cols();
         size_t nbasis = C_lo_basis.rows();
-        MatrixXd &C1 = C_lo_calc;
-        MatrixXd &C2 = C_lo_ref;
-        MatrixXd C1SC1 = C1.transpose() * S_ao * C1;
+        LOSCMatrix &C1 = C_lo_calc;
+        LOSCMatrix &C2 = C_lo_ref;
+        LOSCMatrix C1SC1 = C1.transpose() * S_ao * C1;
         EXPECT_TRUE(C1SC1.isIdentity(1e-8));
         P.noalias() = C1.transpose() * S_ao * C2;
 

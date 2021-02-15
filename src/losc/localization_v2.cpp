@@ -15,8 +15,9 @@
 namespace losc {
 
 void LocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
-                                       const vector<MatrixXd> &D_lo,
-                                       const MatrixXd &H_lo, double &theta_val,
+                                       const vector<LOSCMatrix> &D_lo,
+                                       const LOSCMatrix &H_lo,
+                                       double &theta_val,
                                        double &delta_val) const
 {
     // Spacial part: constant x1 and x2.
@@ -61,15 +62,15 @@ void LocalizerV2::js_optimize_one_pair(const size_t i, const size_t j,
 
 void LocalizerV2::js_rotate_one_pair(const size_t i, const size_t j,
                                      const double theta, RefMat U,
-                                     vector<MatrixXd> &D_lo,
-                                     MatrixXd &H_lo) const
+                                     vector<LOSCMatrix> &D_lo,
+                                     LOSCMatrix &H_lo) const
 {
     // rotate U
     rotate_two_vectors(U.col(i), U.col(j), theta);
 
     // rotate D_lo
     for (int xyz = 0; xyz < 3; ++xyz) {
-        MatrixXd &D = D_lo[xyz];
+        LOSCMatrix &D = D_lo[xyz];
         rotate_two_vectors(D.row(i), D.row(j), theta);
         rotate_two_vectors(D.col(i), D.col(j), theta);
     }
@@ -120,17 +121,17 @@ void LocalizerV2::C_API_lo_U(RefMat L, RefMat U)
             "LocalizerV2::lo_U: dimension error of the U matrix.");
     }
 
-    MatrixXd L_init = C_lo_basis_ * U;
+    LOSCMatrix L_init = C_lo_basis_ * U;
     // calculate dipole on LO initial guess.
     // D_lo = U^T * C_lo_basis^T * D_ao * C_lo_basis * U
-    vector<MatrixXd> D_lo;
+    vector<LOSCMatrix> D_lo;
     for (size_t xyz = 0; xyz < 3; xyz++) {
         D_lo.push_back(L_init.transpose() * Dipole_ao_[xyz] * L_init);
     }
 
     // calculate Hamiltonian matrix on LO initial guess.
     // H_lo = U^T * C_lo_basis^T * H_ao * C_lo_basis * U
-    MatrixXd H_lo = L_init.transpose() * H_ao_ * L_init;
+    LOSCMatrix H_lo = L_init.transpose() * H_ao_ * L_init;
 
     // using jacobi sweep for localization.
     std::mt19937 g(0);
@@ -179,9 +180,9 @@ void LocalizerV2::C_API_lo_U(RefMat L, RefMat U)
     L.noalias() = C_lo_basis_ * U;
 }
 
-vector<MatrixXd> LocalizerV2::lo_U(const string &guess)
+vector<LOSCMatrix> LocalizerV2::lo_U(const string &guess)
 {
-    vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
+    vector<LOSCMatrix> rst{LOSCMatrix(nbasis_, nlo_), LOSCMatrix(nlo_, nlo_)};
     RefMat L = rst[0];
     RefMat U = rst[1];
     set_u_guess(U, guess);
@@ -189,9 +190,9 @@ vector<MatrixXd> LocalizerV2::lo_U(const string &guess)
     return std::move(rst);
 }
 
-vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
+vector<LOSCMatrix> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
 {
-    vector<MatrixXd> rst{MatrixXd(nbasis_, nlo_), MatrixXd(nlo_, nlo_)};
+    vector<LOSCMatrix> rst{LOSCMatrix(nbasis_, nlo_), LOSCMatrix(nlo_, nlo_)};
     RefMat L = rst[0];
     RefMat U = rst[1];
     set_u_guess(U, U_guess, threshold);
@@ -201,11 +202,11 @@ vector<MatrixXd> LocalizerV2::lo_U(ConstRefMat &U_guess, double threshold)
 
 double LocalizerV2::cost_func(ConstRefMat &lo) const
 {
-    vector<MatrixXd> D;
+    vector<LOSCMatrix> D;
     for (size_t xyz = 0; xyz < 3; ++xyz) {
         D.push_back(lo.transpose() * Dipole_ao_[xyz] * lo);
     }
-    MatrixXd H(lo.transpose() * H_ao_ * lo);
+    LOSCMatrix H(lo.transpose() * H_ao_ * lo);
 
     double rst = 0;
     for (size_t xyz = 0; xyz < 3; ++xyz) {

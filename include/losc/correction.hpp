@@ -33,7 +33,7 @@ using std::vector;
  * @param [in] LocalOcc: LOSC local occupation matrix with dimension of
  * [nlo, nlo].
  *
- * @return MatrixXd: the LOSC effective Hamiltonian with dimension of
+ * @return LOSCMatrix: the LOSC effective Hamiltonian with dimension of
  * [nbasis, nbasis].
  *
  * @see
@@ -41,9 +41,9 @@ using std::vector;
  * losc::CurvatureBase::kappa(): return the LOSC curvature matrix.
  * losc::local_occupation(): return the LOSC local occupation matrix.
  */
-MatrixXd ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
-                                   ConstRefMat &Curvature,
-                                   ConstRefMat &LocalOcc);
+LOSCMatrix ao_hamiltonian_correction(ConstRefMat &S, ConstRefMat &C_lo,
+                                     ConstRefMat &Curvature,
+                                     ConstRefMat &LocalOcc);
 
 /**
  * @brief The C interface to calculate LOSC effective Hamiltonian under AOs.

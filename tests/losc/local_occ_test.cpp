@@ -3,18 +3,17 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "matrix_helper.hpp"
 #include "matrix_io.hpp"
 #include <losc/local_occupation.hpp>
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+using std::move;
 using std::string;
 using std::vector;
-using std::move;
+using namespace losc;
 
 struct LocalOccupationTest : public ::testing::TestWithParam<string> {
     string file_path;
@@ -38,13 +37,13 @@ TEST_P(LocalOccupationTest, test)
     string C_lo_path = dir_path + "/data/" + mol + "/lo.txt";
     string D_path = dir_path + "/data/" + mol + "/dfa_density.txt";
     string L_ref_path = dir_path + "/data/" + mol + "/localocc.txt";
-    MatrixXd S = move(test::read_matrices_from_txt(S_path)[0]);
-    MatrixXd C_lo = test::read_matrices_from_txt(C_lo_path)[0].transpose();
-    MatrixXd D = move(test::read_matrices_from_txt(D_path)[0]);
-    MatrixXd L_ref = move(test::read_matrices_from_txt(L_ref_path)[0]);
+    LOSCMatrix S = move(test::read_matrices_from_txt(S_path)[0]);
+    LOSCMatrix C_lo = test::read_matrices_from_txt(C_lo_path)[0].transpose();
+    LOSCMatrix D = move(test::read_matrices_from_txt(D_path)[0]);
+    LOSCMatrix L_ref = move(test::read_matrices_from_txt(L_ref_path)[0]);
 
     // Do calculation.
-    MatrixXd L_calc = losc::local_occupation(C_lo, S, D);
+    LOSCMatrix L_calc = losc::local_occupation(C_lo, S, D);
 
     // Testing.
     // True condition is the calculated Losc local occupation matrix matches

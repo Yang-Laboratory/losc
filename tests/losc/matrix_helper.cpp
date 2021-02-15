@@ -9,8 +9,11 @@
 #include <iomanip> // std::setprecision
 #include <ios>
 #include <iostream>
+#include <losc/eigen_def.hpp>
 #include <losc/exception.hpp>
 #include <random>
+
+using namespace losc;
 
 namespace test {
 
@@ -19,7 +22,7 @@ static std::mt19937 g_rand_generator_mt19937_seed_fixed(1);
 /**
  * @details The matrix elements are printed in the format `%16.8e`.
  */
-void mtx_show_full(const MatrixXd &m, std::ostream &os,
+void mtx_show_full(const LOSCMatrix &m, std::ostream &os,
                    size_t elements_per_line)
 {
     size_t row = m.rows();
@@ -48,7 +51,7 @@ void mtx_show_full(const MatrixXd &m, std::ostream &os,
 /**
  * @details The matrix elements are printed in the format `%16.8e`.
  */
-void mtx_show_lower(const MatrixXd &m, std::ostream &os,
+void mtx_show_lower(const LOSCMatrix &m, std::ostream &os,
                     size_t elements_per_line)
 {
     std::ios_base::fmtflags os_flags(os.flags());
@@ -72,7 +75,7 @@ void mtx_show_lower(const MatrixXd &m, std::ostream &os,
     os.flags(os_flags);
 }
 
-bool mtx_is_symmetric(const MatrixXd &m, double threshold)
+bool mtx_is_symmetric(const LOSCMatrix &m, double threshold)
 {
     threshold = std::abs(threshold);
     if (!mtx_is_square(m)) {
@@ -92,22 +95,22 @@ bool mtx_is_symmetric(const MatrixXd &m, double threshold)
  * @note The dimension of two matrices will be compared as well. If not matched,
  * it will return false.
  */
-bool mtx_is_cwise_equal(const MatrixXd &m, const MatrixXd &other,
+bool mtx_is_cwise_equal(const LOSCMatrix &m, const LOSCMatrix &other,
                         double threshold)
 {
     if (!mtx_is_same_dimension_to(m, other)) {
         return false;
     }
-    MatrixXd diff = m - other;
+    LOSCMatrix diff = m - other;
     return diff.isZero(threshold);
 }
 
-bool mtx_is_same_dimension_to(const MatrixXd &m, const MatrixXd &other)
+bool mtx_is_same_dimension_to(const LOSCMatrix &m, const LOSCMatrix &other)
 {
     return ((m.rows() == other.rows()) && (m.cols() == other.cols()));
 }
 
-void mtx_to_symmetric(MatrixXd &m, const string &uplo)
+void mtx_to_symmetric(LOSCMatrix &m, const string &uplo)
 {
     const size_t row = m.rows();
     const size_t col = m.cols();
@@ -138,7 +141,7 @@ void mtx_to_symmetric(MatrixXd &m, const string &uplo)
  * @see Eigen::setRandom() can also set a matrix element normally distributed in
  * range [-1 : 1].
  */
-void mtx_randomize(MatrixXd &m, double a, double b)
+void mtx_randomize(LOSCMatrix &m, double a, double b)
 {
     std::random_device
         rd; // Will be used to obtain a seed for the random number engine
@@ -159,7 +162,7 @@ void mtx_randomize(MatrixXd &m, double a, double b)
  * @see Eigen::setRandom() can also set a matrix element normally distributed in
  * range [-1 : 1].
  */
-void mtx_randomize_seed_fixed(MatrixXd &m, double a, double b)
+void mtx_randomize_seed_fixed(LOSCMatrix &m, double a, double b)
 {
     std::uniform_real_distribution<> dis(a, b);
     for (size_t i = 0; i < m.rows(); i++) {

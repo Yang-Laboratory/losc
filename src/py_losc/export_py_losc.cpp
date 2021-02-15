@@ -26,14 +26,14 @@
  * may be further wrapped in python module to produce better implementation.
  * For example, CurvatureV2 class (its constructor) is further wrapped in
  * python module to enable the implicit conversion of storage order between
- * np.ndarray and Eigen::MatrixXd.
+ * np.ndarray and Eigen::LOSCMatrix.
  */
 
 #include "export_py_losc.hpp"
-#include "export_curvature.hpp"
-#include "export_localization.hpp"
 #include "export_correction.hpp"
+#include "export_curvature.hpp"
 #include "export_local_occupation.hpp"
+#include "export_localization.hpp"
 
 PYBIND11_MODULE(PY_LOSC_MODULE_NAME, m)
 {

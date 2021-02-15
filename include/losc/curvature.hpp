@@ -123,12 +123,12 @@ class CurvatureBase {
 
     /**
      * @brief Compute the LOSC curvature matrix.
-     * @return MatrixXd: the LOSC curvature matrix with dimension of
+     * @return LOSCMatrix: the LOSC curvature matrix with dimension of
      * [nlo, nlo].
      */
-    virtual MatrixXd kappa() const
+    virtual LOSCMatrix kappa() const
     {
-        MatrixXd K(nlo_, nlo_);
+        LOSCMatrix K(nlo_, nlo_);
         C_API_kappa(K);
         return std::move(K);
     }
@@ -171,8 +171,8 @@ class CurvatureV1 : public CurvatureBase {
      */
     double tau_ = 1.2378;
 
-    MatrixXd compute_kappa_J() const;
-    MatrixXd compute_kappa_xc() const;
+    LOSCMatrix compute_kappa_J() const;
+    LOSCMatrix compute_kappa_xc() const;
 
   public:
     /**

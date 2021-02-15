@@ -61,7 +61,7 @@ void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
         const size_t p = p_index[pi];
         // For each p0 (p0|mn), the (m, n) block has dimension:
         // [nbasis x nbasis].
-        MatrixXd df_pmn_p0_mn(nbasis, nbasis);
+        LOSCMatrix df_pmn_p0_mn(nbasis, nbasis);
         for (size_t m = 0; m < nbasis; ++m) {
             for (size_t n = 0; n <= m; ++n) {
                 const size_t mn = m * (m + 1) / 2 + n;
@@ -73,7 +73,7 @@ void convert_df_pmn2pii_blockwise(const vector<size_t> &p_index,
         // For each p0 (p0|in), the (i, n) block dimension:
         // [nlo x nbasis].
         // Formula: (p0|in) = C_lo^T * (p|mn).
-        MatrixXd df_pmn_p0_in(nlo, nbasis);
+        LOSCMatrix df_pmn_p0_in(nlo, nbasis);
         df_pmn_p0_in.noalias() = C_lo.transpose() * df_pmn_p0_mn;
 
         // calculate element (p|ii)

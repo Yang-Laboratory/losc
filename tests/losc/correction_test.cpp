@@ -11,10 +11,10 @@
 #include "matrix_io.hpp"
 #include <losc/correction.hpp>
 
-using Eigen::MatrixXd;
 using std::move;
 using std::string;
 using std::vector;
+using namespace losc;
 
 /**
  * Get Losc total energy correction from a txt file.
@@ -53,15 +53,15 @@ TEST_P(CorrectionTest, losc_Hamiltonian_correction)
     string K_path = dir_path + "/data/" + mol + "/kappa.txt";
     string L_path = dir_path + "/data/" + mol + "/localocc.txt";
     string H_losc_path = dir_path + "/data/" + mol + "/losc_H_corr.txt";
-    MatrixXd S = move(test::read_matrices_from_txt(S_path)[0]);
-    MatrixXd C_lo =
+    LOSCMatrix S = move(test::read_matrices_from_txt(S_path)[0]);
+    LOSCMatrix C_lo =
         move(test::read_matrices_from_txt(C_lo_path)[0].transpose());
-    MatrixXd K = move(test::read_matrices_from_txt(K_path)[0]);
-    MatrixXd L = move(test::read_matrices_from_txt(L_path)[0]);
-    MatrixXd H_losc_ref = move(test::read_matrices_from_txt(H_losc_path)[0]);
+    LOSCMatrix K = move(test::read_matrices_from_txt(K_path)[0]);
+    LOSCMatrix L = move(test::read_matrices_from_txt(L_path)[0]);
+    LOSCMatrix H_losc_ref = move(test::read_matrices_from_txt(H_losc_path)[0]);
 
     // Do calculation.
-    MatrixXd H_losc_calc = losc::ao_hamiltonian_correction(S, C_lo, K, L);
+    LOSCMatrix H_losc_calc = losc::ao_hamiltonian_correction(S, C_lo, K, L);
 
     // Testing.
     // True condition is the calculated Losc H matrix matches the reference
@@ -91,8 +91,8 @@ TEST_P(CorrectionTest, losc_energy_correction)
     string K_path = dir_path + "/data/" + mol + "/kappa.txt";
     string L_path = dir_path + "/data/" + mol + "/localocc.txt";
     string E_path = dir_path + "/data/" + mol + "/energy.txt";
-    MatrixXd K = move(test::read_matrices_from_txt(K_path)[0]);
-    MatrixXd L = move(test::read_matrices_from_txt(L_path)[0]);
+    LOSCMatrix K = move(test::read_matrices_from_txt(K_path)[0]);
+    LOSCMatrix L = move(test::read_matrices_from_txt(L_path)[0]);
     double E_ref = get_losc_E_correction(E_path);
 
     // assume it is all RKS calculations.
@@ -124,10 +124,10 @@ TEST_P(CorrectionTest, losc_orbE_projection)
     string H_losc_path = dir_path + "/data/" + mol + "/losc_H_corr.txt";
     string C_co_path = dir_path + "/data/" + mol + "/lo_basis.txt";
     string eig_path = dir_path + "/data/" + mol + "/losc_eig.txt";
-    MatrixXd H_dfa = move(test::read_matrices_from_txt(H_dfa_path)[0]);
-    MatrixXd H_losc = move(test::read_matrices_from_txt(H_losc_path)[0]);
-    MatrixXd C_co = test::read_matrices_from_txt(C_co_path)[0].transpose();
-    MatrixXd eig_ref = move(test::read_matrices_from_txt(eig_path)[0]);
+    LOSCMatrix H_dfa = move(test::read_matrices_from_txt(H_dfa_path)[0]);
+    LOSCMatrix H_losc = move(test::read_matrices_from_txt(H_losc_path)[0]);
+    LOSCMatrix C_co = test::read_matrices_from_txt(C_co_path)[0].transpose();
+    LOSCMatrix eig_ref = move(test::read_matrices_from_txt(eig_path)[0]);
 
     // Do calculation.
     vector<double> eig_calc =
@@ -137,7 +137,7 @@ TEST_P(CorrectionTest, losc_orbE_projection)
     // Return is vector<double>, transfer it into matrix to compare.
     // True condition is that the calculated eigenvalue matches to 8-th
     // digit.
-    MatrixXd eig_calc_M(1, eig_calc.size());
+    LOSCMatrix eig_calc_M(1, eig_calc.size());
     eig_calc_M.setZero();
     for (size_t i = 0; i < eig_calc.size(); ++i) {
         eig_calc_M(0, i) = eig_calc[i];
