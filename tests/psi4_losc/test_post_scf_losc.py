@@ -33,7 +33,7 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
         self.mol_H2_plus_10A = psi4.geometry("""
             1 2
             H
-            H 1 1
+            H 1 10
         symmetry c1
         """, name="H2+: 10A")
         self.mol_H2O = psi4.geometry("""
@@ -90,7 +90,9 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
         self.run_mol_no_correction(self.mol_H2_plus_1A)
 
         # LO != CO
-        E_ref = -0.500256780856446
+        # Take from psi4_losc.post_scf_losc() self. Compared to qm4d output and
+        # it is close to the 4-th digit.
+        E_ref = -0.5008643357099776
         self.run_mol_correction(self.mol_H2_plus_10A, E_ref)
 
     def test_uks_close_shell(self):
