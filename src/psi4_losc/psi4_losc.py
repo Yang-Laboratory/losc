@@ -132,20 +132,6 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         D[:] = np.einsum('i,ui,vi->uv', np.asarray(occ_val), Cocc, Cocc,
                          optimize=True)
 
-    def is_aufbau(nocc, occ_idx):
-        nspin = len(nocc)
-        for s in range(nspin):
-            if occ_idx[s] and occ_idx[s][-1] >= nocc[s]:
-                return False
-        return True
-
-    def is_integer(occ_val):
-        for v in occ_val:
-            for x in v:
-                if int(x) != float(x):
-                    return False
-        return True
-
     def local_print(level, *args):
         if verbose >= level:
             t = [f'{i}' for i in args]
@@ -228,8 +214,8 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     # Create the occupation number, including the fractional cases.
     nocc, occ_idx, occ_val = utils.form_occ(wfn, occ)
     nelec = [sum(x) for x in occ_val]
-    is_integer = is_integer(occ_val)
-    is_aufbau = is_aufbau(nocc, occ_idx)
+    is_integer = utils.is_integer_system(wfn, occ)
+    is_aufbau = utils.is_aufbau_system(wfn, occ)
     local_print(1, "=> Occupation Number <=")
     local_print(1, f"Is integer system: {is_integer}")
     local_print(1, f"Is aufbau occupation: {is_aufbau}")
