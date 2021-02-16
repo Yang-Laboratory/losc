@@ -227,9 +227,12 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
             local_print(1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
         else:
             local_print(1, 'Occupation Number:')
-        for i in range(nocc[s]):
-            local_print(1, 'spin={:<2d} idx={:<5d} occ={:<10f}'
-                        .format(s, occ_idx[s][i], occ_val[s][i]))
+        max_idx = -1 if not occ_idx[s] else occ_idx[s][-1]
+        occ_idx_val = dict(zip(occ_idx[s], occ_val[s]))
+        for i in range(max_idx+1):
+            occ_val_t = occ_idx_val.get(i, 0)
+            local_print(1, 'index={:<5d} occ={:<10f}'
+                        .format(i, occ_val_t))
         local_print(1, "")
 
     # ==> Set up matrices <==
@@ -413,9 +416,9 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         # Save scf energy
         Eold = SCF_E
 
-        #if SCF_ITER == maxiter:
-        #    psi4.core.clean()
-        #    raise Exception("Maximum number of SCF cycles exceeded.")
+        if SCF_ITER == maxiter:
+            psi4.core.clean()
+            raise Exception("Maximum number of SCF cycles exceeded.")
 
     # print total energies
     func_type = "HF" if is_hf else "DFA"
