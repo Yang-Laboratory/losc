@@ -7,6 +7,8 @@ from py_losc import py_losc
 from psi4_losc import jk
 from psi4_losc import diis
 from psi4_losc import utils
+from psi4_losc import build_scf_wfn
+from psi4_losc import wfn
 
 import psi4
 from psi4.driver.p4util.exceptions import ValidationError
@@ -219,12 +221,15 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     local_print(1, "=> Occupation Number <=")
     local_print(1, f"Is integer system: {is_integer}")
     local_print(1, f"Is aufbau occupation: {is_aufbau}")
-    local_print(1, f"nelec_a: {nelec[0]} {f' ! update and differ to wfn.nalpha(): nalpha={wfn.nalpha()}.' if nelec[0] != wfn.nalpha() else ''}")
-    local_print(1, f"nelec_b: {nelec[1]} {f' ! update and differ to wfn.nbeta(): nbeta={wfn.nbeta()}.' if nelec[1] != wfn.nbeta() else ''}")
+    local_print(
+        1, f"nelec_a: {nelec[0]} {f' ! update and differ to wfn.nalpha(): nalpha={wfn.nalpha()}.' if nelec[0] != wfn.nalpha() else ''}")
+    local_print(
+        1, f"nelec_b: {nelec[1]} {f' ! update and differ to wfn.nbeta(): nbeta={wfn.nbeta()}.' if nelec[1] != wfn.nbeta() else ''}")
     local_print(1, "")
     for s in range(nspin):
         if not is_rks:
-            local_print(1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
+            local_print(
+                1, f'{"Alpha" if s == 0 else "Beta"} Occupation Number:')
         else:
             local_print(1, 'Occupation Number:')
         max_idx = -1 if not occ_idx[s] else occ_idx[s][-1]
@@ -793,7 +798,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     return E_losc_dfa_tot, losc_eig
 
 
-def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
+def scf_losc_frac(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     """
     Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
@@ -873,4 +878,56 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
                orbital_energy_unit=orbital_energy_unit, verbose=verbose)
     wfn.losc_data = {'occ': dfa_wfn.losc_data['occ'].copy()}
 
+    return wfn
+
+
+def scf_losc(dfa_info, dfa_wfn):
+    """
+    Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
+
+    This function calls `psi4.energy()` to do the SCF calculation internally.
+    To make the usage of `psi4.energy()` compatibale with LOSC calculation,
+    we define the LOSC wavefunction (see `wfn.RLOSC` and `wfn.ULOSC`) that are
+    derived from `psi4.core.RHF` or `psi4.core.UHF`. Simply overwrite several
+    key functions derived from `psi4.core.HF`, we can make `psi4.energy()`
+    function involve the LOSC contributions correctly in the SCF procedure.
+    See `wfn.py`.
+
+    This function does not supports calculations for fractional systems.
+
+    Parameters
+    ----------
+    dfa_info: py_losc.DFAInfo
+        The information of the parent DFA, including the weights of exchanges.
+    dfa_wfn: psi4.core.HF like psi4 object
+        The converged wavefunction from a parent DFA.
+
+    Returns
+    -------
+    wfn: psi4_losc.wfn.RLOSC or psi4_losc.wfn.ULOSC
+        The LOSC wavefunction.
+
+    Notes
+    -----
+    1. Since `psi4.energy()` is used internally to drive the SCF procedure,
+    ideally, this function supports all the types of SCF calculations that
+    are supported by psi4, such as integer/aufbau systems, MOM calculations.
+    However, this is not fully tested. But for normal SCF, meaning integer
+    and aufbau system, this function works fine.
+    """
+    # Check if the user tries to customize the occupation number.
+    if hasattr(dfa_wfn, 'losc_data'):
+        if 'occ' in dfa_wfn.losc_data:
+            raise Exception('Customizing occupation number is allowed.')
+
+    # Do post-SCF-LOSC to build curvature and LO.
+    post_scf_losc(dfa_info, dfa_wfn)
+
+    # Do SCF-LOSC.
+    dfa_name = dfa_wfn.functional().name()
+    _, wfn = psi4.energy(dfa_name, losc_data=dfa_wfn.losc_data, return_wfn=True)
+
+    # Remove dynamical attributes created for LOSC.
+    if hasattr(wfn, 'losc_data'):
+        delattr(wfn, 'losc_data')
     return wfn
