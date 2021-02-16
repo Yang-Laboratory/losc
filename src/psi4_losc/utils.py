@@ -142,6 +142,66 @@ def form_grid_w(wfn):
     return grid_w
 
 def form_occ(wfn, occ={}):
+    """
+    Form the occupation number for a given psi4 wavefunction object.
+
+    Parameters
+    ----------
+    wfn: psi4.core.Wavefunction
+        A psi4 wavefunction object.
+    occ: dict, default to an empty dict.
+        A dictionary that specifies the customized occupation number. The
+        occupation is obtained based on the aufbau occupation number of the
+        current molecule to give the final set of occupation numbers for the SCF
+        calculation. All the str in this dictionary is case-insensitive.
+
+        The structure of the dict:
+        {
+            "alpha": # for alpha spin
+            {
+                int or str: float,
+            }
+            "beta": # for beta spin
+            {
+                int or str: float,
+            }
+        }
+        The key-value pair (int: float): int refers to orbital index (0-based);
+        float refers to the customized occupation number (in the range of [0, 1]).
+        The key-value pair (str: float): str can be either ['homo', 'lumo'],
+        which refers to HOMO and LUMO orbital respectively; float refers to the
+        customized occupation number (in the range of [0, 1]). Using `homo` and
+        the orbital index of HOMO as the key will cause ambiguity to specify
+        the HOMO occupation number, so it is not allowed. The same rule applies
+        to LUMO.
+
+        Example:
+        >> H2 system: charge=0, mult=1
+        The aufbau occupation numbers for H2 are:
+        alpha occ: 1, 0, 0, 0, ...
+        beta occ: 1, 0, 0, 0, ...
+        >> Customized occ dictionary:
+        occ = {
+            "alpha": {"homo": 0.5}
+            "beta": {"3": 0.7}
+        }
+        >> Resulted occupation numbers:
+        alpha occ: 0.5, 0, 0, 0, ...
+        beta occ:  1,   0, 0, 0.7, ...
+
+        Returns
+        -------
+        nocc: [int, int]
+            Number of non-zero occupied orbitals.
+        occ_idx: [[int, ...], [int, ...]]
+            The index (0-based) of non-zero occupied orbitals. If the alpha or
+            beta spin chanel has zero number of non-zero occupied orbitals,
+            the index list is an empty list.
+        occ_val: [[float, ...], [float, ...]]
+            The occupation number of non-zero occupied orbitals. If the alpha or
+            beta spin chanel has zero number of non-zero occupied orbitals,
+            the occupation number list is an empty list.
+    """
     nbf = wfn.basisset().nbf()
     nelec = [wfn.nalpha(), wfn.nbeta()]
     # Build aufbau occupation.
@@ -152,7 +212,10 @@ def form_occ(wfn, occ={}):
         if k not in spin_chanel:
             raise Exception(f"invalid customized occupation spin chanel: {k}.")
         s = spin_chanel.index(k)
+        homo_status = []
+        lumo_status = []
         for orb_i, occ_i in v.items():
+            # check orbital index
             if isinstance(orb_i, str):
                 orb_i = orb_i.lower()
                 if orb_i not in ['homo', 'lumo']:
@@ -161,10 +224,25 @@ def form_occ(wfn, occ={}):
                     orb_i = nelec[s] - 1
                 else:
                     orb_i = nelec[s]
-            if orb_i >= nbf:
-                raise Exception(f"customized occupation index is out-of-range: {orb_i} (orbital index) > {nbf} (basis size).")
+            elif not isinstance(orb_i, int):
+                raise Exception('Orbital index should be either int, "homo" or "lumo".')
+            if not 0 <= orb_i < nbf:
+                    raise Exception(f"customized occupation index is out-of-range [0, {nbf}): {orb_i}")
+            # check occupation number
             if not 0 <= occ_i <= 1:
-                raise Exception(f"customized occupation number is invalid: occ={occ_i}.")
+                raise Exception(f"customized occupation number is out-of-range [0, 1]: occ={occ_i}.")
+            # check if homo and homo_idx appear at the same time:
+            if orb_i == nelec[s] - 1:
+                homo_status.append(orb_i)
+            if len(homo_status) == 2:
+                raise ValueError("HOMO and HOMO index appear at the same time, which causes ambiguity.")
+            # check if lumo and lumo_idx appear at the same time:
+            if orb_i == nelec[s]:
+                lumo_status.append(orb_i)
+            if len(lumo_status) == 2:
+                raise ValueError("LUMO and LUMO index appear at the same time, which causes ambiguity.")
+
+            # update occupation number
             rst_occ[s][orb_i] = occ_i
 
     occ_idx = []
@@ -172,14 +250,72 @@ def form_occ(wfn, occ={}):
     for d in rst_occ:
         if d:
             idx_occ = list(d.items())
+            # remove 0 occupied orbital
+            idx_occ = list(filter(lambda x: abs(x[1]) > 0, idx_occ))
             idx_occ.sort()
-            idx, occ = zip(*idx_occ)
+            if idx_occ:
+                idx, occ = zip(*idx_occ)
+            else:
+                idx, occ = tuple(), tuple()
             occ_idx.append(idx)
             occ_val.append(occ)
         else:
-            occ_idx.append([])
-            occ_val.append([])
+            occ_idx.append(tuple())
+            occ_val.append(tuple())
 
-    nocc = [len(x) for x in occ_idx]
+    nocc = tuple(len(x) for x in occ_idx)
 
     return nocc, occ_idx, occ_val
+
+def is_integer_system(wfn, occ={}):
+    """
+    Check if the wavefunction is an integer system.
+
+    Parameters
+    ----------
+    wfn: psi4.core.Wavefunction
+        The wavefunction object to be check.
+    occ: dict
+        The occupation information dictionary. See `form_occ()`.
+
+    Returns
+    -------
+    out: bool
+        If the wavefunction is an integer system.
+    """
+    _, _, occ_val = form_occ(wfn, occ=occ)
+    for occ_val_i in occ_val:
+        for o in occ_val_i:
+            if int(o) != float(o):
+                return False
+    return True
+
+def is_aufbau_system(wfn, occ={}):
+    """
+    Check if the wavefunction is an aufbau system.
+
+    Parameters
+    ----------
+    wfn: psi4.core.Wavefunction
+        The wavefunction object to be check.
+    occ: dict
+        The occupation information dictionary. See `form_occ()`.
+
+    Returns
+    -------
+    out: bool
+        If the wavefunction is an aufbau system.
+    """
+    norbs, occ_idx, occ_val = form_occ(wfn, occ=occ)
+    nelec = [sum(x) for x in occ_val]
+    occ_idx_val = [list(zip(occ_idx[s], occ_val[s])) for s in range(len(norbs))]
+    for s in range(len(norbs)):
+        n_orbitals = norbs[s]
+        if n_orbitals > 0:
+            highest_orbital_idx = occ_idx_val[s][-1][0]
+            electron_number = nelec[s]
+            is_aufbau = (n_orbitals -1 <= electron_number <= n_orbitals and
+                         highest_orbital_idx == n_orbitals - 1)
+            if not is_aufbau:
+                return False
+    return True
