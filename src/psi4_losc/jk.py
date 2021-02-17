@@ -133,7 +133,7 @@ class JK_psi4_mints:
     def _compute_ao_eri_df(self):
         basis = self._wfn.basisset()
         zero_bas = psi4.core.BasisSet.zero_ao_basis_set()
-        aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
+        aux_bas_name = psi4.core.get_option('SCF', 'DF_BASIS_SCF').lower()
         aux_bas = psi4.core.BasisSet.build(self._wfn.molecule(), "ORBITAL",
                                            aux_bas_name)
 

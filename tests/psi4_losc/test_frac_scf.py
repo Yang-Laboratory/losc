@@ -40,9 +40,8 @@ class TestSelfSCFFractional(unittest.TestCase):
             "\n==> Test the ground state E(N) curve of H atom in [0, 1]:")
         print("    method=HF, guess=core, basis=3-21g, scf_type=DF")
         psi4.core.set_active_molecule(self.mol_H)
-        optstash = psi4.driver.p4util.OptionsState(
-            ['reference'])
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         name = 'hf'
         E_0 = scf(name, occ={'alpha': {'homo': 0}}).energy()
@@ -64,9 +63,8 @@ class TestSelfSCFFractional(unittest.TestCase):
             "\n==> Test the ground state E(N) curve of H atom in [0, 1]:")
         print("    method=b3lyp, guess=core, basis=3-21g, scf_type=DF")
         psi4.core.set_active_molecule(self.mol_H)
-        optstash = psi4.driver.p4util.OptionsState(
-            ['reference'])
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         name = 'b3lyp'
         # ref comes from self generation. compared with qm4d calculations
@@ -98,9 +96,8 @@ class TestSelfSCFFractional(unittest.TestCase):
         print("\n==> Test the ground state of E(N) curve of H2+ in [0, 1]:")
         print("      method=HF, guess=core, basis=3-21g, scf_type=DF")
         psi4.core.set_active_molecule(self.mol_H2_plus)
-        optstash = psi4.driver.p4util.OptionsState(
-            ['reference'])
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         name = 'hf'
         psi4.core.set_output_file('t', False)

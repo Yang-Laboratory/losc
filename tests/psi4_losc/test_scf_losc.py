@@ -78,35 +78,45 @@ class TestSCFLOSCIntegerAufbau(unittest.TestCase):
         Test unrestricted calculations for open shell cases.
         """
         print("\n==> Test UKS Open Shell")
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         # LO = CO
         self.run_mol_no_correction(self.mol_H2_plus_1A)
 
         # TODO: LO != CO
 
+        optstash.restore()
+
     def test_uks_close_shell(self):
         """
         Test unrestricted calculations for close shell cases.
         """
         print("\n==> Test UKS Close Shell")
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         # LO = CO
         self.run_mol_no_correction(self.mol_H2_1A)
 
         # TODO: LO != CO
+
+        optstash.restore()
 
     def test_rks_close_shell(self):
         """
         Test restricted calculations for close shell cases.
         """
         print("\n==> Test RKS Close Shell")
-        psi4.set_options({'reference':  'rhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE', 'RHF')
+
         # LO = CO
         self.run_mol_no_correction(self.mol_H2_1A)
 
         # TODO: LO != CO
+
+        optstash.restore()
 
 
 if __name__ == '__main__':

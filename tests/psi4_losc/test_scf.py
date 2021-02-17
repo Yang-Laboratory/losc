@@ -82,29 +82,42 @@ class TestSelfSCFIntegerAufbau(unittest.TestCase):
         Test unrestricted calculations for open shell cases.
         """
         print("\n==> Test UKS Open Shell")
-        psi4.set_options({'d_convergence': 1e-4,
-                          'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(
+            ['SCF', 'REFERENCE'],
+            ['SCF', 'D_CONVERGENCE'],
+            )
+        psi4.core.set_local_option('SCF', 'REFERENCE','UHF')
+        psi4.core.set_local_option('SCF', 'D_CONVERGENCE', 1.0e-4)
+
         self.run_mol(self.mol_H)
         self.run_mol(self.mol_H2_plus)
         self.run_mol(self.mol_H2O_plus, precision=5)
+
+        optstash.restore()
 
     def test_uks_close_shell(self):
         """
         Test unrestricted calculations for close shell cases.
         """
         print("\n==> Test UKS Close Shell")
-        psi4.set_options({'reference':  'uhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE','UHF')
+
         self.run_mol(self.mol_H2)
         self.run_mol(self.mol_H2O)
 
+        optstash.restore()
     def test_rks_close_shell(self):
         """
         Test restricted calculations for close shell cases.
         """
         print("\n==> Test RKS Close Shell")
-        psi4.set_options({'reference':  'rhf'})
+        optstash = psi4.driver.p4util.OptionsState(['SCF', 'REFERENCE'])
+        psi4.core.set_local_option('SCF', 'REFERENCE','RHF')
         self.run_mol(self.mol_H2)
         self.run_mol(self.mol_H2O)
+
+        optstash.restore()
 
 
 if __name__ == '__main__':

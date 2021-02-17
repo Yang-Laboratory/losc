@@ -31,7 +31,7 @@ class diis(object):
         """
         self.error = []
         self.vector = []
-        self.max_vec = psi4.core.get_global_option('DIIS_MAX_VECS')
+        self.max_vec = psi4.core.get_option('SCF', 'DIIS_MAX_VECS')
 
     def add(self, state, error):
         """

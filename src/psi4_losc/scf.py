@@ -35,7 +35,7 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         equivalent to copy guess_wfn.C (coefficient matrix) and guess_wfn.D
         (density matrix) to the scf wavefunction object to initialize the SCF
         calculation. Note: (1) setting this variable will ignore the psi4
-        global guess setting; (2) if you use this variable, make sure you are
+        guess setting; (2) if you use this variable, make sure you are
         passing a reasonable guess wfn to the function. This function does not
         check the validity the input.
     losc_ref_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
@@ -75,8 +75,7 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
 
     Notes
     -----
-    1. This function only relies on the GLOBAL settings in psi4, NOT any local
-    settings for any psi4 modules!
+    1. The option settins are handled by psi4 SCF module.
 
     2. For the updated matrices/vectors in returned wfn (such as C, D, F matrices),
     although psi4.wfn objects provide interface to interact with the internal
@@ -113,19 +112,23 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         D[:] = np.einsum('i,ui,vi->uv', np.asarray(occ_val), Cocc, Cocc,
                          optimize=True)
 
+    optstash = psi4.driver.p4util.OptionsState(
+        ['SCF', 'REFERENCE'],
+        ['SCF', 'PRINT'])
+
     local_print = utils.init_local_print(verbose)
 
-    # If we do DFT, we the global reference should be either 'rks' or 'uks'.
+    # If we do DFT, we the reference should be either 'rks' or 'uks'.
     # Using 'rhf` or `uhf` for DFT calculation will lead to error in
     # psi4.core.HF constructor.
     is_hf = True
     if name.upper() not in ['HF', 'SCF']:
         is_hf = False
-        reference = psi4.core.get_global_option('REFERENCE')
+        reference = psi4.core.get_option('SCF', 'REFERENCE')
         if reference == 'RHF':
-            psi4.set_options({'reference': 'rks'})
+            psi4.core.set_local_option('SCF', 'REFERENCE', 'RKS')
         elif reference == 'UHF':
-            psi4.set_options({'reference': 'uks'})
+            psi4.core.set_local_option('SCF', 'REFERENCE', 'UKS')
 
     mol = psi4.core.get_active_molecule()
     # print out molecule information
@@ -161,14 +164,14 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         local_print(1, "             by Yuncai Mei")
         local_print(1, "---------------------------------------")
 
-    # Get global settings
-    maxiter = psi4.core.get_global_option('MAXITER')
-    E_conv = psi4.core.get_global_option('E_CONVERGENCE')
-    D_conv = psi4.core.get_global_option('D_CONVERGENCE')
-    reference = psi4.core.get_global_option('REFERENCE')
-    is_diis_rms = psi4.core.get_global_option('DIIS_RMS_ERROR')
-    is_dfjk = psi4.core.get_global_option('SCF_TYPE').endswith('DF')
-    basis = psi4.core.get_global_option('BASIS')
+    # Get psi4 settings
+    maxiter = psi4.core.get_option('SCF', 'MAXITER')
+    E_conv = psi4.core.get_option('SCF', 'E_CONVERGENCE')
+    D_conv = psi4.core.get_option('SCF', 'D_CONVERGENCE')
+    reference = psi4.core.get_option('SCF', 'REFERENCE')
+    is_diis_rms = psi4.core.get_option('SCF', 'DIIS_RMS_ERROR')
+    is_dfjk = psi4.core.get_option('SCF', 'SCF_TYPE').endswith('DF')
+    basis = psi4.core.get_option('SCF', 'BASIS')
     local_print(1, '\n==> SCF settings <==')
     local_print(1, f'Reference: {reference}')
     local_print(1, f'Basis set: {basis}')
@@ -183,7 +186,6 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
     optstash = psi4.driver.p4util.OptionsState(
         ['SCF', 'PRINT'])
     psi4.core.set_local_option('SCF', 'PRINT', 0)
-    psi4.core.set_global_option('PRINT', 0)
     wfn = psi4.core.Wavefunction.build(mol, basis)
     wfn = psi4.proc.scf_wavefunction_factory(name, wfn, reference)
 
@@ -487,8 +489,8 @@ def scf(name, guess_wfn=None, occ={}, verbose=1, orbital_energy_unit='eV'):
     guess_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
         The wfn used to set the initial guess of the SCF calculation. Setting
         this variable will copy the coefficient matrix from `guess_wfn` as the
-        initial SCF guess. Setting this variable will ignore the psi4 global
-        guess setting. If you use this variable, make sure you are passing a
+        initial SCF guess. Setting this variable will ignore the psi4 guess
+        setting. If you use this variable, make sure you are passing a
         reasonable guess wfn to the function. This function does not validate
         the input `guess_wfn`.
     occ: dict, default to an empty dict.
@@ -560,8 +562,7 @@ def scf(name, guess_wfn=None, occ={}, verbose=1, orbital_energy_unit='eV'):
 
     Notes
     -----
-    1. This function only relies on the GLOBAL settings in psi4, NOT any local
-    settings for any psi4 modules!
+    1. The option settings are handeld by psi4 SCF module.
 
     2. There are double memory cost for all the updated matrices/vectors in
     the returned wfn (such as C, D, F matrices): one is for the allocation in
@@ -633,8 +634,7 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
 
     Notes
     -----
-    1. This function only relies on the GLOBAL settings in psi4, NOT any local
-    settings for any psi4 modules!
+    1. The option settings are handled by psi4 SCF module.
 
     2. There are double memory cost for all the updated matrices/vectors in
     the returned wfn (such as C, D, F matrices): one is for the allocation in

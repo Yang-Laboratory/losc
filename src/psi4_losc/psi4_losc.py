@@ -36,11 +36,11 @@ def _validate_dfa_wfn(dfa_wfn):
     # check symmetry
     if dfa_wfn.molecule().schoenflies_symbol() != 'c1':
         raise ValidationError('LOSC only supports C1 symmetry')
-    ## check spin
-    #is_rks = psi4.core.get_local_option('SCF', 'REFERENCE') in ['RKS', 'RHF']
-    #is_rks_wfn = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
-    #if is_rks != is_rks_wfn:
-    #    raise Exception('Reference in passed wfn is different to psi4 reference setting.')
+    # check spin
+    is_rks = psi4.core.get_option('SCF', 'REFERENCE') in ['RKS', 'RHF']
+    is_rks_wfn = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
+    if is_rks != is_rks_wfn:
+        raise Exception('Reference in passed wfn is different to psi4 reference setting.')
     # check super functional
     supfunc = dfa_wfn.functional()
     if supfunc.is_x_lrc():
