@@ -19,8 +19,8 @@ from psi4_losc import jk
 from qcelemental import constants
 
 
-def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
-         verbose=1, orbital_energy_unit='eV'):
+def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
+         dfa_info=None, occ={}, verbose=1, orbital_energy_unit='eV'):
     """
     Perform the SCF (normal SCF-DFA or SCF-LOSC-DFA) calculation for general
     systems.
@@ -41,6 +41,10 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     losc_ref_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
         The wfn used to do SCF-LOSC (frozen-LO) calculation. This variable is
         the flag to trigger SCF-LOSC (frozen-LO) calculation.
+    curvature: [np.array, ...]
+        The LOSC curvature matrix.
+    C_lo: [np.array, ...]
+        The LOSC LO coefficient matrix.
     dfa_info: py_losc.DFAInfo, default to None.
         DFA information of the weights of exchanges.
     occ: dict, default to an empty dict.
@@ -109,10 +113,7 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
         D[:] = np.einsum('i,ui,vi->uv', np.asarray(occ_val), Cocc, Cocc,
                          optimize=True)
 
-    def local_print(level, *args):
-        if verbose >= level:
-            t = [f'{i}' for i in args]
-            psi4.core.print_out(f'{" ".join(t)}\n')
+    local_print = utils.init_local_print(verbose)
 
     # If we do DFT, we the global reference should be either 'rks' or 'uks'.
     # Using 'rhf` or `uhf` for DFT calculation will lead to error in
@@ -144,9 +145,10 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, dfa_info=None, occ={},
     if losc_ref_wfn:
         if not dfa_info:
             raise Exception("SCF-LOSC miss argument: dfa_info.")
-        occ = losc_ref_wfn.losc_data['occ']
-        C_lo = losc_ref_wfn.losc_data['C_lo']
-        curvature = losc_ref_wfn.losc_data['curvature']
+        if not curvature:
+            raise Exception("SCF-LOSC miss argument: curvature.")
+        if not C_lo:
+            raise Exception("SCF-LOSC miss argument: C_lo.")
 
     if losc_ref_wfn:
         local_print(1, "---------------------------------------")
@@ -553,14 +555,8 @@ def scf(name, guess_wfn=None, occ={}, verbose=1, orbital_energy_unit='eV'):
         2. Other members are not touched. Accessing and using other members
         in the returned wfn may be a undefined behavior.
 
-        3. A new attributes will be added into the returned wfn object:
-            losc_data: dict
-                The data that can be used for post-SCF-LOSC and SCF-LOSC
-                calculations.
-                losc_data['occ']: dict
-                    The occupation information that is copied from the input
-                    `occ`. See `psi4_losc.scf()` for detailed description of
-                    occupation information.
+        3. The input argument `occ` is added as a new attribute to the returned
+        wfn object as `wfn.losc_data['occ'] = occ`.
 
     Notes
     -----
@@ -587,12 +583,12 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
     This function supports SCF-LOSC (frozen-LO) calculations for integer/fractional
-    systems with aufbau/non-aufbau occupations.
-    If you want to calculate integer system with aufbau occupations, use
-    `psi4.energy()` or `psi4_losc.scf()` to get the `dfa_wfn`.
-    If you want to calculate integer system with non-aufbau occupation, or
-    fractional system with aufbau/non-aufbau occupations, use `psi4_losc.scf()`
-    to get the `dfa_wfn`.
+    systems with aufbau/non-aufbau occupations:
+    (1) If you want to calculate integer system with aufbau occupations, use
+    `psi4.energy()` or `psi4_losc.scf.scf()` to generate the input `dfa_wfn`.
+    (2) If you want to calculate integer system with non-aufbau occupation, or
+    fractional system with aufbau/non-aufbau occupations, use `psi4_losc.scf.scf()`
+    to generate the input `dfa_wfn`.
 
     Parameters
     ----------
@@ -626,21 +622,13 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
         2. Accessing and using other members in the returned wfn is a undefined
         behavior.
 
-        3. A new attributes will be added into the returned wfn object:
-            losc_data: dict
-                The data that can be used for post-SCF-LOSC and SCF-LOSC
-                calculations.
-                losc_data['occ']: dict
-                    The occupation information. See `psi4_losc.scf()` for more
-                    detailed description of occupation information.
-
     See Also
     --------
     py_losc.DFAInfo(): constructor of the DFA information class.
     psi4.energy(): return a DFA SCF wavefunction. psi4.energy() only supports
         calculations for integer systems with aufbau occupations.
-    psi4_losc.scf(): return a DFA SCF wavefunction. psi4_losc.scf() supports
-        calculations for integer/fractional systems with aufbau/non-aufbau
+    psi4_losc.scf.scf(): return a DFA SCF wavefunction. `psi4_losc.scf.scf()`
+        supports calculations for integer/fractional systems with aufbau/non-aufbau
         occupations.
 
     Notes
@@ -655,11 +643,15 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     C++ side code. This is limited by the psi4 core interface. We have to pay
     the price.
     """
-    post_scf_losc(dfa_info, dfa_wfn,
-                  orbital_energy_unit=orbital_energy_unit, verbose=verbose)
+    _, _, losc_data = post_scf_losc(dfa_info, dfa_wfn, verbose=verbose,
+                                    orbital_energy_unit=orbital_energy_unit,
+                                    return_losc_data=True)
     dfa_name = dfa_wfn.functional().name()
-    wfn = _scf(dfa_name, losc_ref_wfn=dfa_wfn, dfa_info=dfa_info,
+    occ = {}
+    if hasattr(dfa_wfn, 'losc_data'):
+        occ = dfa_wfn.losc_data['occ']
+    wfn = _scf(dfa_name, occ=occ, losc_ref_wfn=dfa_wfn, dfa_info=dfa_info,
+               curvature=losc_data['curvature'], C_lo=losc_data['C_lo'],
                orbital_energy_unit=orbital_energy_unit, verbose=verbose)
-    wfn.losc_data = {'occ': dfa_wfn.losc_data['occ'].copy()}
 
     return wfn

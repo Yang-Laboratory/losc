@@ -30,10 +30,18 @@ PBE0 = py_losc.DFAInfo(0.75, 0.25, 'PBE0')
 
 def _validate_dfa_wfn(dfa_wfn):
     "Validate the input dfa wavefunction for the LOSC calculation."
+    # check type
     if not isinstance(dfa_wfn, psi4.core.HF):
         raise ValidationError('Not a psi4.core.HF object.')
+    # check symmetry
     if dfa_wfn.molecule().schoenflies_symbol() != 'c1':
         raise ValidationError('LOSC only supports C1 symmetry')
+    ## check spin
+    #is_rks = psi4.core.get_local_option('SCF', 'REFERENCE') in ['RKS', 'RHF']
+    #is_rks_wfn = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
+    #if is_rks != is_rks_wfn:
+    #    raise Exception('Reference in passed wfn is different to psi4 reference setting.')
+    # check super functional
     supfunc = dfa_wfn.functional()
     if supfunc.is_x_lrc():
         raise ValidationError(
@@ -45,25 +53,25 @@ def _validate_dfa_wfn(dfa_wfn):
         raise ValidationError('Sorry, LOSC does not support meta-GGA.')
 
 
-def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
+def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
+                  return_losc_data = False):
     """
     Perform the post-SCF-LOSC calculation based on a DFA wavefunction.
 
     This function supports post-SCF LOSC calculations for integer/fractional
-    systems with aufbau/non-aufbau occupations.
-    If you want to calculate integer system with aufbau occupations, use
-    `psi4.energy()` or `psi4_losc.scf()` to get the `dfa_wfn`.
-    If you want to calculate integer system with non-aufbau occupation, or
-    fractional system with aufbau/non-aufbau occupations, use `psi4_losc.scf()`
-    to get the `dfa_wfn`.
+    systems with aufbau/non-aufbau occupations:
+    (1) If you want to calculate integer system with aufbau occupations, use
+    `psi4.energy()` to get the input `dfa_wfn`.
+    (2) If you want to calculate integer/non-aufbau system or fractional system
+    (either aufbau or non-aufbau occupation), use `psi4_losc.scf.scf()`
+    to get the input `dfa_wfn`.
 
     Parameters
     ----------
     dfa_info: py_losc.DFAInfo
         The information of the parent DFA, including the weights of exchanges.
     dfa_wfn: psi4.core.HF
-        The converged wavefunction from a parent DFA. At return, it will have
-        some new dynamic attributes. See the notes.
+        The converged wavefunction from a parent DFA.
     orbital_energy_unit: str, default to 'eV'
         The units of orbital energies used to print in the output.
         Valid choices are ['au', 'eV'].
@@ -72,23 +80,29 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     verbose: int, default to 1
         print level. 0 means print nothing. 1 means normal print level. A larger
         number means more details.
+    return_losc_data: bool, default to false.
+        Return the data of LOSC or not.
 
     Returns
     -------
     energy: float
         The total energy of LOSC-DFA.
-    eig: [[float, ...], ...], shape=(nspin, nbasis).
-        The orbital energies from LOSC-DFA. nspin=1 if it is RKS and nspin=2
-        if it is UKS.
+    eig: [np.array, ...]
+        All orbital energies (same number to basis set) from LOSC-DFA. For RKS,
+        It includes alpha orbital energies. For UKS, it includes alpha and beta
+        orbital energies in order.
+    losc_data: dict
+        Returned if `return_losc_data` is true. It contains the data of LOSC
+        calculations.
 
     See Also
     --------
     py_losc.DFAInfo(): constructor of the DFA information class.
     psi4.energy(): return a DFA SCF wavefunction. psi4.energy() only supports
         calculations for integer systems with aufbau occupations.
-    psi4_losc.scf(): return a DFA SCF wavefunction. psi4_losc.scf() supports
-        calculations for integer/fractional systems with aufbau/non-aufbau
-        occupations.
+    psi4_losc.scf.scf(): return a DFA SCF wavefunction. psi4_losc.scf.scf()
+        supports calculations for integer/fractional systems with
+        aufbau/non-aufbau occupations.
 
     Notes
     -----
@@ -96,25 +110,8 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     psi4 superfunctional objects which can be accessed from psi4 wfn. However,
     it looks like psi4 does not support this functionality well. So we require
     the user take the responsibility to construct the py_losc.DFAInfo object
-    manually by himself. We provide several py_losc.DFAInfo objects for common
-    DFAs in this module.
-
-    2. At the return, the attribute of dfa_wfn, `dfa_wfn.losc_data` is updated
-    or created if not exists:
-        dfa_wfn.losc_data: dict
-            The data that can be used for SCF-LOSC (frozen-LO) calculations.
-
-            dfa_wfn.losc_data['occ']: dict
-                The occupation information. See `psi4_losc.scf()`.
-                If It exists, no changes, otherwise, it will be created with
-                an empty dict which represents the aufbau occupation numbers.
-            dfa_wfn.losc_data['curvature']: [np.array, ...]
-                A list (size=1 for RKS and 2 for UKS) of LOSC curvature matrix.
-                It will be created.
-            dfa_wfn.losc_data['C_lo']: [np.array, ...]
-                A list (size=1 for RKS and 2 for UKS) of LOSC LO coefficient
-                matrix. It will be created.
-    This is just for the implementation purpose. Users should not rely on this.
+    manually by himself. We provide several `py_losc.DFAInfo` objects for common
+    DFAs in `psi4_losc` module.
     """
     # sanity-check of input dfa wfn.
     _validate_dfa_wfn(dfa_wfn)
@@ -190,50 +187,47 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
         E_losc[s] = py_losc.energy_correction(curvature[s], local_occ[s])
         # calculate corrected orbital energy from LOSC.
         losc_eigs[s] = np.array(py_losc.orbital_energy_post_scf(
-            H_ao[s], H_losc[s], C_co[s]))
+            H_ao[s], H_losc[s], C_co[s])) * eig_factor
 
     E_losc_tot = 2 * E_losc[0] if nspin == 1 else sum(E_losc)
+    E_losc_dfa_tot = dfa_wfn.energy() + E_losc_tot
     # ====> !!! End of LOSC !!! <====
 
-    # ==> add/update LOSC related attributes to dfa_wfn <==
-    E_losc_dfa_tot = dfa_wfn.energy() + E_losc_tot
-    dfa_eigs = [np.asarray(dfa_wfn.epsilon_a()),
-                np.asarray(dfa_wfn.epsilon_b())]
-    if not hasattr(dfa_wfn, 'losc_data'):
-        dfa_wfn.losc_data = {}
-    if 'occ' not in dfa_wfn.losc_data:
-        dfa_wfn.losc_data['occ'] = {}
-    dfa_wfn.losc_data['losc_type'] = 'post-SCF-LOSC'
-    dfa_wfn.losc_data['orbital_energy_unit'] = orbital_energy_unit
-    dfa_wfn.losc_data['nspin'] = nspin
-    dfa_wfn.losc_data['curvature'] = curvature
-    dfa_wfn.losc_data['C_lo'] = C_lo
-    dfa_wfn.losc_data['dfa_energy'] = dfa_wfn.energy()
-    dfa_wfn.losc_data['dfa_orbital_energy'] = dfa_eigs
-    dfa_wfn.losc_data['losc_energy'] = E_losc_tot
-    dfa_wfn.losc_data['losc_dfa_energy'] = E_losc_tot + dfa_wfn.energy()
-    dfa_wfn.losc_data['losc_dfa_orbital_energy'] = losc_eigs
+    # ==> pack LOSC data into dict <==
+    dfa_eigs = [np.asarray(dfa_wfn.epsilon_a()) * eig_factor,
+                np.asarray(dfa_wfn.epsilon_b()) * eig_factor]
+    occ = {}
+    if hasattr(dfa_wfn, 'losc_data'):
+        occ = dfa_wfn.losc_data.get('occ', {})
+    losc_data = {}
+    losc_data['occ'] = occ
+    losc_data['losc_type'] = 'post-SCF-LOSC'
+    losc_data['orbital_energy_unit'] = orbital_energy_unit
+    losc_data['nspin'] = nspin
+    losc_data['curvature'] = curvature
+    losc_data['C_lo'] = C_lo
+    losc_data['dfa_energy'] = dfa_wfn.energy()
+    losc_data['dfa_orbital_energy'] = dfa_eigs
+    losc_data['losc_energy'] = E_losc_tot
+    losc_data['losc_dfa_energy'] = E_losc_tot + dfa_wfn.energy()
+    losc_data['losc_dfa_orbital_energy'] = losc_eigs
 
     # ==> Print energies to output <==
-    utils.print_total_energies(1, dfa_wfn.losc_data)
-    utils.print_orbital_energies(1, dfa_wfn, dfa_wfn.losc_data)
+    utils.print_total_energies(1, losc_data)
+    utils.print_orbital_energies(1, dfa_wfn, losc_data)
 
-    return E_losc_dfa_tot, [eig * eig_factor for eig in losc_eigs]
+    if return_losc_data:
+        return E_losc_dfa_tot, losc_eigs, losc_data
+    else:
+        return E_losc_dfa_tot, losc_eigs
 
 
 def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     """
     Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
-    This function calls `psi4.energy()` to do the SCF calculation internally.
-    To make the usage of `psi4.energy()` compatible with LOSC calculation,
-    we define the LOSC wavefunction (see `wfn.RLOSC` and `wfn.ULOSC`) that are
-    derived from `psi4.core.RHF` or `psi4.core.UHF`. Simply overwrite several
-    key functions derived from `psi4.core.HF`, we can make `psi4.energy()`
-    function involve the LOSC contributions correctly in the SCF procedure.
-    See `wfn.py`.
-
-    This function does not supports calculations for fractional systems.
+    This function use `psi4.energy()` to do the SCF procedure.
+    This function only supports calculations for integer systems.
 
     Parameters
     ----------
@@ -257,11 +251,12 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
 
     Notes
     -----
-    1. Since `psi4.energy()` is used internally to drive the SCF procedure,
-    ideally, this function supports all the types of SCF calculations that
-    are supported by psi4, such as integer/aufbau systems, MOM calculations.
-    However, this is not fully tested. But for normal SCF, meaning integer
-    and aufbau system, this function works fine.
+    1. The `psi4.energy()` function is used internally to drive the SCF
+    procedure. So, ideally, this function supports all the types of SCF
+    calculations that are supported by psi4, such as integer/aufbau systems,
+    MOM calculations. However, these are not fully tested. But for normal SCF,
+    meaning integer and aufbau system, this function works fine.
+
     2. SCF-LOSC (frozen-LO) requires to use the DFA wfn as the initial guess.
     The psi4 guess setting for SCF will be ignored. To use DFA wfn as the
     initial guess, currently it is limited by `psi4.energy()` interface in
@@ -284,7 +279,9 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     local_print = utils.init_local_print(verbose)
 
     # Do post-SCF-LOSC to build curvature and LO.
-    post_scf_losc(dfa_info, dfa_wfn, verbose=verbose)
+    _, _, losc_data = post_scf_losc(dfa_info, dfa_wfn, verbose=verbose,
+                                    return_losc_data=True,
+                                    orbital_energy_unit=orbital_energy_unit)
 
     # Do SCF-LOSC.
     # Trying to use ref_wfn keyword in psi4.energy(ref_wfn=dfa_wfn) will cause
@@ -315,19 +312,15 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     local_print(1, '')
 
     dfa_name = dfa_wfn.functional().name()
-    _, wfn = psi4.energy(
-        dfa_name, losc_data=dfa_wfn.losc_data, return_wfn=True)
+    _, wfn = psi4.energy(dfa_name, losc_data=losc_data, return_wfn=True)
 
-    losc_data = {}
-    losc_data['occ'] = {}
+    eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
     losc_data['losc_type'] = 'SCF-LOSC'
-    losc_data['orbital_energy_unit'] = orbital_energy_unit
-    losc_data['nspin'] = 1 if wfn.same_a_b_orbs() else 2
-    losc_data['dfa_energy'] = wfn.energy() -wfn.get_energies('LOSC energy')
-    losc_data['dfa_orbital_energy'] = dfa_wfn.losc_data['dfa_orbital_energy']
+    losc_data['dfa_energy'] = wfn.energy() - wfn.get_energies('LOSC energy')
     losc_data['losc_energy'] = wfn.get_energies('LOSC energy')
     losc_data['losc_dfa_energy'] = wfn.energy()
-    losc_data['losc_dfa_orbital_energy'] = [np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b())]
+    losc_data['losc_dfa_orbital_energy'] = [np.asarray(wfn.epsilon_a()) * eig_factor,
+                                            np.asarray(wfn.epsilon_b()) * eig_factor]
 
     # ==> Print energies in LOSC style <==
     utils.print_total_energies(verbose, losc_data)

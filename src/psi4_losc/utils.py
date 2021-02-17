@@ -5,7 +5,6 @@ LOSC implementation with psi4.
 
 import psi4
 import numpy as np
-from qcelemental import constants
 
 
 def _local_print(print_level, verbose_level, *args):
@@ -74,7 +73,6 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
     losc_eigs = losc_data['losc_dfa_orbital_energy']
 
     nbf = wfn.basisset().nbf()
-    eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
     is_rks = True if nspin == 1 else False
     _, occ_idx, occ_val = form_occ(wfn, losc_data['occ'])
     occ_idx_val = [dict(zip(occ_idx[s], occ_val[s])) for s in range(nspin)]
@@ -91,8 +89,7 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
         for i in range(nbf):
             local_print(print_level, "{:<5d}  {:<8.5f}  {:>14.6f} {:>14.6f}"
                         .format(i, occ_idx_val[s].get(i, 0),
-                                dfa_eigs[s][i] * eig_factor,
-                                losc_eigs[s][i] * eig_factor))
+                                dfa_eigs[s][i], losc_eigs[s][i]))
         local_print(print_level, "")
 
 
