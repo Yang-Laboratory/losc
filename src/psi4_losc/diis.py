@@ -1,4 +1,12 @@
-import time
+"""
+DIIS algorithm for SCF procedure implemented with Python.
+
+Notes
+-----
+This DIIS algorithm is used in self-implemented SCF procedure, that is
+`psi4_losc/scf.py` module (not the psi4 SCF procedure).
+"""
+
 import numpy as np
 import psi4
 

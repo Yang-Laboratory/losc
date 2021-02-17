@@ -1,8 +1,12 @@
+"""
+Test code for SCF-LOSC (frozen-LO) calculations.
+"""
+
 import unittest
-from psi4_losc.psi4_losc import scf_losc
-from psi4_losc import psi4_losc
+import psi4_losc
 import psi4
-import numpy as np
+from psi4_losc import scf_losc
+from psi4_losc.scf import scf_losc as my_scf_losc
 
 psi4.core.be_quiet()
 
@@ -65,7 +69,9 @@ class TestSCFLOSCIntegerAufbau(unittest.TestCase):
             print(f'    Test mol {mol.name()}:  dfa={dfa}')
             E_ref, dfa_wfn = psi4.energy(dfa, return_wfn=True)
             E_calc = scf_losc(dfa_info[dfa], dfa_wfn).energy()
+            my_E_calc = my_scf_losc(dfa_info[dfa], dfa_wfn).energy()
             self.assertAlmostEqual(E_ref, E_calc, places=precision)
+            self.assertAlmostEqual(my_E_calc, E_calc, places=precision)
 
     def test_uks_open_shell(self):
         """

@@ -1,8 +1,11 @@
-from numpy.lib.function_base import unwrap
+"""
+JK matrix builder for self-implemented SCF procedure (`psi4_losc/scf.py` module).
+More specifically, it is implemented in order to perform calculations of
+fractional systems.
+"""
+
 import psi4
 import numpy as np
-
-from psi4.driver.driver import optimize
 
 
 class JK_psi4_jk:
@@ -123,7 +126,6 @@ class JK_psi4_mints:
             self._compute_ao_eri_df()
         else:
             raise Exception(f"SCF type not support: {self._algo}")
-
 
     def _compute_ao_eri_direct(self):
         self._uvst = self._mints.ao_eri()

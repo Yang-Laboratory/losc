@@ -1,3 +1,8 @@
+"""
+Psi4_losc package utils, a collection of helper functions to help to integrate
+LOSC implementation with psi4.
+"""
+
 import psi4
 import numpy as np
 

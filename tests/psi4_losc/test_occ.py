@@ -1,9 +1,12 @@
+"""
+Test code related to occupation numbers.
+"""
+
+import psi4
+import unittest
 from psi4_losc.utils import form_occ
 from psi4_losc.utils import is_aufbau_system
 from psi4_losc.utils import is_integer_system
-import psi4
-import unittest
-
 
 class TestFormOcc(unittest.TestCase):
     def setUp(self):

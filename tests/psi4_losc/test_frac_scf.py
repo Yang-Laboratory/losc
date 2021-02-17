@@ -1,12 +1,17 @@
+"""
+Test code for the extended SCF procedure, `psi4_losc.scf.scf()` for fractional
+systems.
+"""
+
 import unittest
-from psi4_losc.psi4_losc import scf
 import psi4
 import numpy as np
+from psi4_losc.scf import scf
 
 psi4.core.be_quiet()
 
 
-class TestSCFFractional(unittest.TestCase):
+class TestSelfSCFFractional(unittest.TestCase):
     def setUp(self):
         self.mol_H = psi4.geometry("""
             0 2

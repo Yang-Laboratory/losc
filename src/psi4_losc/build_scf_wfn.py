@@ -1,13 +1,12 @@
 """
 Import this module will update function `psi4.proc.scf_wavefunction_factory()`
-defined in psi4 to be an extended version. Doing so make using `psi4.energy()`
-compatible with LOSC calculation.
+defined in psi4 to be an extended version. Making such update is to enable
+`psi4.energy()` to be compatible with LOSC calculation.
 """
 
 import psi4
 import psi4_losc
 from psi4 import core
-from psi4_losc import utils
 from psi4.driver.p4util.exceptions import ValidationError
 
 # Function `psi4.proc.scf_wavefunction_factory()` will be extended in this

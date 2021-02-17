@@ -1,14 +1,17 @@
+"""
+Test code for the extended SCF procedure, `psi4_losc.scf.scf()` for integer
+systems.
+"""
+
 import unittest
-from psi4_losc.psi4_losc import scf
 import psi4
-import numpy as np
+from psi4_losc.scf import scf
 
 psi4.core.be_quiet()
 
-
-class TestSCFIntegerAufbau(unittest.TestCase):
+class TestSelfSCFIntegerAufbau(unittest.TestCase):
     """
-    Test `psi4_losc.scf()` for integer systems with aufbau occupations.
+    Test `psi4_losc.scf.scf()` for integer systems with aufbau occupations.
     """
     def setUp(self):
         self.mol_H = psi4.geometry("""
@@ -56,7 +59,7 @@ class TestSCFIntegerAufbau(unittest.TestCase):
 
     def run_mol(self, mol, precision=7):
         """
-        Compare the total energy between `psi4_losc.scf()` and `psi4.energy()`.
+        Compare the total energy between `psi4_losc.scf.scf()` and `psi4.energy()`.
         Three representative DFAs, svwn, blyp and b3lyp, are used for test.
         """
         psi4.core.set_active_molecule(mol)

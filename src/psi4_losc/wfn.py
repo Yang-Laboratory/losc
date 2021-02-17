@@ -1,14 +1,12 @@
 """
-LOSC wavefunction that derived from `psi4.core.RHF` and `psi4.core.UHF`.
-Following methods in `psi4.core.HF` are overwrote to make the direct usage of
-LOSC wavefunction in `psi4.energy()`:
-    `psi4.core.HF.form_F()`: update Fock matrix builder to involve LOSC effects.
-    `psi4.core.HF.compute_E()`: update energy calculator to involve LOSC effects.
+LOSC wavefunction class that are derived from `psi4.core.RHF` and `psi4.core.UHF`.
+With the inheritance of wavefunction class from psi4 and override
+'virtual' functions of `psi4.core.HF` class, it becomes very easy to integrate
+LOSC with psi4.
 """
+
 import psi4
 import numpy as np
-import py_losc
-from psi4_losc import utils
 from py_losc import py_losc
 
 

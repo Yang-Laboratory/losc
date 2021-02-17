@@ -1,11 +1,14 @@
+"""
+Test code for post-SCF-LOSC calculation, `psi4_losc.post_scf_losc()`.
+"""
+
 import unittest
-from psi4_losc.psi4_losc import post_scf_losc
-from psi4_losc import psi4_losc
 import psi4
 import numpy as np
+import psi4_losc
+from psi4_losc import post_scf_losc
 
 psi4.core.be_quiet()
-
 
 class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
     """
