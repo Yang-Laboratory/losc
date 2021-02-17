@@ -6,6 +6,7 @@ defined in psi4 to be an extended version. Making such update is to enable
 
 import psi4
 import psi4_losc
+import psi4_losc.wfn
 from psi4 import core
 from psi4.driver.p4util.exceptions import ValidationError
 

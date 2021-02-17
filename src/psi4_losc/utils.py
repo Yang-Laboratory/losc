@@ -5,6 +5,95 @@ LOSC implementation with psi4.
 
 import psi4
 import numpy as np
+from qcelemental import constants
+
+
+def _local_print(print_level, verbose_level, *args):
+    """
+    Print arguments to psi4 output file when verbose level >= print level.
+
+    Parameters
+    ----------
+    print_level: int
+        The print level.
+    verbose_level: int
+        The verbose level.
+    """
+    if verbose_level >= print_level:
+        t = [f'{i}' for i in args]
+        psi4.core.print_out(f'{" ".join(t)}\n')
+
+
+def init_local_print(verbose_level):
+    """
+    Create a local printer and set its verbose level.
+
+    Parameters
+    ----------
+    verbose_level: int
+        The verbose level that is compared to print level.
+
+    Returns
+    -------
+    local_print: function(print_level, *args)
+        A printer with setting verbose level to be `verbose_level`.
+    """
+    def local_print(print_level, *args):
+        """
+        Print arguments into psi4 output file when verbose level >= print level.
+        The verbose level is initialized at the call of
+        `psi4_losc.utils.init_local_print()`.
+        """
+        _local_print(print_level, verbose_level, *args)
+    return local_print
+
+
+def print_total_energies(verbose_level, losc_data, print_level=1):
+    """
+    Print total energies to pis4 output file. Default print level is 1.
+    """
+    local_print = init_local_print(verbose_level)
+    l = print_level
+    local_print(l, f'\n=> {losc_data["losc_type"]} Energetics <=')
+    local_print(l, 'DFA energy: {:.16f}'.format(losc_data['dfa_energy']))
+    local_print(l, 'LOSC correction energy: {:.16f}'.format(
+        losc_data['losc_energy']))
+    local_print(
+        l, 'LOSC-DFA total energy: {:.16f}'.format(losc_data['losc_dfa_energy']))
+
+
+def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
+    """
+    Print orbital energies to pis4 output file. Default print level is 1.
+    """
+    local_print = init_local_print(verbose_level)
+
+    nspin = losc_data['nspin']
+    orbital_energy_unit = losc_data['orbital_energy_unit']
+    dfa_eigs = losc_data['dfa_orbital_energy']
+    losc_eigs = losc_data['losc_dfa_orbital_energy']
+
+    nbf = wfn.basisset().nbf()
+    eig_factor = 1.0 if orbital_energy_unit == 'au' else constants.hartree2ev
+    is_rks = True if nspin == 1 else False
+    _, occ_idx, occ_val = form_occ(wfn, losc_data['occ'])
+    occ_idx_val = [dict(zip(occ_idx[s], occ_val[s])) for s in range(nspin)]
+
+    local_print(
+        print_level, f'\n=> {losc_data["losc_type"]} Orbital Energies <=')
+    for s in range(nspin):
+        if not is_rks:
+            local_print(
+                print_level, f"{'Alpha' if s == 0 else 'Beta'} orbital energy:")
+        local_print(print_level, "{:<5s}  {:<8s}  {:>14s} {:>14s}"
+                    .format("Index", "Occ", f"DFA ({orbital_energy_unit})",
+                            f"LOSC ({orbital_energy_unit})"))
+        for i in range(nbf):
+            local_print(print_level, "{:<5d}  {:<8.5f}  {:>14.6f} {:>14.6f}"
+                        .format(i, occ_idx_val[s].get(i, 0),
+                                dfa_eigs[s][i] * eig_factor,
+                                losc_eigs[s][i] * eig_factor))
+        local_print(print_level, "")
 
 
 def form_df_basis_matrix(wfn):
@@ -60,7 +149,8 @@ def form_grid_lo(wfn, C_lo):
         grid points, and nlo is the number of LOs.
     """
     if not isinstance(wfn, psi4.core.HF):
-        raise Exception("Unknown type of argument wfn. It has to be the type of psi4.core.HF.")
+        raise Exception(
+            "Unknown type of argument wfn. It has to be the type of psi4.core.HF.")
     # psi4.VBase object to help building grid.
     Vpot = wfn.V_potential()
     # number of grid points
@@ -125,7 +215,8 @@ def form_grid_w(wfn):
     psi4numpy/Tutorials/04_Density_Functional_Theory/4b_LDA_kernel.ipynb
     """
     if not isinstance(wfn, psi4.core.HF):
-        raise Exception("Unknown type of argument wfn. It has to be the type of psi4.core.HF.")
+        raise Exception(
+            "Unknown type of argument wfn. It has to be the type of psi4.core.HF.")
     # psi4.VBase object to help building grid.
     Vpot = wfn.V_potential()
     # number of grid points
@@ -145,6 +236,7 @@ def form_grid_w(wfn):
         npts_count += npoints
 
     return grid_w
+
 
 def form_occ(wfn, occ={}):
     """
@@ -224,28 +316,34 @@ def form_occ(wfn, occ={}):
             if isinstance(orb_i, str):
                 orb_i = orb_i.lower()
                 if orb_i not in ['homo', 'lumo']:
-                    raise Exception(f"unknown customized occupation index: {orb_i}.")
+                    raise Exception(
+                        f"unknown customized occupation index: {orb_i}.")
                 if orb_i == 'homo':
                     orb_i = nelec[s] - 1
                 else:
                     orb_i = nelec[s]
             elif not isinstance(orb_i, int):
-                raise Exception('Orbital index should be either int, "homo" or "lumo".')
+                raise Exception(
+                    'Orbital index should be either int, "homo" or "lumo".')
             if not 0 <= orb_i < nbf:
-                    raise Exception(f"customized occupation index is out-of-range [0, {nbf}): {orb_i}")
+                raise Exception(
+                    f"customized occupation index is out-of-range [0, {nbf}): {orb_i}")
             # check occupation number
             if not 0 <= occ_i <= 1:
-                raise Exception(f"customized occupation number is out-of-range [0, 1]: occ={occ_i}.")
+                raise Exception(
+                    f"customized occupation number is out-of-range [0, 1]: occ={occ_i}.")
             # check if homo and homo_idx appear at the same time:
             if orb_i == nelec[s] - 1:
                 homo_status.append(orb_i)
             if len(homo_status) == 2:
-                raise ValueError("HOMO and HOMO index appear at the same time, which causes ambiguity.")
+                raise ValueError(
+                    "HOMO and HOMO index appear at the same time, which causes ambiguity.")
             # check if lumo and lumo_idx appear at the same time:
             if orb_i == nelec[s]:
                 lumo_status.append(orb_i)
             if len(lumo_status) == 2:
-                raise ValueError("LUMO and LUMO index appear at the same time, which causes ambiguity.")
+                raise ValueError(
+                    "LUMO and LUMO index appear at the same time, which causes ambiguity.")
 
             # update occupation number
             rst_occ[s][orb_i] = occ_i
@@ -272,6 +370,7 @@ def form_occ(wfn, occ={}):
 
     return nocc, occ_idx, occ_val
 
+
 def is_integer_system(wfn, occ={}):
     """
     Check if the wavefunction is an integer system.
@@ -295,6 +394,7 @@ def is_integer_system(wfn, occ={}):
                 return False
     return True
 
+
 def is_aufbau_system(wfn, occ={}):
     """
     Check if the wavefunction is an aufbau system.
@@ -313,13 +413,14 @@ def is_aufbau_system(wfn, occ={}):
     """
     norbs, occ_idx, occ_val = form_occ(wfn, occ=occ)
     nelec = [sum(x) for x in occ_val]
-    occ_idx_val = [list(zip(occ_idx[s], occ_val[s])) for s in range(len(norbs))]
+    occ_idx_val = [list(zip(occ_idx[s], occ_val[s]))
+                   for s in range(len(norbs))]
     for s in range(len(norbs)):
         n_orbitals = norbs[s]
         if n_orbitals > 0:
             highest_orbital_idx = occ_idx_val[s][-1][0]
             electron_number = nelec[s]
-            is_aufbau = (n_orbitals -1 <= electron_number <= n_orbitals and
+            is_aufbau = (n_orbitals - 1 <= electron_number <= n_orbitals and
                          highest_orbital_idx == n_orbitals - 1)
             if not is_aufbau:
                 return False
