@@ -107,8 +107,9 @@ typedef struct LoscCurvatureV1 {
      * // losc_curvature_v1_create function.
      * size_t nbasis = pV1->p_base->nbasis(pV1); // Get number of AOs.
      * size_t nlo = pV1->p_base->nlo(pV1); // Get number of LOs.
-     * losc_matrix *K = losc_matrix_create(nlo, nlo); // allocate curvature matrix.
-     * pV1->p_base(pV1, K); // calculate curvature matrix and store it in K.
+     * losc_matrix *K = losc_matrix_create(nlo, nlo); // allocate curvature
+     * matrix. pV1->p_base(pV1, K); // calculate curvature matrix and store it
+     * in K.
      * @endcode
      *
      * @see
@@ -125,6 +126,11 @@ typedef struct LoscCurvatureV1 {
      * `losc::CurvatureV1` not in its base class) in the future, add the
      * corresponding C interface with new function pointers below.
      */
+
+    /**
+     * @brief Set parameter tau.
+     */
+    void (*set_tau)(const LoscCurvatureV1 *self, double tau);
 } LoscCurvatureV1;
 
 /**
@@ -209,6 +215,16 @@ typedef struct LoscCurvatureV2 {
      * `losc::CurvatureV2` not in its base class) in the future, add the
      * corresponding C interface with new function pointers below.
      */
+
+    /**
+     * @brief Set parameter tau.
+     */
+    void (*set_tau)(const LoscCurvatureV2 *self, double tau);
+
+    /**
+     * @brief Set parameter zeta.
+     */
+    void (*set_zeta)(const LoscCurvatureV2 *self, double zeta);
 } LoscCurvatureV2;
 
 /**

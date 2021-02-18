@@ -228,6 +228,13 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
             curvature_helper = py_losc.CurvatureV2(dfa_info, df_pii[s],
                                                    df_Vpq_inv, grid_lo[s],
                                                    grid_w)
+            curvature_helper.set_tau(options.curvature['v2_parameter_tau'])
+            curvature_helper.set_zeta(options.curvature['v2_parameter_zeta'])
+        elif options.curvature['version'] == 1:
+            curvature_helper = py_losc.CurvatureV1(dfa_info, df_pii[s],
+                                                   df_Vpq_inv, grid_lo[s],
+                                                   grid_w)
+            curvature_helper.set_tau(options.curvature['v1_parameter_tau'])
         else:
             raise Exception('Detect un-supported curvature version.')
         # TODO: add curvature setting options.

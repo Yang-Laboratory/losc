@@ -67,6 +67,12 @@ create_losc_curvature_base(losc::CurvatureBase *_p_base)
 //**********************************************
 // ==> Binding `losc::CurvatureV1` methods.
 //**********************************************
+static void losc_curvature_v1_set_tau(const LoscCurvatureV1 *self, double tau)
+{
+    auto v1 = reinterpret_cast<losc::CurvatureV1*>(self->_p_v1);
+    v1->set_tau(tau);
+}
+
 LoscCurvatureV1 *losc_curvature_v1_create(const LoscDFAInfo *dfa_info,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
@@ -90,6 +96,7 @@ LoscCurvatureV1 *losc_curvature_v1_create(const LoscDFAInfo *dfa_info,
     rst->p_base = create_losc_curvature_base(p_v1);
     // Assign new function pointers here in the future, if we want to export
     // new functions in `losc::CurvatureV1`.
+    rst->set_tau = losc_curvature_v1_set_tau;
     return rst;
 }
 
@@ -111,6 +118,18 @@ void *_losc_curvature_v1_free(LoscCurvatureV1 **pptr_self)
 //**********************************************
 // ==> Binding `losc::CurvatureV2` methods.
 //**********************************************
+static void losc_curvature_v2_set_tau(const LoscCurvatureV2 *self, double tau)
+{
+    auto v2 = reinterpret_cast<losc::CurvatureV2*>(self->_p_v2);
+    v2->set_tau(tau);
+}
+
+static void losc_curvature_v2_set_zeta(const LoscCurvatureV2 *self, double zeta)
+{
+    auto v2 = reinterpret_cast<losc::CurvatureV2*>(self->_p_v2);
+    v2->set_zeta(zeta);
+}
+
 LoscCurvatureV2 *losc_curvature_v2_create(const LoscDFAInfo *dfa_info,
                                           const losc_matrix *df_pii,
                                           const losc_matrix *df_Vpq_inv,
@@ -134,6 +153,8 @@ LoscCurvatureV2 *losc_curvature_v2_create(const LoscDFAInfo *dfa_info,
     rst->p_base = create_losc_curvature_base(p_v2);
     // Assign new function pointers here in the future, if we want to export
     // new functions in `losc::CurvatureV2`.
+    rst->set_tau = losc_curvature_v2_set_tau;
+    rst->set_zeta = losc_curvature_v2_set_zeta;
     return rst;
 }
 

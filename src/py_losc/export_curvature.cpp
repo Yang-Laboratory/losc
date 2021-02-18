@@ -139,9 +139,17 @@ void export_curvature_v1(py::module &m)
                       ConstRefVec &    // grid_weight
                       >(),
              "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
-             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert());
-    // CurvatureV1 class has no new functions compared to CurvatureBase.
-    // So no more functions need to be exported here.
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert())
+        // CurvatureV1 class has no new functions compared to CurvatureBase.
+        // So no more functions need to be exported here.
+
+        // set_tau
+        .def("set_tau", &CurvatureV1::set_tau, R"pddoc(
+            Parameters
+            ----------
+            tau: float
+                The curvature V1 parameter tau.
+            )pddoc");
 }
 
 void export_curvature_v2(py::module &m)
@@ -157,7 +165,21 @@ void export_curvature_v2(py::module &m)
                       ConstRefVec &    // grid_weight
                       >(),
              "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
-             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert());
-    // CurvatureV2 class has no new functions compared to CurvatureBase.
-    // So no more functions need to be exported here.
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert())
+        // CurvatureV2 class has no new functions compared to CurvatureBase.
+        // So no more functions need to be exported here.
+
+        // set_tau
+        .def("set_tau", &CurvatureV2::set_tau, R"pddoc(
+            Parameters
+            ----------
+            tau: float
+                The curvature V2 parameter tau.
+            )pddoc")
+        .def("set_zeta", &CurvatureV2::set_zeta, R"pddoc(
+            Parameters
+            ----------
+            zeta: float
+                The curvature V2 parameter zeta.
+            )pddoc");
 }

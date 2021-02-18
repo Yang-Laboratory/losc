@@ -7,6 +7,9 @@ from psi4_losc import utils
 # ==> The LOSC curvature options <==
 curvature = {
     'version': 2,
+    'v1_parameter_tau': 1.2378,
+    'v2_parameter_tau': 1.2378,
+    'v2_parameter_zeta': 8.0,
 }
 
 

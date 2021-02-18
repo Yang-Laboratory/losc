@@ -204,6 +204,11 @@ class CurvatureV1 : public CurvatureBase {
      * losc::CurvatureBase::C_API_kappa(): calculate curvature matrix.
      */
     virtual void C_API_kappa(RefMat K) const override;
+
+    /**
+     * @brief Set parameter tau.
+     */
+    void set_tau(double tau) { tau_ = tau; }
 };
 
 /**
@@ -259,6 +264,16 @@ class CurvatureV2 : public CurvatureBase {
      * losc::CurvatureBase::C_API_kappa(): calculate curvature matrix.
      */
     virtual void C_API_kappa(RefMat K) const override;
+
+    /**
+     * @brief Set parameter tau.
+     */
+    void set_tau(double tau) { tau_ = tau; }
+
+    /**
+     * @brief Set parameter zeta.
+     */
+    void set_zeta(double zeta) { zeta_ = zeta; }
 };
 
 /**

@@ -100,7 +100,6 @@ class TestSelfSCFFractional(unittest.TestCase):
         psi4.core.set_local_option('SCF', 'REFERENCE', 'UHF')
 
         name = 'hf'
-        psi4.core.set_output_file('t', False)
         E_0 = scf(name, occ={'alpha': {'homo': 0}}).energy()
         E_1 = scf(name, occ={'alpha': {'homo': 1}}).energy()
 
