@@ -12,6 +12,7 @@ import psi4
 import numpy as np
 from py_losc import py_losc
 from psi4_losc import utils
+import psi4_losc.options as options
 from psi4.driver.p4util.exceptions import ValidationError
 from pkg_resources import parse_version
 from qcelemental import constants
@@ -54,7 +55,8 @@ def _validate_dfa_wfn(dfa_wfn):
 
 
 def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
-                  return_losc_data = False):
+                  return_losc_data = False,
+                  window = None):
     """
     Perform the post-SCF-LOSC calculation based on a DFA wavefunction.
 
@@ -82,6 +84,10 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         number means more details.
     return_losc_data: bool, default to false.
         Return the data of LOSC or not.
+    window: [float, float], default to None.
+        The orbital energy window in eV to select COs to do localization.
+        Select all COs whose energies are in the window. Default to None which
+        means dismiss the window setting and use all COs to do localization.
 
     Returns
     -------
@@ -129,6 +135,14 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     is_rks = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
     nspin = 1 if is_rks else 2
 
+    # Need real number of electrons. Cannot rely on `wfn.nalpha()` and
+    # `wfn.nbeta()`, because `post_scf_losc()` can support fractional systems.
+    occ = {}
+    if hasattr(dfa_wfn, 'losc_data'):
+        occ = dfa_wfn.losc_data['occ']
+    _, _, occ_val = utils.form_occ(dfa_wfn, occ)
+    nelec = [sum(x) for x in occ_val]
+
     # map needed matrices to DFA wfn.
     C_co = [np.asarray(dfa_wfn.Ca()), np.asarray(dfa_wfn.Cb())]
     H_ao = [np.asarray(dfa_wfn.Fa()), np.asarray(dfa_wfn.Fb())]
@@ -137,11 +151,57 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     D = [np.asarray(dfa_wfn.Da()), np.asarray(dfa_wfn.Db())]
 
     # ====> !!! Start of LOSC !!! <====
+    if verbose >= 1:
+        options.show_options()
     # ==> LOSC localization <==
+    def select_CO(wfn, spin, window):
+        """Return the CO index bounds."""
+        eig = [np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b())][spin]
+        nbf = wfn.basisset().nbf()
+        # return all COs.
+        if not window or nelec[spin] == 0:
+            return None
+        # select COs
+        if len(window) != 2:
+            raise Exception('Invalid LOSC window: wrong size of window.')
+        if window[0] >= window[1]:
+            raise ValueError('Invalid LOS window: left bound >= right bound.')
+        idx_start = next(filter(lambda x: x[1] * constants.hartree2ev >= window[0], enumerate(eig)), [nbf])[0]
+        idx_end = next(filter(lambda x: x[1] * constants.hartree2ev >= window[1], enumerate(eig)), [nbf])[0]
+        if idx_end - idx_start <= 0:
+            raise Exception('LOSC window is too tight. No COs selected to do LOSC localization.')
+        return (idx_start, idx_end)
+
+    # Get selected COs index from the window setting.
+    local_print(1, '\n==> LOSC Localization Window <==')
+    selected_co_idx = [None] * nspin
+    for s in range(nspin):
+        idx = select_CO(dfa_wfn, s, window)
+        if not idx:
+            local_print(1, f'localization COs index (spin={s}): ALL COs')
+        else:
+            local_print(1, f'localization COs index (spin={s}): [{idx[0]}, {idx[1]})')
+        selected_co_idx[s] = idx
+    local_print(1, '')
+
     C_lo = [None] * nspin
     for s in range(nspin):
+        # Get selected COs.
+        if selected_co_idx[s]:
+            idx_start, idx_end = selected_co_idx[s]
+            C_co_used = C_co[s][:, list(range(idx_start, idx_end))]
+        else:
+            C_co_used = C_co[s]
         # create losc localizer object
-        localizer = py_losc.LocalizerV2(C_co[s], H_ao[s], D_ao)
+        if options.localization['version'] == 2:
+            localizer = py_losc.LocalizerV2(C_co_used, H_ao[s], D_ao)
+            localizer.set_c(options.localization['v2_parameter_c'])
+            localizer.set_gamma(options.localization['v2_parameter_gamma'])
+        else:
+            raise Exception('Detect non-supporting localization version.')
+        localizer.set_max_iter(options.localization['max_iter'])
+        localizer.set_convergence(options.localization['convergence'])
+        localizer.set_random_permutation(options.localization['random_permutation'])
         # compute LOs
         C_lo[s] = localizer.lo()
 
@@ -164,8 +224,13 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     curvature = [None] * nspin
     for s in range(nspin):
         # build losc curvature matrix
-        curvature_helper = py_losc.CurvatureV2(
-            dfa_info, df_pii[s], df_Vpq_inv, grid_lo[s], grid_w)
+        if options.curvature['version'] == 2:
+            curvature_helper = py_losc.CurvatureV2(dfa_info, df_pii[s],
+                                                   df_Vpq_inv, grid_lo[s],
+                                                   grid_w)
+        else:
+            raise Exception('Detect un-supported curvature version.')
+        # TODO: add curvature setting options.
         curvature[s] = curvature_helper.kappa()
 
     # ==> LOSC local occupation matrix <==
@@ -189,7 +254,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         losc_eigs[s] = np.array(py_losc.orbital_energy_post_scf(
             H_ao[s], H_losc[s], C_co[s])) * eig_factor
 
-    E_losc_tot = 2 * E_losc[0] if nspin == 1 else sum(E_losc)
+    E_losc_tot = 2 * E_losc[0] if is_rks else sum(E_losc)
     E_losc_dfa_tot = dfa_wfn.energy() + E_losc_tot
     # ====> !!! End of LOSC !!! <====
 

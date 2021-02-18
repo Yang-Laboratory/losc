@@ -67,7 +67,9 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
             print(f'    Test mol {mol.name()}:  dfa={dfa}')
             E_ref, dfa_wfn = psi4.energy(dfa, return_wfn=True)
             E_calc, _ = post_scf_losc(dfa_info[dfa], dfa_wfn)
+            E_calc_2, _ = post_scf_losc(dfa_info[dfa], dfa_wfn, window=[-30, 10])
             self.assertAlmostEqual(E_ref, E_calc, places=precision)
+            self.assertAlmostEqual(E_ref, E_calc_2, places=precision)
 
     def run_mol_correction(self, mol, E_ref, precision=4):
         """
