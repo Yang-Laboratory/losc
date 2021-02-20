@@ -144,9 +144,10 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     nelec = [sum(x) for x in occ_val]
 
     # map needed matrices to DFA wfn.
+    mintshelper = psi4.core.MintsHelper(dfa_wfn.basisset())
     C_co = [np.asarray(dfa_wfn.Ca()), np.asarray(dfa_wfn.Cb())]
     H_ao = [np.asarray(dfa_wfn.Fa()), np.asarray(dfa_wfn.Fb())]
-    D_ao = [np.asarray(m) for m in dfa_wfn.mintshelper().ao_dipole()]
+    D_ao = [np.asarray(m) for m in mintshelper.ao_dipole()]
     S = np.asarray(dfa_wfn.S())
     D = [np.asarray(dfa_wfn.Da()), np.asarray(dfa_wfn.Db())]
 

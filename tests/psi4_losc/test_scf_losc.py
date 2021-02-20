@@ -72,6 +72,7 @@ class TestSCFLOSCIntegerAufbau(unittest.TestCase):
             my_E_calc = my_scf_losc(dfa_info[dfa], dfa_wfn).energy()
             self.assertAlmostEqual(E_ref, E_calc, places=precision)
             self.assertAlmostEqual(my_E_calc, E_calc, places=precision)
+        psi4.core.clean()
 
     def test_uks_open_shell(self):
         """

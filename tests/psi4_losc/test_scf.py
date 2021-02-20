@@ -68,6 +68,7 @@ class TestSelfSCFIntegerAufbau(unittest.TestCase):
             E_ref = psi4.energy(dfa)
             wfn = scf(dfa)
             self.assertAlmostEqual(E_ref, wfn.energy(), places=precision)
+        psi4.core.clean()
 
     def test_H_plus(self):
         """

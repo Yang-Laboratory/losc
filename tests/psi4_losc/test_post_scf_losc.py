@@ -83,6 +83,7 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
         E_calc, _ = post_scf_losc(psi4_losc.B3LYP, dfa_wfn)
         print(f'    Test mol {mol.name()}:  dfa=b3lyp, E_losc={E_calc}')
         self.assertAlmostEqual(E_ref, E_calc, places=precision)
+        psi4.core.clean()
 
     def test_uks_open_shell(self):
         """

@@ -188,6 +188,7 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
     psi4.core.set_local_option('SCF', 'PRINT', 0)
     wfn = psi4.core.Wavefunction.build(mol, basis)
     wfn = psi4.proc.scf_wavefunction_factory(name, wfn, reference)
+    mintshelper = psi4.core.MintsHelper(wfn.basisset())
 
     supfunc = wfn.functional()
     nbf = wfn.basisset().nbf()
@@ -225,12 +226,13 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         S = np.asarray(guess_wfn.S())
         H = np.asarray(guess_wfn.H())
     else:
-        S = np.asarray(wfn.mintshelper().ao_overlap())
-        V = np.asarray(wfn.mintshelper().ao_potential())
+        S = np.asarray(mintshelper.ao_overlap())
+        V = np.asarray(mintshelper.ao_potential())
         if losc_ref_wfn:
-            T = np.asarray(wfn.mintshelper().ao_kinetic())
+            T = np.asarray(mintshelper.ao_kinetic())
             H = V + T
         else:
+            mintshelper.one_electron_integrals()
             wfn.form_H()
             H = np.array(wfn.H())
     # S^(-1/2)
