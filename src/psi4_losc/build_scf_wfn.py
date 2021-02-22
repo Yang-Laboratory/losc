@@ -5,129 +5,60 @@ defined in psi4 to be an extended version. Making such update is to enable
 """
 
 import psi4
-import psi4_losc
-import psi4_losc.wfn
-from psi4 import core
-from psi4.driver.p4util.exceptions import ValidationError
-from psi4.driver import dft
+import numpy as np
+from py_losc import py_losc
 
 # Function `psi4.proc.scf_wavefunction_factory()` will be extended in this
 # module. Here, we save the original one first.
 _psi4_scf_wavefunction_factory = psi4.driver.scf_wavefunction_factory
 
 
-def _scf_wavefunction_factory_losc(name, ref_wfn, reference, **kwargs):
+def _to_losc_wfn(wfn):
     """
-    Build an SCF wavefunction for SCF-LOSC. This function is modified on the
-    basis of `psi4.proc.scf_wavefunction_factory()`.
+    Update psi4 wfn methods to have LOSC contributions by overriding some
+    key functions.
     """
-    losc_data = kwargs.get('losc_data', {})
+    self = wfn
+    original_form_F = self.form_F
+    origninal_compute_E = self.compute_E
+    nspin = 1 if wfn.same_a_b_orbs() and wfn.same_a_b_dens() else 2
 
-    if core.has_option_changed("SCF", "DFT_DISPERSION_PARAMETERS"):
-        modified_disp_params = core.get_option("SCF", "DFT_DISPERSION_PARAMETERS")
-    else:
-        modified_disp_params = None
+    def form_F():
+        # Build DFA Fock matrix. This will update `wfn.Fa()` and `wfn.Fb()`.
+        original_form_F()
 
-    # Figure out functional
-    superfunc, disp_type = dft.build_superfunctional(name, (reference in ["RKS", "RHF"]))
+        # ==> LOSC contributions <==
+        # 1. Build LOSC effective Hamiltonian and add it to internal
+        # wavefunction Fock matrix.
+        # 2. Build LOSC correction to total energy
+        S = np.asarray(self.S())
+        D = [np.asarray(self.Da()), np.asarray(self.Db())]
+        F = [np.asarray(self.Fa()), np.asarray(self.Fb())]
+        self._E_losc = 0
+        for s in range(nspin):
+            # build LOSC local occupation matrix
+            local_occ = py_losc.local_occupation(self._C_lo[s], S, D[s])
+            # build LOSC effective Fock matrix
+            H_losc = py_losc.ao_hamiltonian_correction(
+                S, self._C_lo[s], self._curvature[s], local_occ)
+            F[s][:] += H_losc
+            # form LOSC energy correction
+            self._E_losc += py_losc.energy_correction(
+                self._curvature[s], local_occ)
+        if nspin == 1:
+            self._E_losc *= 2
 
-    # Build the wavefunction
-    psi4.core.prepare_options_for_module("SCF")
-    # Do SCF-LOSC: build LOSC wavefunction.
-    if not losc_data:
-        raise Exception('need LOSC data to build LOSC class.')
-    curvature = losc_data.get('curvature', [])
-    C_lo = losc_data.get('C_lo', [])
-    if not curvature:
-        raise Exception('need LOSC curvature matrix to build LOSC class.')
-    if not C_lo:
-        raise Exception('need LOSC localized orbital to build LOSC class.')
+    def compute_E():
+        # Compute DFA total energy
+        E_dfa = origninal_compute_E()
+        # Add LOSC energy. Register LOSC energy into wfn energetics table.
+        self.set_energies('LOSC energy', self._E_losc)
+        E_tot = E_dfa + self._E_losc
+        return E_tot
 
-    # restricted
-    if reference in ["RHF", "RKS"]:
-        if len(curvature) != 1 or len(C_lo) != 1:
-            raise Exception(
-                'restricted case: size of curvature or C_lo is not 1.')
-        wfn = psi4_losc.wfn.RLOSC(ref_wfn, superfunc, curvature, C_lo)
-    # unrestricted
-    elif reference in ['UHF', 'UKS']:
-        if len(curvature) != 2 or len(C_lo) != 2:
-            raise Exception(
-                'unrestricted case: size of curvature or C_lo is not 2.')
-        wfn = psi4_losc.wfn.ULOSC(ref_wfn, superfunc, curvature, C_lo)
-    # error reference
-    else:
-        raise ValidationError(
-            f"reference ({reference}) not supported for LOSC wavefunction.")
-
-    if disp_type:
-        if isinstance(name, dict):
-            # user dft_functional={} spec - type for lookup, dict val for param defs,
-            #   name & citation discarded so only param matches to existing defs will print labels
-            wfn._disp_functor = empirical_dispersion.EmpiricalDispersion(
-                name_hint='',
-                level_hint=disp_type["type"],
-                param_tweaks=disp_type["params"],
-                engine=kwargs.get('engine', None))
-        else:
-            # dft/*functionals.py spec - name & type for lookup, option val for param tweaks
-            wfn._disp_functor = empirical_dispersion.EmpiricalDispersion(
-                name_hint=superfunc.name(),
-                level_hint=disp_type["type"],
-                param_tweaks=modified_disp_params,
-                engine=kwargs.get('engine', None))
-
-        # [Aug 2018] there once was a breed of `disp_type` that quacked
-        #   like a list rather than the more common dict handled above. if
-        #   ever again sighted, make an issue so this code can accommodate.
-
-        wfn._disp_functor.print_out()
-        if disp_type["type"] == 'nl':
-            del wfn._disp_functor
-
-    # Set the DF basis sets
-    if (("DF" in core.get_global_option("SCF_TYPE")) or
-            (core.get_option("SCF", "DF_SCF_GUESS") and (core.get_global_option("SCF_TYPE") == "DIRECT"))):
-        aux_basis = core.BasisSet.build(wfn.molecule(), "DF_BASIS_SCF",
-                                        core.get_option("SCF", "DF_BASIS_SCF"),
-                                        "JKFIT", core.get_global_option('BASIS'),
-                                        puream=wfn.basisset().has_puream())
-        wfn.set_basisset("DF_BASIS_SCF", aux_basis)
-    else:
-        wfn.set_basisset("DF_BASIS_SCF", core.BasisSet.zero_ao_basis_set())
-
-    # Set the relativistic basis sets
-    if core.get_global_option("RELATIVISTIC") in ["X2C", "DKH"]:
-        decon_basis = core.BasisSet.build(wfn.molecule(), "BASIS_RELATIVISTIC",
-                                        core.get_option("SCF", "BASIS_RELATIVISTIC"),
-                                        "DECON", core.get_global_option('BASIS'),
-                                        puream=wfn.basisset().has_puream())
-        wfn.set_basisset("BASIS_RELATIVISTIC", decon_basis)
-
-    # Set the multitude of SAD basis sets
-    if (core.get_option("SCF", "GUESS") == "SAD" or core.get_option("SCF", "GUESS") == "HUCKEL"):
-        sad_basis_list = core.BasisSet.build(wfn.molecule(), "ORBITAL",
-                                             core.get_global_option("BASIS"),
-                                             puream=wfn.basisset().has_puream(),
-                                             return_atomlist=True)
-        wfn.set_sad_basissets(sad_basis_list)
-
-        if ("DF" in core.get_option("SCF", "SAD_SCF_TYPE")):
-            # We need to force this to spherical regardless of any user or other demands.
-            optstash = p4util.OptionsState(['PUREAM'])
-            core.set_global_option('PUREAM', True)
-            sad_fitting_list = core.BasisSet.build(wfn.molecule(), "DF_BASIS_SAD",
-                                                   core.get_option("SCF", "DF_BASIS_SAD"),
-                                                   puream=True,
-                                                   return_atomlist=True)
-            wfn.set_sad_fitting_basissets(sad_fitting_list)
-            optstash.restore()
-
-    # Deal with the EXTERN issues
-    if hasattr(core, "EXTERN"):
-        wfn.set_external_potential(core.EXTERN)
-
-    return wfn
+    # override wfn methods.
+    self.form_F = form_F
+    self.compute_E = compute_E
 
 
 def _scf_wavefunction_factory_extended_version(name, ref_wfn, reference, **kwargs):
@@ -135,16 +66,37 @@ def _scf_wavefunction_factory_extended_version(name, ref_wfn, reference, **kwarg
     Build an SCF wavefunction. This is the extended version for
     `psi4.proc.scf_wavefunction_factory()`.
     """
+    # build psi4 SCF wfn.
     reference = reference.upper()
+    wfn = _psi4_scf_wavefunction_factory(name, ref_wfn, reference, **kwargs)
+
+    # update to LOSC wavefunction behavior if it is necessary.
     losc_data = kwargs.get('losc_data', {})
-    # psi4 default wavefunction: integer and aufbau system
-    if not losc_data:
-        wfn = _psi4_scf_wavefunction_factory(
-            name, ref_wfn, reference, **kwargs)
-    # LOSC wavefunction or wavefunction with customized occupation numbers.
-    else:
-        wfn = _scf_wavefunction_factory_losc(
-            name, ref_wfn, reference, **kwargs)
+    if losc_data:
+        # same sanity checks
+        curvature = losc_data.get('curvature', [])
+        C_lo = losc_data.get('C_lo', [])
+        if not curvature:
+            raise Exception('need LOSC curvature matrix to build LOSC class.')
+        if not C_lo:
+            raise Exception('need LOSC localized orbital to build LOSC class.')
+        # restricted
+        if reference in ["RHF", "RKS"]:
+            if len(curvature) != 1 or len(C_lo) != 1:
+                raise Exception(
+                    'restricted case: size of curvature or C_lo is not 1.')
+        # unrestricted
+        elif reference in ['UHF', 'UKS']:
+            if len(curvature) != 2 or len(C_lo) != 2:
+                raise Exception(
+                    'unrestricted case: size of curvature or C_lo is not 2.')
+        # error reference
+        else:
+            raise Exception(
+                f"reference ({reference}) not supported for LOSC wavefunction.")
+
+        # update to losc wfn.
+        _to_losc_wfn(wfn)
     return wfn
 
 

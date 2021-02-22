@@ -10,17 +10,10 @@ you can use the extended SCF procedure provided in `psi4_losc/scf.py` module.
 
 import psi4
 import numpy as np
+import psi4_losc.options as options
 from py_losc import py_losc
 from psi4_losc import utils
-import psi4_losc.options as options
-from psi4.driver.p4util.exceptions import ValidationError
-from pkg_resources import parse_version
 from qcelemental import constants
-
-if parse_version(psi4.__version__) >= parse_version('1.3a1'):
-    build_superfunctional = psi4.driver.dft.build_superfunctional
-else:
-    build_superfunctional = psi4.driver.dft.build_superfunctional
 
 B3LYP = py_losc.DFAInfo(0.8, 0.2, 'B3LYP')
 SVWN = py_losc.DFAInfo(1.0, 0, 'SVWN')
@@ -33,30 +26,31 @@ def _validate_dfa_wfn(dfa_wfn):
     "Validate the input dfa wavefunction for the LOSC calculation."
     # check type
     if not isinstance(dfa_wfn, psi4.core.HF):
-        raise ValidationError('Not a psi4.core.HF object.')
+        raise Exception('Not a psi4.core.HF object.')
     # check symmetry
     if dfa_wfn.molecule().schoenflies_symbol() != 'c1':
-        raise ValidationError('LOSC only supports C1 symmetry')
+        raise Exception('LOSC only supports C1 symmetry')
     # check spin
     is_rks = psi4.core.get_option('SCF', 'REFERENCE') in ['RKS', 'RHF']
     is_rks_wfn = dfa_wfn.same_a_b_orbs() and dfa_wfn.same_a_b_dens()
     if is_rks != is_rks_wfn:
-        raise Exception('Reference in passed wfn is different to psi4 reference setting.')
+        raise Exception(
+            'Reference in passed wfn is different to psi4 reference setting.')
     # check super functional
     supfunc = dfa_wfn.functional()
     if supfunc.is_x_lrc():
-        raise ValidationError(
+        raise Exception(
             'Current LOSC does not support range-separated exchange functional.')
     if supfunc.is_c_hybrid():
-        raise ValidationError(
+        raise Exception(
             'Sorry, LOSC does not support double hybrid functional.')
     if supfunc.is_meta():
-        raise ValidationError('Sorry, LOSC does not support meta-GGA.')
+        raise Exception('Sorry, LOSC does not support meta-GGA.')
 
 
 def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
-                  return_losc_data = False,
-                  window = None):
+                  return_losc_data=False,
+                  window=None):
     """
     Perform the post-SCF-LOSC calculation based on a DFA wavefunction.
 
@@ -155,6 +149,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     if verbose >= 1:
         options.show_options()
     # ==> LOSC localization <==
+
     def select_CO(wfn, spin, window):
         """Return the CO index bounds."""
         eig = [np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b())][spin]
@@ -167,10 +162,13 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
             raise Exception('Invalid LOSC window: wrong size of window.')
         if window[0] >= window[1]:
             raise ValueError('Invalid LOS window: left bound >= right bound.')
-        idx_start = next(filter(lambda x: x[1] * constants.hartree2ev >= window[0], enumerate(eig)), [nbf])[0]
-        idx_end = next(filter(lambda x: x[1] * constants.hartree2ev >= window[1], enumerate(eig)), [nbf])[0]
+        idx_start = next(filter(
+            lambda x: x[1] * constants.hartree2ev >= window[0], enumerate(eig)), [nbf])[0]
+        idx_end = next(filter(
+            lambda x: x[1] * constants.hartree2ev >= window[1], enumerate(eig)), [nbf])[0]
         if idx_end - idx_start <= 0:
-            raise Exception('LOSC window is too tight. No COs selected to do LOSC localization.')
+            raise Exception(
+                'LOSC window is too tight. No COs selected to do LOSC localization.')
         return (idx_start, idx_end)
 
     # Get selected COs index from the window setting.
@@ -181,7 +179,8 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         if not idx:
             local_print(1, f'localization COs index (spin={s}): ALL COs')
         else:
-            local_print(1, f'localization COs index (spin={s}): [{idx[0]}, {idx[1]})')
+            local_print(
+                1, f'localization COs index (spin={s}): [{idx[0]}, {idx[1]})')
         selected_co_idx[s] = idx
     local_print(1, '')
 
@@ -202,7 +201,8 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
             raise Exception('Detect non-supporting localization version.')
         localizer.set_max_iter(options.localization['max_iter'])
         localizer.set_convergence(options.localization['convergence'])
-        localizer.set_random_permutation(options.localization['random_permutation'])
+        localizer.set_random_permutation(
+            options.localization['random_permutation'])
         # compute LOs
         C_lo[s] = localizer.lo()
 
@@ -319,8 +319,11 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
 
     Returns
     -------
-    wfn: psi4_losc.wfn.RLOSC or psi4_losc.wfn.ULOSC
-        The LOSC wavefunction.
+    wfn: psi4.core.RHF or psi4.core.HHF with LOSC behaviors.
+
+    See Also
+    --------
+    psi4_losc.build_scf_wfn.py: update psi4 wfn objects to have LOSC hebaviors.
 
     Notes
     -----
@@ -379,8 +382,10 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     if not ref_wfn_file.endswith('.npy'):
         ref_wfn_file += '.npy'
     dfa_wfn.to_file(ref_wfn_file)
-    local_print(1, '\nNotice: psi4 guess setting is ignored for the SCF-LOSC calculation.')
-    local_print(1, 'The wfn from the associated DFA is ALWAYS used as the initial guess.')
+    local_print(
+        1, '\nNotice: psi4 guess setting is ignored for the SCF-LOSC calculation.')
+    local_print(
+        1, 'The wfn from the associated DFA is ALWAYS used as the initial guess.')
     local_print(1, f'File of DFA wfn: {ref_wfn_file}')
     local_print(1, '')
 
