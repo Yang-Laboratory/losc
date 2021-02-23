@@ -185,6 +185,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     local_print(1, '')
 
     C_lo = [None] * nspin
+    U = [None] * nspin
     for s in range(nspin):
         # Get selected COs.
         if selected_co_idx[s]:
@@ -204,7 +205,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         localizer.set_random_permutation(
             options.localization['random_permutation'])
         # compute LOs
-        C_lo[s] = localizer.lo()
+        C_lo[s], U[s] = localizer.lo_U()
 
     # ==> LOSC curvature matrix <==
     # build matrices related to density fitting
@@ -241,6 +242,25 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
     for s in range(nspin):
         # build losc local occupation matrix
         local_occ[s] = py_losc.local_occupation(C_lo[s], S, D[s])
+
+    # ==> print matrix into psi4 output file <==
+    if verbose >= 2:
+        local_print(2, '\n==> Details of Matrices in LOSC <==')
+        for s in range(nspin):
+            local_print(2, f'\nCO coefficient matrix.T: spin={s}')
+            utils.print_full_matrix(C_co[s].T)
+        for s in range(nspin):
+            local_print(2, f'\nLO coefficient matrix.T: spin={s}')
+            utils.print_full_matrix(C_lo[s].T)
+        for s in range(nspin):
+            local_print(2, f'\nLO U matrix: spin={s}')
+            utils.print_full_matrix(U[s])
+        for s in range(nspin):
+            local_print(2, f'\nCurvature: spin={s}')
+            utils.print_sym_matrix(curvature[s])
+        for s in range(nspin):
+            local_print(2, f'\nLocal Occupation matrix: spin={s}')
+            utils.print_sym_matrix(local_occ[s])
 
     # ==> LOSC corrections <==
     H_losc = [None] * nspin

@@ -94,6 +94,36 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
                                 dfa_eigs[s][i], losc_eigs[s][i]))
         local_print(print_level, "")
 
+def print_full_matrix(mat, line_limit=5):
+    """
+    Print matrix into psi4 output.
+    """
+    psi4.core.print_out(f'Dimension: {mat.shape}\n')
+    row, col = mat.shape
+    for i in range(row):
+        psi4.core.print_out(f'    {i}:\n')
+        for j in range(col):
+            psi4.core.print_out(' {:>15.8e}'.format(mat[i, j]))
+            if j != col - 1:
+                if (j+1) % line_limit == 0:
+                    psi4.core.print_out('\n')
+        psi4.core.print_out('\n')
+
+def print_sym_matrix(mat, line_limit=5):
+    """
+    Print matrix into psi4 output.
+    """
+    psi4.core.print_out(f'Dimension: {mat.shape}\n')
+    row, col = mat.shape
+    for i in range(row):
+        psi4.core.print_out(f'    {i}:\n')
+        for j in range(0, i + 1):
+            psi4.core.print_out(' {:>15.8e}'.format(mat[i, j]))
+            if j != i:
+                if (j+1) % line_limit == 0:
+                    psi4.core.print_out('\n')
+        psi4.core.print_out('\n')
+
 
 def form_df_matrix(wfn, C_lo):
     """
