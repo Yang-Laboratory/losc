@@ -5,6 +5,8 @@ LOSC implementation with psi4.
 
 import psi4
 import numpy as np
+from random import shuffle
+from psi4_losc import options
 
 
 def _local_print(print_level, verbose_level, *args):
@@ -93,39 +95,70 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
         local_print(print_level, "")
 
 
-def form_df_basis_matrix(wfn):
+def form_df_matrix(wfn, C_lo):
     """
-    Form the three-center integral used in density fitting.
+    Build density fitting related matrices. DF_pii, DF_Vpq_inv.
 
     Parameters
     ----------
-    wfn: psi4.core.wavefunction
-        A psi4 wavefunction object.
+    wfn: psi4.core.HF
+        The wavefunction object.
+    C_lo: [np.array, ...]
+        LOSC LO coefficient matrix.
 
     Returns
     -------
-    df_pmn: np.array [nfitbasis, nbasis x nbasis]
-        The three-center integral of <fitbasis|basis, basis>.
-    df_Vpq_inv: np.array [nfitbasis, nfitbasis]
-        The inverse of matrix <fitbasis|1/r|fitbasis>.
+    df_pii: [np.array, ...]
+        The three center <fitbasis|lo, lo> matrix.
+    df_Vpq_inv: np.array
+        The inverse of <fitbasis|1/r|fitbasis> matrix.
     """
     # basis set
     basis = wfn.basisset()
     zero_bas = psi4.core.BasisSet.zero_ao_basis_set()
-    aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
-    aux_bas = psi4.core.BasisSet.build(wfn.molecule(), "ORBITAL", aux_bas_name)
-    aux_bas.print_out()
     # psi4.mintshelper object to help building AO integrals.
     mints = psi4.core.MintsHelper(basis)
-    # build three-center integral <fitbasis|ao, ao>
-    df_pmn = np.asarray(mints.ao_eri(aux_bas, zero_bas, basis, basis))
-    df_pmn = np.squeeze(df_pmn)
-    # build density fitting Vpq inverse
-    df_Vpq = np.asarray(mints.ao_eri(aux_bas, zero_bas, aux_bas, zero_bas))
+
+    # build auxiliary fitbasis for each fragments.
+    nspin = len(C_lo)
+    mol = wfn.molecule()
+    frag_mol, whole_mol = split_molecule(mol, return_whole_mol=True,
+                                        frag_size=options.curvature['df_molecular_fragment_size'])
+    aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
+    aux_bas = []
+    nfitbasis = 0
+    for frag in frag_mol:
+        aux_bas_t = psi4.core.BasisSet.build(frag, "ORBITAL", aux_bas_name)
+        nfitbasis += aux_bas_t.nbf()
+        aux_bas.append(aux_bas_t)
+
+    # ==> build df_pii <==
+    df_pii = [np.zeros((nfitbasis, C_lo[s].shape[1])) for s in range(nspin)]
+    nfitbasis_count = 0
+    for i in range(len(aux_bas)):
+        # build three-center integral <fitbasis|ao, ao>
+        df_pmn = np.asarray(mints.ao_eri(aux_bas[i], zero_bas, basis, basis))
+        df_pmn = np.squeeze(df_pmn)
+
+        # transform from AO to LO.
+        nbf = aux_bas[i].nbf()
+        for s in range(nspin):
+            # build three-center integral <fitbasis|lo, lo>
+            df_pii[s][nfitbasis_count:nfitbasis_count + nbf, :] = (
+                np.einsum('pmn,mi,ni->pi', df_pmn,
+                          C_lo[s], C_lo[s], optimize=True))
+
+        # update row counter
+        nfitbasis_count += nbf
+
+    # ==> build df_Vpq_inv <==
+    aux_bas_all = psi4.core.BasisSet.build(whole_mol, "ORBITAL", aux_bas_name)
+    df_Vpq = np.asarray(mints.ao_eri(
+        aux_bas_all, zero_bas, aux_bas_all, zero_bas))
     df_Vpq = np.squeeze(df_Vpq)
     df_Vpq_inv = np.linalg.inv(df_Vpq)
 
-    return df_pmn, df_Vpq_inv
+    return df_pii, df_Vpq_inv
 
 
 def form_grid_lo(wfn, C_lo):
@@ -422,3 +455,71 @@ def is_aufbau_system(wfn, occ={}):
             if not is_aufbau:
                 return False
     return True
+
+
+def split_molecule(mol, frag_size=5, return_whole_mol=False):
+    """
+    Split a molecule into small fragments based on number of atoms.
+
+    This function is based on the `psi4.core.Molecule.to_dict()` functions to
+    extract the information of molecular xyz and atom labels. At the return,
+    a list of molecular fragments are created by calling `psi4.geometry()`
+    function.
+
+    Parameters
+    ----------
+    mol: psi4.core.Molecule
+        The input molecule to be splitted.
+    frag_size: int, default to 5.
+        The maximum size of fragments in atom numbers.
+    return_whole_mol: bool, default to False.
+        Return the whole molecule which has the same order of returned fragments.
+        The order needs consideration because the generated fragments are
+        shuffled.
+
+    Returns
+    -------
+    mol_frags: [psi4.core.Molecule, ...]
+        A list of small molecular fragments.
+    whole_mol: psi4.core.Molecule
+        The whole molecule with the corresponding order for splitted fragmetns.
+    """
+    mol_dict = mol.to_dict()
+    unit = mol_dict['units']
+    xyz = mol_dict['geom'].reshape(-1, 3)
+    atoms = mol_dict['elem']
+
+    def make_mol(geom_str_list):
+        # specify no re-orientation, no re-centering and use the same units.
+        geom = geom_str_list.copy()
+        geom.append('no_reorient')
+        geom.append('no_com')
+        geom.append(f'units {unit}')
+        return psi4.geometry('\n'.join(geom))
+
+    if len(xyz) != len(atoms):
+        raise Exception('Miss some atoms.')
+
+    # form xyz string to represent the molecule.
+    geom_str = []
+    for i in range(len(atoms)):
+        atom_xyz = ['{:.16f}'.format(x) for x in xyz[i, :]]
+        geom_str.append(' '.join([str(atoms[i])] + atom_xyz))
+
+    # shuffle atoms before spliting into chunks
+    shuffle(geom_str)
+    whole_mol = make_mol(geom_str)
+
+    # split into molecular fragments
+    mol_frags = []
+    for i in range(0, len(geom_str), frag_size):
+        frag = geom_str[i:i+frag_size]
+        mol_frags.append(make_mol(frag))
+
+    # we need to reset the wfn.molecule to be the active one.
+    psi4.core.set_active_molecule(mol)
+
+    if return_whole_mol:
+        return mol_frags, whole_mol
+    else:
+        return mol_frags

@@ -10,6 +10,7 @@ curvature = {
     'v1_parameter_tau': 1.2378,
     'v2_parameter_tau': 1.2378,
     'v2_parameter_zeta': 8.0,
+    'df_molecular_fragment_size': 5,
 }
 
 

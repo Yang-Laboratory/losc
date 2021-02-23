@@ -208,12 +208,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
 
     # ==> LOSC curvature matrix <==
     # build matrices related to density fitting
-    df_pmn, df_Vpq_inv = utils.form_df_basis_matrix(dfa_wfn)
-    df_pii = [None] * nspin
-    for s in range(nspin):
-        # build three-center integral <fitbasis|lo, lo>
-        df_pii[s] = np.einsum('pmn,mi,ni->pi', df_pmn,
-                              C_lo[s], C_lo[s], optimize=True)
+    df_pii, df_Vpq_inv = utils.form_df_matrix(dfa_wfn, C_lo)
 
     # build weights of grid points
     grid_w = utils.form_grid_w(dfa_wfn)
