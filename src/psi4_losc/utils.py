@@ -7,6 +7,7 @@ import psi4
 import numpy as np
 from random import shuffle
 from psi4_losc import options
+from qcelemental import constants
 
 
 def _local_print(print_level, verbose_level, *args):
@@ -63,7 +64,8 @@ def print_total_energies(verbose_level, losc_data, print_level=1):
         l, 'LOSC-DFA total energy: {:.16f}'.format(losc_data['losc_dfa_energy']))
 
 
-def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
+def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1,
+                           window=None):
     """
     Print orbital energies to pis4 output file. Default print level is 1.
     """
@@ -89,10 +91,15 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1):
                     .format("Index", "Occ", f"DFA ({orbital_energy_unit})",
                             f"LOSC ({orbital_energy_unit})"))
         for i in range(nbf):
-            local_print(print_level, "{:<5d}  {:<8.5f}  {:>14.6f} {:>14.6f}"
-                        .format(i, occ_idx_val[s].get(i, 0),
-                                dfa_eigs[s][i], losc_eigs[s][i]))
+            orbE = dfa_eigs[s][i]
+            if orbital_energy_unit != 'eV':
+                orbE *= constants.hartree2ev
+            if not window or (window[0] <= orbE <= window[1]):
+                local_print(print_level, "{:<5d}  {:<8.5f}  {:>14.6f} {:>14.6f}"
+                            .format(i, occ_idx_val[s].get(i, 0),
+                                    dfa_eigs[s][i], losc_eigs[s][i]))
         local_print(print_level, "")
+
 
 def print_full_matrix(mat, line_limit=5):
     """
@@ -108,6 +115,7 @@ def print_full_matrix(mat, line_limit=5):
                 if (j+1) % line_limit == 0:
                     psi4.core.print_out('\n')
         psi4.core.print_out('\n')
+
 
 def print_sym_matrix(mat, line_limit=5):
     """
@@ -153,7 +161,7 @@ def form_df_matrix(wfn, C_lo):
     nspin = len(C_lo)
     mol = wfn.molecule()
     frag_mol, whole_mol = split_molecule(mol, return_whole_mol=True,
-                                        frag_size=options.curvature['df_molecular_fragment_size'])
+                                         frag_size=options.curvature['df_molecular_fragment_size'])
     aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
     aux_bas = []
     nfitbasis = 0

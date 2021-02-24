@@ -310,7 +310,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
 
     # ==> Print energies to output <==
     utils.print_total_energies(1, losc_data)
-    utils.print_orbital_energies(1, dfa_wfn, losc_data)
+    utils.print_orbital_energies(1, dfa_wfn, losc_data, window=window)
 
     if return_losc_data:
         return E_losc_dfa_tot, losc_eigs, losc_data
