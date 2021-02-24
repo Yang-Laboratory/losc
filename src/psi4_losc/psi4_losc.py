@@ -207,6 +207,14 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         # compute LOs
         C_lo[s], U[s] = localizer.lo_U()
 
+        # print localization status
+        local_print(1, '')
+        local_print(1, f'    ==> Localization status for spin: {s} <==')
+        local_print(1, f'    iteration steps: {localizer.steps()}')
+        local_print(1, f'    cost function value: {localizer.cost_func(C_lo[s])}')
+        local_print(1, f'    convergence: {"True" if localizer.is_converged() else "False, Warning!!!"}')
+        local_print(1, '')
+
     # ==> LOSC curvature matrix <==
     # build matrices related to density fitting
     df_pii, df_Vpq_inv = utils.form_df_matrix(dfa_wfn, C_lo)
