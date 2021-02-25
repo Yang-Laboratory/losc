@@ -318,7 +318,8 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         return E_losc_dfa_tot, losc_eigs
 
 
-def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
+def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
+             window=None):
     """
     Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
@@ -339,6 +340,9 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     verbose: int
         The print level to control `psi4_losc.post_scf_losc()` and
         `psi4.energy()`.
+    window: [float, float], default to None.
+        The orbital energy window in eV to select COs to do localization.
+        See `post_scf_losc()`.
 
     Returns
     -------
@@ -380,7 +384,8 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
     # Do post-SCF-LOSC to build curvature and LO.
     _, _, losc_data = post_scf_losc(dfa_info, dfa_wfn, verbose=verbose,
                                     return_losc_data=True,
-                                    orbital_energy_unit=orbital_energy_unit)
+                                    orbital_energy_unit=orbital_energy_unit,
+                                    window=window)
 
     # Do SCF-LOSC.
     # Trying to use ref_wfn keyword in psi4.energy(ref_wfn=dfa_wfn) will cause
