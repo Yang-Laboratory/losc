@@ -9,16 +9,28 @@ you can use the extended SCF procedure provided in `psi4_losc/scf.py` module.
 """
 
 import psi4
+import py_losc
 import numpy as np
 import psi4_losc.options as options
-from py_losc import py_losc
 from psi4_losc import utils
 from qcelemental import constants
 
+#: py_losc.DFAInfo object for B3LYP functional.
 B3LYP = py_losc.DFAInfo(0.8, 0.2, 'B3LYP')
+
+#: py_losc.DFAInfo object for SVWN functional.
 SVWN = py_losc.DFAInfo(1.0, 0, 'SVWN')
+
+#: py_losc.DFAInfo object for BLYP functional.
 BLYP = py_losc.DFAInfo(1.0, 0, 'BLYP')
+
+#: py_losc.DFAInfo object for PBE functional.
 PBE = py_losc.DFAInfo(1.0, 0, 'PBE')
+
+#: py_losc.DFAInfo object for pure GGA type functional.
+GGA = py_losc.DFAInfo(1.0, 0, 'Pure GGA functional')
+
+#: py_losc.DFAInfo object for PBE0 functional.
 PBE0 = py_losc.DFAInfo(0.75, 0.25, 'PBE0')
 
 
@@ -211,8 +223,10 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
         local_print(1, '')
         local_print(1, f'    ==> Localization status for spin: {s} <==')
         local_print(1, f'    iteration steps: {localizer.steps()}')
-        local_print(1, f'    cost function value: {localizer.cost_func(C_lo[s])}')
-        local_print(1, f'    convergence: {"True" if localizer.is_converged() else "False, Warning!!!"}')
+        local_print(
+            1, f'    cost function value: {localizer.cost_func(C_lo[s])}')
+        local_print(
+            1, f'    convergence: {"True" if localizer.is_converged() else "False, Warning!!!"}')
         local_print(1, '')
 
     # ==> LOSC curvature matrix <==
@@ -346,7 +360,7 @@ def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
 
     Returns
     -------
-    wfn: psi4.core.RHF or psi4.core.HHF with LOSC behaviors.
+    wfn: psi4.core.RHF or psi4.core.HF with LOSC behaviors.
 
     See Also
     --------

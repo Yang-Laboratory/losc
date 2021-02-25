@@ -5,8 +5,8 @@ defined in psi4 to be an extended version. Making such update is to enable
 """
 
 import psi4
+import py_losc
 import numpy as np
-from py_losc import py_losc
 
 # Function `psi4.proc.scf_wavefunction_factory()` will be extended in this
 # module. Here, we save the original one first.

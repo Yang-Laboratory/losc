@@ -11,7 +11,7 @@ SCF procedure are handled by psi4 and may be more efficient and reliable.
 
 import psi4
 import numpy as np
-from py_losc import py_losc
+import py_losc
 from psi4_losc import post_scf_losc
 from psi4_losc import utils
 from psi4_losc import diis
@@ -187,7 +187,7 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         ['SCF', 'PRINT'])
     psi4.core.set_local_option('SCF', 'PRINT', 0)
     wfn = psi4.core.Wavefunction.build(mol, basis)
-    wfn = psi4.proc.scf_wavefunction_factory(name, wfn, reference)
+    wfn = psi4.driver.scf_wavefunction_factory(name, wfn, reference)
     mintshelper = psi4.core.MintsHelper(wfn.basisset())
 
     supfunc = wfn.functional()

@@ -21,16 +21,7 @@ interanally.
 
 import numpy as np
 from py_losc import py_losc_core as core
-import functools
 from typing import List
-
-# ==> Interface for LOSC corrections <==
-from py_losc.py_losc_core import ao_hamiltonian_correction
-from py_losc.py_losc_core import orbital_energy_post_scf
-from py_losc.py_losc_core import energy_correction
-
-# ==> Interface for LOSC local occupation <==
-from py_losc.py_losc_core import local_occupation
 
 # ==> Interface for LOSC curvature matrix <==
 
