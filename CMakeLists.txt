@@ -38,8 +38,8 @@ add_subdirectory("${PYBIND11_SOURCE_DIR}")
 add_subdirectory(src)
 
 # ==> build tests <==
-option(DO_TEST "Run test or not." OFF)
-if (DO_TEST)
+option(BUILD_TEST "Build test or not." OFF)
+if (BUILD_TEST)
     enable_testing()
     # Download googletest library
     set(GOOGLE_TEST_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/googletest")
@@ -65,5 +65,5 @@ if (DO_TEST)
     # build test source
     add_subdirectory(tests)
 else()
-    message(STATUS "Note: Tests are disabled. Use \"-DDO_TEST=On\" to build tests.")
+    message(STATUS "Note: Tests are disabled. Use \"-DBUILD_TEST=On\" to build tests.")
 endif()

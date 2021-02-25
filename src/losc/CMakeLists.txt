@@ -4,6 +4,7 @@ set(PROJECT_NAME ${PROJECT_LOSC})
 # first we can indicate the documentation build as an option and set it to ON by
 # default
 option(BUILD_DOC "Build documentation for Losc library" OFF)
+option(OPENMP "Enable openmp" On)
 if (BUILD_DOC)
     if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
         # check if Doxygen is installed
@@ -37,16 +38,16 @@ endif (BUILD_DOC)
 
 # enable openmp or not.
 if (OPENMP)
-    message(STATUS "trying to use openmp.")
-    add_compile_definitions(USE_OPENMP)
+    message(STATUS "Openmp is enabled.")
+    add_compile_definitions(_OPENMP)
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)
-        message(STATUS "openmp for CXX is found and enabled.")
+        message(STATUS "Found openmp for CXX.")
     else()
-        message(WARNING "Fail to find openmp for CXX. Will compile WITHOUT openmp for CXX.")
+        message(FATAL_ERROR "Fail to find openmp for CXX. Abort compilation.")
     endif()
 else()
-    message(STATUS "openmp for CXX is not used. If you want to enable openmp, use `cmake -DOPENMP=on`.")
+    message(STATUS "Openmp is disabled, use `cmake -DOPENMP=on` to turn on.")
 endif()
 
 # sources
