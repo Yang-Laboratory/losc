@@ -1,5 +1,4 @@
-"""
-Import this module will update function `psi4.proc.scf_wavefunction_factory()`
+"""Import this module will update function `psi4.proc.scf_wavefunction_factory()`
 defined in psi4 to be an extended version. Making such update is to enable
 `psi4.energy()` to be compatible with LOSC calculation.
 """

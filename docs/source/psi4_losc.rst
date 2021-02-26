@@ -1,6 +1,6 @@
-=========
-psi4_losc
-=========
+==========================
+Use LOSC library in psi4
+==========================
 
 ------------
 Introduction
@@ -26,8 +26,9 @@ Installing psi4
    To have stable performance, it would be better to install this version of
    psi4. Other versions of ``psi4`` are not tested.
 
-If you never use psi4 before, you are suggested to just install the conda binary
-package of psi4:
+To perform LOSC calculation with ``psi4_losc`` in ``psi4``, you need to
+install ``psi4`` package first. If never use psi4 before, you are suggested to
+just install the conda binary package of psi4:
 
 .. code-block:: bash
 
@@ -39,9 +40,9 @@ the installation of psi4 from its `documentation
 
 ---------------------
 
-----------
-First Step
-----------
+-----------
+Basic Guide
+-----------
 
 LOSC can significantly eliminate the delocalization error exisiting in
 conventional density functional approximations (DFAs), such as local density
@@ -75,7 +76,7 @@ To perform the calculation of LOSC via ``psi4_losc``, always import following:
     import psi4
     import psi4_losc
 
-In ``psi4_losc`` module, no matter doing SCF-LOSC or post-SCF-LOSC,
+No matter doing SCF-LOSC or post-SCF-LOSC,
 an SCF calculation for the associated DFA should be performed in advance to
 generate the corresponding converged psi4 wavefunction object.
 
@@ -88,13 +89,14 @@ Now, taking a simple molecule, a stretched H2 molecule, as an example.
 You first calculate the SCF-DFA in psi4.
 
 .. code-block:: python
+    :emphasize-lines: 6
 
     # A stretched H2 molecule with 10A bond length with symmetry turned off.
     mol = psi4.geometry("""
         0 1
         H 0 0 0
         H 10 0 0
-        symmetry c1
+        symmetry c1  # turn off symmetry
         """)
 
     # some basic setting in psi4.

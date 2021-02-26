@@ -79,5 +79,5 @@ target_include_directories(
     ${LOSC_PUBLIC_INCLUDE_DIR})
 
 # ==> install losc library <==
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
-install(DIRECTORY "${LOSC_PUBLIC_INCLUDE_DIR}/losc" DESTINATION include)
+install(TARGETS ${PROJECT_NAME} DESTINATION liblosc/losc)
+install(DIRECTORY "${LOSC_PUBLIC_INCLUDE_DIR}/losc" DESTINATION liblosc/losc/include)

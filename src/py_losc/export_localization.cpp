@@ -142,12 +142,12 @@ void export_localization_base(py::module &m)
 
         Parameters
         ----------
-        max_iter: int
-            The max number of iterations.
+        max_iter : int
+            The maximum number of iterations.
 
         Returns
         -------
-        out: None
+        None
         )pddoc")
         // set_convergence
         .def("set_convergence", &LocalizerBase::set_convergence, R"pddoc(
@@ -155,26 +155,26 @@ void export_localization_base(py::module &m)
 
         Parameters
         ----------
-        tol: double
+        tol : float
             The convergence tolerance.
 
         Returns
         -------
-        out: None
+        None
         )pddoc")
         // set_random_permutation
         .def("set_random_permutation", &LocalizerBase::set_random_permutation,
              R"pddoc(
-        Set the flag for performing random permutation or not in localization
+        Set the flag to perform random permutation or not in the localization
         with Jacobi-Sweep algorithm.
 
         Parameters
         ----------
-        flag: bool
+        flag : bool
 
         Returns
         -------
-        out: None
+        None
         )pddoc")
         // lo_U: overload 1
         .def("lo_U",
@@ -186,19 +186,22 @@ void export_localization_base(py::module &m)
 
         Parameters
         ----------
-        guess: str
-            Initial guess of the unitary matrix to do localization. The choices
-            are ['identity', 'random', 'random_fixed_seed']. Default to 'identity'.
-            'identity': initial U matrix is set as an identity matrix.
-            'random': initial U matrix is set as a random unitary matrix.
-            'random_fixed_seed': initial U matrix is set as a random unitary
-                matrix with fixed random seed.
+        guess : {'identity', 'random', 'random_fixed_seed'}, default='identity'
+            Initial guess of the unitary matrix to do localization.
+
+            - 'identity': initial U matrix is set as an identity matrix.
+            - 'random': initial U matrix is set as a random unitary matrix.
+            - 'random_fixed_seed': initial U matrix is set as a random unitary
+              matrix with fixed random seed.
 
         Returns
         -------
-        out: (np.ndarray, np.ndarray)
-            The first one is the LO coefficient matrix, and the second one is the
-            corresponding U matrix.
+        C_lo : numpy.array
+            The LO coefficient matrix. ``C_lo[:, i]`` is the coefficients of
+            the i-th LO represented on AO.
+        U : numpy.array
+            The corresponding unitary transformation matrix for `C_lo`.
+            ``U[:, i]`` corresponds to the transformation of i-th LO.
         )pddoc")
         // lo_U: overload 2
         .def("lo_U",
@@ -211,18 +214,21 @@ void export_localization_base(py::module &m)
 
         Parameters
         ----------
-        U_guess: np.ndarray
+        U_guess : numpy.array
             The initial guess of U matrix. Its data will be copied for
             localization. Its unitarity will be verified and throw an exception
             if the validation fails.
-        threshold: float
-            The threshold used to check the unitarity. Default to 1e-8.
+        threshold : float, default=1.0e-8
+            The threshold used to check the unitarity.
 
         Returns
         -------
-        out: (np.ndarray, np.ndarray)
-            The first one is the LO coefficient matrix, and the second one is the
-            corresponding U matrix.
+        C_lo : numpy.array
+            The LO coefficient matrix. ``C_lo[:, i]`` is the coefficients of
+            the i-th LO represented on AO.
+        U : numpy.array
+            The corresponding unitary transformation matrix for `C_lo`.
+            ``U[:, i]`` corresponds to the transformation of i-th LO.
         )pddoc")
         // lo: overload 1
         .def("lo",
@@ -232,18 +238,25 @@ void export_localization_base(py::module &m)
              R"pddoc(
         Calculate the LOs' coefficient matrix under AO.
 
+        Parameters
+        ----------
+        guess : {'identity', 'random', 'random_fixed_seed'}, default='identity'
+            Initial guess of the unitary matrix to do localization.
+
+            - 'identity': initial U matrix is set as an identity matrix.
+            - 'random': initial U matrix is set as a random unitary matrix.
+            - 'random_fixed_seed': initial U matrix is set as a random unitary
+              matrix with fixed random seed.
+
         Returns
         -------
-        out: np.ndarray
-            The the LO coefficient matrix.
-
-        Notes
-        -----
-        Same interface of arguments as lo_U.
+        C_lo : numpy.array
+            The LO coefficient matrix. ``C_lo[:, i]`` is the coefficients of
+            the i-th LO represented on AO.
 
         See Also
         --------
-        lo_U: Return both LOs and the U matrix.
+        lo_U
         )pddoc")
         // lo: overload 2
         .def("lo",
@@ -254,45 +267,52 @@ void export_localization_base(py::module &m)
         Calculate the LOs' coefficient matrix under AO with a given U matrix as
         the initial guess.
 
+        Parameters
+        ----------
+        U_guess : numpy.array
+            The initial guess of U matrix. Its data will be copied for
+            localization. Its unitarity will be verified and throw an exception
+            if the validation fails.
+        threshold : float, default=1.0e-8
+            The threshold used to check the unitarity.
+
         Returns
         -------
-        out: np.ndarray
-            The the LO coefficient matrix.
-
-        Notes
-        -----
-        Same interface of arguments as lo_U.
+        C_lo : numpy.array
+            The LO coefficient matrix. ``C_lo[:, i]`` is the coefficients of
+            the i-th LO represented on AO.
 
         See Also
         --------
-        lo_U: return both LOs and the U matrix.
+        lo_U
         )pddoc")
         // cost_func
         .def("cost_func", &LocalizerBase::cost_func, "lo"_a,
              R"pddoc(
-        Return the localization cost function value for the given LOs.
+        Calculate the localization cost function value for the given LOs.
 
         Parameters
         ----------
-        lo: np.ndarray [nbasis, nlo]
-            The LOs coefficient matrix under AOs.
+        lo : numpy.array
+            The LOs coefficient matrix under AOs with dimension [nbasis, nlo].
 
         Returns
         -------
-        out: float
-            The cost function value.
+        float
+            The cost function value in hartree.
         )pddoc")
         // nsteps
         .def("steps", &LocalizerBase::steps,
              R"pddoc(
         Return the number of iteration steps for the most recent localization
-        performed by calling the `lo_U()` and `lo()` functions.
+        performed by calling the `lo_U` and `lo` functions.
 
         Returns
         -------
-        out: int
+        int
             The number of iterations.
         )pddoc")
+
         // is_converged
         .def("is_converged", &LocalizerBase::is_converged,
              R"pddoc(
@@ -301,7 +321,7 @@ void export_localization_base(py::module &m)
 
         Returns
         -------
-        out: bool
+        bool
             The convergence of localization.
         )pddoc");
 }
@@ -317,7 +337,26 @@ void export_localization_v2(py::module &m)
                       const vector<RefConstMat> & // D_ao
                       >(),
              "C_lo_basis"_a.noconvert(), "H_ao"_a.noconvert(),
-             "D_ao"_a.noconvert())
+             "D_ao"_a.noconvert(),
+             R"pddoc(
+        Constructor of LOSC localizerV2.
+
+        Parameters
+        ----------
+        C_lo_basis : numpy.array
+            The coefficient matrix of LO basis that is expanded under AO with
+            dimension [nbasis, nlo]. ``C_lo_basis[:, i]`` is the coefficient of
+            the i-th LO basis. The LO basis refers to a set of MOs that
+            will be unitary transformed to be the LOs. The basis is usually
+            being the COs from the associated DFA.
+
+        H_ao : numpy.array
+            The Hamiltonian matrix under AO representation for the associated
+            DFA. The dimension is [nbasis, nbasis].
+
+        D_ao : list of numpy.array
+            The dipole matrix under AO representation for x, y and z directions.
+        )pddoc")
         // set_gamma
         .def("set_gamma", &LocalizerV2::set_gamma, "gamma"_a,
              R"pddoc(
@@ -325,7 +364,7 @@ void export_localization_v2(py::module &m)
 
         Returns
         -------
-        out: None
+        None
         )pddoc")
         // set_c
         .def("set_c", &LocalizerV2::set_c, "c"_a,
@@ -334,6 +373,6 @@ void export_localization_v2(py::module &m)
 
         Returns
         -------
-        out: None
+        None
         )pddoc");
 }

@@ -63,21 +63,21 @@ void export_curvature_base(py::module &m)
              R"pddoc(
              Returns
              -------
-             out: str
+             str
                 The description of the DFA.
              )pddoc")
         .def("gga_x", &DFAInfo::gga_x,
              R"pddoc(
              Returns
              -------
-             out: float
-                The weight of the GGA type exchange of the DFA.
+             float
+                The weight of the total GGA type exchange of the DFA.
              )pddoc")
         .def("hf_x", &DFAInfo::hf_x,
              R"pddoc(
              Returns
              -------
-             out: float
+             float
                 The weight of HF exchange of the DFA.
              )pddoc");
 
@@ -97,21 +97,21 @@ void export_curvature_base(py::module &m)
         .def("nlo", &CurvatureBase::nlo, R"pddoc(
             Returns
             -------
-            out: int
+            int
                 the number of LOs.
             )pddoc")
         // nfitbasis
         .def("nfitbasis", &CurvatureBase::nfitbasis, R"pddoc(
             Returns
             -------
-            out: int
+            int
                 the number of fitting basis in density fitting.
             )pddoc")
         // npts
         .def("npts", &CurvatureBase::npts, R"pddoc(
             Returns
             -------
-            out: int
+            int
                 the number of grid points.
             )pddoc")
         // kappa: only export the version of creating a kappa matrix.
@@ -121,8 +121,8 @@ void export_curvature_base(py::module &m)
              R"pddoc(
             Returns
             -------
-            out: np.ndarray [nlo, nlo]
-                The LOSC curvature matrix.
+            numpy.array
+                The LOSC curvature matrix with dimension [nlo, nlo].
             )pddoc");
 }
 
@@ -139,7 +139,31 @@ void export_curvature_v1(py::module &m)
                       ConstRefVec &    // grid_weight
                       >(),
              "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
-             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert())
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert(),
+             R"pddoc(
+            Constructor of LOSC curvature version1.
+
+            Parameters
+            ----------
+            dfa_info : DFAInfo
+                The information for the DFA.
+            df_pii : numpy.array
+                The three-center integral :math:`\langle p | ii \rangle`
+                used in density fitting, in which index `p` refers to the =
+                fitting basis and index `i` refers to the LO. The dimension of
+                `df_pii` is [nfitbasis, nlo].
+            df_Vpq_inv : numpy.array
+                The inverse of integral matrix
+                :math:`\langle p | 1/r | q \rangle` used in density fitting, in
+                which indices `p` and `q` refer to the fitting basis. The
+                dimension of `df_Vpq_inv` is [nfitbasis, nfitbasis].
+            grid_lo : numpy.array
+                The LOs values on grid points. The dimension of `grid_lo` is
+                [npts, nlo].
+            grid_weight : numpy.array
+                The weights for numerical integral over grid points. The
+                dimension of `grid_lo` is [npts, ].
+            )pddoc")
         // CurvatureV1 class has no new functions compared to CurvatureBase.
         // So no more functions need to be exported here.
 
@@ -147,8 +171,12 @@ void export_curvature_v1(py::module &m)
         .def("set_tau", &CurvatureV1::set_tau, R"pddoc(
             Parameters
             ----------
-            tau: float
+            tau : float
                 The curvature V1 parameter tau.
+
+            Returns
+            -------
+            None
             )pddoc");
 }
 
@@ -165,7 +193,18 @@ void export_curvature_v2(py::module &m)
                       ConstRefVec &    // grid_weight
                       >(),
              "dfa_info"_a, "df_pii"_a.noconvert(), "df_Vpq_inv"_a.noconvert(),
-             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert())
+             "grid_lo"_a.noconvert(), "grid_weight"_a.noconvert(),
+             R"pddoc(
+            Constructor of LOSC curvature version2.
+
+            See Also
+            --------
+            CurvatureV1.__int__
+
+            Notes
+            -----
+            Same interface of input arguments as `CurvatureV1.__init__`.
+            )pddoc")
         // CurvatureV2 class has no new functions compared to CurvatureBase.
         // So no more functions need to be exported here.
 
@@ -173,13 +212,21 @@ void export_curvature_v2(py::module &m)
         .def("set_tau", &CurvatureV2::set_tau, R"pddoc(
             Parameters
             ----------
-            tau: float
+            tau : float
                 The curvature V2 parameter tau.
+
+            Returns
+            -------
+            None
             )pddoc")
         .def("set_zeta", &CurvatureV2::set_zeta, R"pddoc(
             Parameters
             ----------
-            zeta: float
+            zeta : float
                 The curvature V2 parameter zeta.
+
+            Returns
+            -------
+            None
             )pddoc");
 }

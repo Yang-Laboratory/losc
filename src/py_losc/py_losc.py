@@ -1,24 +1,3 @@
-"""
-Python interface for localized orbital scaling correction (LOSC) library.
-
-Notations
----------
-LO refers to the localized orbital.
-AO refers to the atomic orbitals.
-CO refers to the canonical orbital.
-`nlo` refers to the number of LOs.
-`nbasis` refers to the number of AOs.
-`nfitbasis` refers to the number of fitting basis for density fitting.
-`npts` refers to the number of grids.
-
-Notes
------
-1. All the matrices are represented and stored in 2-dimensional
-`np.ndarray` object. The storage order of matrices is required to be
-C-style (row major). If the input matrix is not C-style, it will be converted
-interanally.
-"""
-
 import numpy as np
 from py_losc import py_losc_core as core
 from typing import List
@@ -50,33 +29,43 @@ def _convert_mat(m, order='C'):
         raise Exception(f'Unknown storage order: {order}')
 
 class DFAInfo(core.DFAInfo):
+    """The information of a density functional approximation.
+    """
+
     def __init__(self, gga_x, hf_x, name=''):
         """
         Constructor of DFAInfo class that represents a DFA.
 
         Parameters
         ----------
-        name: str
+        name : str
            The description of the DFA. Default to an empty string.
-        hf_x: float
+        hf_x : float
            The weight of HF exchange in the DFA.
-        gga_x: float
+        gga_x : float
            The total weights of ALL GGA and LDA type exchange in the DFA.
 
         Examples
         --------
-        B3LYP functional is:
-        E_B3LYP = E_LDA_x + a0 * (E_HF_x - E_LDA_x) + ax * (E_GGA_x - E_LDA_x)
-        + E_LDA_c + ac * (E_GGA_c - E_LDA_c),
-        in which exchanges end with suffix "_x" and correlations end with
-        suffix "_c", and (a0, ax, ac) are coefficients.
+        B3LYP functional is
 
-        The total weights of GGA and LDA exchanges are:
-        gga_x = 1 + a0 * (-1) + ax * (1 - 1) = 1 - a0
+        .. math:: E^{\\rm{B3LYP}}_{\\rm{xc}} = E^{\\rm{LDA}}_{\\rm{x}} +
+           a_0 (E^{\\rm{HF}}_{\\rm{x}} - E^{\\rm{LDA}}_{\\rm{x}}) +
+           a_x (E^{\\rm{GGA}}_{\\rm{x}} - E^{\\rm{LDA}}_{\\rm{x}}) +
+           E^{\\rm{LDA}}_{\\rm{c}} + a_c (E^{\\rm{GGA}}_{\\rm{c}} -
+           E^{\\rm{LDA}}_{\\rm{c}}),
 
-        The total weights of HF exchanges is clear:
-        hf_x = a0
-        >>> b3lyp = DFAInfo(gga_x, hf_x, "B3LYP")
+        in which exchanges end with suffix ``_x`` and correlations end with
+        suffix ``_c``, :math:`a_0=0.20`, :math:`a_x=0.72` and :math:`a_c=0.81`.
+        The total weights of GGA and LDA exchanges are
+        :math:`1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80`.
+        The total weights of HF exchanges is
+        :math:`a0 = 0.20`. To construct a ``DFAInfo`` object for B3LYP
+        functional, one should do the following
+
+        .. code-block:: python
+
+            >>> b3lyp = DFAInfo(0.80, 0.20, "B3LYP")
         """
         core.DFAInfo.__init__(self, gga_x, hf_x, name)
 
@@ -92,8 +81,9 @@ class DFAInfo(core.DFAInfo):
 class CurvatureV1(core.CurvatureV1):
     """LOSC curvature matrix version 1.
 
-    Curvature version 1 is defined as $\kappa$ in Eq. 10 of the original
-    LOSC paper (https://doi.org/10.1093/nsr/nwx11).
+    References
+    ----------
+    Eq. 10 in the original LOSC paper https://doi.org/10.1093/nsr/nwx11.
     """
 
     def __init__(self, dfa_info: DFAInfo,
@@ -102,28 +92,33 @@ class CurvatureV1(core.CurvatureV1):
                  grid_lo: np.ndarray,
                  grid_weight: np.ndarray):
         """
-        Curvature version 1 class constructor.
+        Constructor of LOSC curvature version1.
 
         Parameters
         ----------
-        dfa_info: DFAInfo
-            The information of the associated DFA.
-        df_pii: np.ndarray [nfitbasis, nlo]
-            Three-body integral <p|ii> for density fitting, in which index
-            p is for fitting basis and index i is for LOs.
-        df_Vpq_inv: np.ndarray [nfitbasis, nfitbasis]
-            Inverse matrix of integral <p|1/r|q> for density fitting, in
-            which index p and q are for fitting basis.
-        grid_lo: np.ndarray [npts, nbasis]
-            Grid values of LOs. grid_lo[ip, i] is the i-th LO's value
-            on ip-th grid point.
-        grid_weight: list or np.ndarray [npts, 1]
-            Weights of grids.
+        dfa_info : DFAInfo
+            The information for the DFA.
+        df_pii : numpy.array
+            The three-center integral :math:`\langle p | ii \\rangle`
+            used in density fitting, in which index `p` refers to the =
+            fitting basis and index `i` refers to the LO. The dimension of
+            `df_pii` is [nfitbasis, nlo].
+        df_Vpq_inv : numpy.array
+            The inverse of integral matrix
+            :math:`\langle p | 1/\mathbf{r} | q \\rangle` used in density
+            fitting, in which indices `p` and `q` refer to the fitting basis.
+            The dimension of `df_Vpq_inv` is [nfitbasis, nfitbasis].
+        grid_lo : numpy.array
+            The LOs values on grid points. The dimension of `grid_lo` is
+            [npts, nlo].
+        grid_weight : numpy.array
+            The weights for numerical integral over grid points. The
+            dimension of `grid_lo` is [npts, ].
 
         See Also
         --------
-        DFAInfo: the DFA information class.
-        LocalizerV2: it can build the LOs.
+        DFAInfo
+        LocalizerV2
         """
         # Pybind11 has to call the base.__init__() explicitly, instead of
         # using super().__init__() to initialize the base class.
@@ -139,8 +134,9 @@ class CurvatureV1(core.CurvatureV1):
 class CurvatureV2(core.CurvatureV2):
     """LOSC curvature matrix version 2.
 
-    Curvature version 2 is defined as $\tilde{\kappa}$ in Eq. 8 of the
-    LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
+    References
+    ----------
+    Eq. 8 in the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
     """
 
     # @_np2eigen
@@ -150,16 +146,17 @@ class CurvatureV2(core.CurvatureV2):
                  grid_lo: np.ndarray,
                  grid_weight: np.ndarray):
         """
-        Curvature version 2 class constructor.
 
-        Notes
-        -----
-        Same interface for input parameters as described in CurvatureV1 class.
+        Curvature version 2 class constructor.
 
         See Also
         --------
-        CurvatureV1: constructor of LOSC curvature version 1.
-        LocalizerV2: it can build the LOs.
+        CurvatureV1, LocalizerV2
+
+        Notes
+        -----
+        Same interface for input parameters as `CurvatureV1.__init__`.
+
         """
         self._df_pii = _convert_mat(df_pii)
         self._df_vpq_inv = _convert_mat(df_vpq_inv)
@@ -174,30 +171,32 @@ class CurvatureV2(core.CurvatureV2):
 class LocalizerV2(core.LocalizerV2):
     """LOSC localization version 2.
 
-    The LOSC localization version 2 is defined in Eq. 7 of the
-    LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
+    References
+    ----------
+    Eq. 7 in the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).
     """
 
     def __init__(self, C_lo_basis: np.ndarray,
                  H_ao: np.ndarray,
                  D_ao: List[np.ndarray]):
         """
-        LOSC localization version 2 class constructor.
+        Constructor of LOSC localizerV2.
 
         Parameters
         ----------
-        C_lo_basis: np.ndarray [nbasis, nlo]
-            The coefficient matrix under AO for the molecular orbitals that
-            serves as the basis to expand the LOs. These molecular orbitals
-            are called LO basis. The LO basis $\psi_i$ is expanded under AOs
-            $\phi_\mu$ via the coefficient matrix $C_{\mu i}$ as
-            $\psi_i = \phi_\mu C_{\mu i}$.
-        H_ao: np.ndarray [nbasis, nbasis]
-            The Halmiltonian matrix under AOs. The LOSC localization v2,
-            the Halmiltonian matrix is defined as just the DFA's
-            Halmiltonian (note, not the LOSC-DFA Hamiltonian).
-        D_ao: list(np.ndarray [nbasis, nbasis])
-            The dipole matrix under AOs in the order of x, y and z directions.
+        C_lo_basis : numpy.array
+            The coefficient matrix of LO basis that is expanded under AO with
+            dimension [nbasis, nlo]. ``C_lo_basis[:, i]`` is the coefficient of
+            the i-th LO basis. The LO basis refers to a set of MOs that
+            will be unitary transformed to be the LOs. The basis is usually
+            being the COs from the associated DFA.
+
+        H_ao : numpy.array
+            The Hamiltonian matrix under AO representation for the associated
+            DFA. The dimension is [nbasis, nbasis].
+
+        D_ao : list of numpy.array
+            The dipole matrix under AO representation for x, y and z directions.
         """
         self._C_lo_basis = _convert_mat(C_lo_basis)
         self._H_ao = _convert_mat(H_ao)

@@ -1,22 +1,21 @@
-"""
-Python interface for localized orbital scaling correction (LOSC) library.
-
-Notations
----------
-LO refers to the localized orbital.
-AO refers to the atomic orbitals.
-CO refers to the canonical orbital.
-`nlo` refers to the number of LOs.
-`nbasis` refers to the number of AOs.
-`nfitbasis` refers to the number of fitting basis for density fitting.
-`npts` refers to the number of grids.
+"""Python interface for localized orbital scaling correction (LOSC) library.
 
 Notes
 -----
-1. All the matrices are represented and stored in 2-dimensional
-`np.ndarray` object. The storage order of matrices is required to be
+All the matrices are represented and stored in the 2-dimensional
+`numpy.array` object. The storage order of matrices is required to be
 C-style (row major). If the input matrix is not C-style, it will be converted
 interanally.
+
+Following notations are used in the docstrings:
+
+    - LO: the localized orbital.
+    - AO: the atomic orbitals.
+    - CO: the canonical orbital.
+    - nlo: the number of LOs.
+    - nbasis: the number of AOs.
+    - nfitbasis: the number of fitting basis for density fitting.
+    - npts: the number of grids.
 """
 
 # ==> Interface for LOSC corrections <==

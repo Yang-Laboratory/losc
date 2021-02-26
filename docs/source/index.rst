@@ -8,12 +8,14 @@ Localized Orbital Scaling Correction Library
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
-   installation.rst
    introduction.rst
-   py_losc.rst
-   psi4_losc.rst
+   installation.rst
+   LOSC C++ library <losc.rst>
+   LOSC C library <c_losc.rst>
+   LOSC Python library <py_losc.rst>
+   Using LOSC library in psi4 <psi4_losc.rst>
 
 
 

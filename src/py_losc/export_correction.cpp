@@ -10,59 +10,61 @@ void export_correction(py::module &m)
           R"pddoc(
     Calculate LOSC effective Hamiltonian under AO basis.
 
-    The LOSC effective Hamiltonian is constructed with LOs fixed. The
-    expression of the effective Hamiltonian is shown as Eq. S25 in the
-    supporting information of the original LOSC paper
-    (https://doi.org/10.1093/nsr/nwx111). This effective Hamiltonian is exact
-    in the developed version of SCF-LOSC (self-consistent LOSC). See reference
-    (J. Phys. Chem. Lett. 2020, 11, 23, 10269-10277) for more details about
-    how to perform reliable SCF-LOSC calculations.
-
     Parameters
     ----------
-    S: np.ndarray [nbasis, nbasis]
-        AO overlap matrix.
-    C_lo: np.ndarray [nbasis, nbasis]
-        LO coefficient matrix under AO basis.
-    Curvature: np.ndarray [nbasis, nbasis]
+    S : numpy.ndarray
+        AO overlap matrix with dimension [nbasis, nbasis].
+    C_lo : numpy.array
+        LO coefficient matrix under AO basis with dimension of [nbasis, nbasis].
+        The coefficients of i-th LO is the i-th column of `C_lo`.
+    Curvature : numpy.array
         LOSC curvature matrix with dimension [nlo, nlo].
-    LocalOcc: np.ndarray [nbasis, nbasis]
-        LOSC local occupation matrix.
+    LocalOcc : numpy.array
+        LOSC local occupation matrix with dimension [nlo, nlo].
 
     Returns
     -------
-    out: np.ndarray [nbasis, nbasis]
-        The LOSC effective Hamiltonian under AOs.
+    numpy.array
+        The LOSC effective Hamiltonian under AOs with dimension [nbasis, nbasis].
 
     See Also
     --------
-    CurvatureV1.kappa(), CurvatureV2.kappa(), ...: Return the curvature matrix.
-    local_occupation(): Return the local occupation matrix.
+    CurvatureV1.kappa, CurvatureV2.kappa, local_occupation
+
+    Notes
+    -----
+    The LOSC effective Hamiltonian is constructed with LOs fixed. The
+    expression of the effective Hamiltonian is shown as Eq. S25 in the
+    supporting information of the `original LOSC paper
+    <https://doi.org/10.1093/nsr/nwx111>`_. This effective Hamiltonian is exact
+    in the `developed version of SCF-LOSC
+    <https://doi.org/10.1021/acs.jpclett.0c03133>`_
     )pddoc");
 
     // energy_correction
     m.def("energy_correction", &losc::energy_correction, R"pddoc(
     Calculate the total energy correction from LOSC.
 
-    This is just the energy correction from LOSC, NOT the total energy of
-    LOSC-DFA. Total energy of LOSC-DFA is: E_losc_dfa = E_dfa + E_losc.
-
     Parameters
     ----------
-    Curvature: np.ndarray [nlo, nlo]
-        The LOSC curvature matrix.
-    LocalOcc: np.ndarray [nlo, nlo]
-        The LOSC local occupation matrix.
+    Curvature : numpy.ndarray
+        The LOSC curvature matrix with dimension [nlo, nlo].
+    LocalOcc: numpy.ndarray
+        The LOSC local occupation matrix with dimension [nlo, nlo].
 
     Returns
     -------
-    out: float
+    float
         The correction from LOSC to the total energy.
 
     See Also
     --------
-    CurvatureV1.kappa(), CurvatureV2.kappa(), ...: Return the curvature matrix.
-    local_occupation(): Return the local occupation matrix.
+    CurvatureV1.kappa, CurvatureV2.kappa, local_occupation
+
+    Notes
+    -----
+    This is just the energy correction from LOSC, NOT the total energy of
+    LOSC-DFA. Total energy of LOSC-DFA is ``E_losc_dfa = E_dfa + E_losc``.
     )pddoc");
 
     // orbital_energy_post_scf
@@ -70,12 +72,7 @@ void export_correction(py::module &m)
           R"pddoc(
     Calculate corrected orbital energy from LOSC in a post-SCF approach.
 
-    This function gives the final orbital energies WITH the correction
-    from LOSC. Note the difference to the function energy_correction() that only
-    calculates the energy correction. The corrected orbital energies are the
-    expectation values of converged DFA's COs on the LOSC-DFA Hamiltonian,
-    that is,
-    $\epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}} | \psi_i \rangle.$
+
 
     Parameters
     ----------
@@ -95,17 +92,27 @@ void export_correction(py::module &m)
 
     See Also
     --------
-    ao_hamiltonian_correction(): obtain the LOSC effective Hamiltonian under AOs.
+    ao_hamiltonian_correction
 
     Notes
     -----
-    This function is just one of the ways to construct the LOSC corrected orbital
-    energy in a post-SCF LOSC calculation. It is the way we used to produce
-    results in the published paper for the post-SCF LOSC calculations. Besides
-    this way, there are another two ways to calculate corrected orbital energies:
-    (1) diagonalize the corrected LOSC-DFA Hamiltonian; (2) Follow Eq. 11 to
-    calculate the corrections to orbital energies. These three ways usually
-    prouce very similar results. Here, we only provide the commonly used
-    approach.
+    This function gives the final corrected orbital energies from LOSC.
+    Note the difference to the function `energy_correction`.
+
+    The corrected orbital energies are the expectation values of converged
+    DFA's COs on the LOSC-DFA Hamiltonian, that is,
+
+    .. math:: \epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}}
+       | \psi_i \rangle.
+
+
+    This is just one of the ways to calculate the LOSC corrected orbital
+    energy in a post-SCF LOSC calculation. It is the way usually used to produce
+    results in the `published paper <https://doi.org/10.1093/nsr/nwx111>`_
+    for the post-SCF LOSC calculations. Besides this way, there are another two
+    ways to calculate corrected orbital energies: (1) diagonalize the corrected
+    LOSC-DFA Hamiltonian; (2) Follow
+    `Eq. 11 <https://doi.org/10.1093/nsr/nwx111>`_ to calculate the corrections
+    to orbital energies. These three ways usually produce similar results.
     )pddoc");
 }
