@@ -1,12 +1,5 @@
-"""
-Extended SCF procedure for SCF-DFA and SCF-LOSC-DFA (frozen-LO) with
-compability to fractional systems.
-
-Notes
------
-If you are interested in calculations of integer systems for LOSC,
-use `psi4_losc.post_scf_losc()` or `psi4_losc.scf_losc()` instead, since their
-SCF procedure are handled by psi4 and may be more efficient and reliable.
+"""Extended SCF procedure built on psi4 package to perform SCF-DFA and
+SCF-LOSC-DFA calculations with compabilities for fractional systems.
 """
 
 import psi4
@@ -21,16 +14,15 @@ from qcelemental import constants
 
 def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
          dfa_info=None, occ={}, verbose=1, orbital_energy_unit='eV'):
-    """
-    Perform the SCF (normal SCF-DFA or SCF-LOSC-DFA) calculation for general
+    """Perform the SCF (normal SCF-DFA or SCF-LOSC-DFA) calculation for general
     systems.
 
     Parameters
     ----------
-    name: str
-        The name of the DFT functional or HF method. The same style as
-        psi4.energy() function.
-    guess_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
+    name : str
+        The name of the DFT functional or HF method. The style is the same as
+        `psi4.energy` function.
+    guess_wfn : psi4.core.RHF or psi4.core.UHF, default=None.
         The wfn used to set the initial guess of the SCF calculation. This is
         equivalent to copy guess_wfn.C (coefficient matrix) and guess_wfn.D
         (density matrix) to the scf wavefunction object to initialize the SCF
@@ -38,70 +30,77 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
         guess setting; (2) if you use this variable, make sure you are
         passing a reasonable guess wfn to the function. This function does not
         check the validity the input.
-    losc_ref_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
+    losc_ref_wfn : psi4.core.RHF or psi4.core.UHF, default=None.
         The wfn used to do SCF-LOSC (frozen-LO) calculation. This variable is
         the flag to trigger SCF-LOSC (frozen-LO) calculation.
-    curvature: [np.array, ...]
+    curvature : [np.array, ...]
         The LOSC curvature matrix.
-    C_lo: [np.array, ...]
+    C_lo : [np.array, ...]
         The LOSC LO coefficient matrix.
-    dfa_info: py_losc.DFAInfo, default to None.
+    dfa_info : py_losc.DFAInfo, default=None.
         DFA information of the weights of exchanges.
-    occ: dict, default to an empty dict.
+    occ : dict, default to an empty dict.
         A dictionary that specifies the customized occupation number. This
         variable will be ignored and overwrite as `losc_ref_wfn.losc_data['occ']`
         if the `losc_ref_wfn` is provided.
-    verbose: int, default to 1
+    verbose : int, default=1
         print level to the psi4 output file.
-        0 means print nothing. 1 means normal print level. A larger number means
-        more details.
+
+        - 0 means print nothing.
+        - 1 means normal print level.
+        - A larger number means more details.
 
     Returns
     -------
-    wfn: psi4.core.RHF or psi4.core.UHF
+    wfn : psi4.core.RHF or psi4.core.UHF
         The SCF wavefunction.
-        1. Following members in the returned wfn object are updated:
-            wfn.S(): AO overlap matrix.
-            wfn.H(): Core matrix.
-            wfn.Ca(), wfn.Cb(): CO coefficient matrix.
-            wfn.Fa(), wfn.Fb(): Fock matrix.
-            wfn.Da(), wfn.Db(): density matrix.
-            wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc matrix.
-            wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.
-            wfn.energy(): total energy.
 
-        2. Other members are not touched. Accessing and using other members
-        in the returned wfn may be a undefined behavior.
+        - Following members in the returned wfn object are updated:
+
+            - wfn.S(): AO overlap matrix.
+            - wfn.H(): Core matrix.
+            - wfn.Ca(), wfn.Cb(): CO coefficient matrix.
+            - wfn.Fa(), wfn.Fb(): Fock matrix.
+            - wfn.Da(), wfn.Db(): density matrix.
+            - wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc
+              matrix.
+            - wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.
+            - wfn.energy(): total energy.
+
+        - Other members are not touched. Accessing and using other members
+          in the returned wfn may be a undefined behavior.
 
     Notes
     -----
-    1. The option settins are handled by psi4 SCF module.
 
-    2. For the updated matrices/vectors in returned wfn (such as C, D, F matrices),
-    although psi4.wfn objects provide interface to interact with the internal
-    data (such the interface wfn.Fa() that returns a shared_ptr to internal Fock
-    matrix), we do not map wfn internal matrices into python to modify these
-    matrices in place in python. The reason is that the lifetime of the internal
-    psi4.Matrix object managed by the shared_ptr is hard to track in python.
-    Take wfn.Fa matrix as example.
-    >>>
-    # 1. Map internal Fock matrix into python. Now `F` in python refers to the
-    # wfn.Fa matrix.
-    F = np.asarray(wfn.Fa())
+    - The option settins are handled by psi4 SCF module.
 
-    # 2. psi4.core code internally changes the Fock matrix by doing something
-    # like
-    # wfn.Fa = std::make_shared(Matrix(nbf, nbf)); # this is in c++ psi4.core.
+    - For the updated matrices/vectors in returned wfn (such as C, D, F
+      matrices), although psi4.wfn objects provide interface to interact with
+      the internal data (such the interface `wfn.Fa()` that returns a shared_ptr
+      to internal Fock matrix), we do not map wfn internal matrices into python
+      to modify these matrices in place in python. The reason is that the
+      lifetime of the internal psi4.Matrix object managed by the shared_ptr is
+      hard to track in python. Take wfn.Fa matrix as example.
 
-    # 3. Now `F` in python no longer refers to `wfn.Fa()`, since wfn.Fa is
-    # updated.
-    >>>
-    Because of this issue, all the matrices those will be used to update wfn
-    are allocated and managed in python. I know this doubles the memory cost
-    (same matrix, such as Fock matrix, is allocated in both python and psi4.core),
-    but this makes the logic clearer and less chances to have bug.
-    At the return, the python matrix will be copied into wfn through the
-    interface. I know we don't copy, but this is the price we have to pay.
+      # 1. Map internal Fock matrix into python. Now `F` in python refers to the
+      # wfn.Fa matrix.
+      F = np.asarray(wfn.Fa())
+
+      # 2. psi4.core code internally changes the Fock matrix by doing something
+      # like
+      # wfn.Fa = std::make_shared(Matrix(nbf, nbf)); # this is in c++ psi4.core.
+
+      # 3. Now `F` in python no longer refers to `wfn.Fa()`, since wfn.Fa is
+      # updated.
+
+      Because of this issue, all the matrices those will be used to update wfn
+      are allocated and managed in python. I know this doubles the memory cost
+      (same matrix, such as Fock matrix, is allocated in both python and
+      psi4.core), but this makes the logic clearer and less chances to have bug.
+      At the return, the python matrix will be copied into wfn through the
+      interface. I know we don't like copy, but this is the price we have to
+      pay.
     """
     def update_C(occ_idx, occ_val, Cin, C, Cocc, D):
         """
@@ -479,99 +478,124 @@ def _scf(name, guess_wfn=None, losc_ref_wfn=None, curvature=None, C_lo=None,
 
 
 def scf(name, guess_wfn=None, occ={}, verbose=1, orbital_energy_unit='eV'):
-    """
-    Perform the SCF calculation for a normal DFA. It supports the systems with
-    fractional occupations.
+    """Perform the SCF calculation for a conventional DFA. It supports the
+    systems with fractional occupations.
 
     Parameters
     ----------
-    name: str
+    name : str
         The name of the psi4 superfunctional, including DFT functional or HF
-        method. The same style as psi4.energy() function.
-    guess_wfn: psi4.core.RHF or psi4.core.UHF, default to None.
-        The wfn used to set the initial guess of the SCF calculation. Setting
-        this variable will copy the coefficient matrix from `guess_wfn` as the
-        initial SCF guess. Setting this variable will ignore the psi4 guess
-        setting. If you use this variable, make sure you are passing a
+        method. The style is the same as `psi4.energy` function.
+    guess_wfn : psi4.core.RHF or psi4.core.UHF, default=None.
+        The wavefunction used to set the initial guess of the SCF calculation.
+        Setting this variable will copy the coefficient matrix from `guess_wfn`
+        as the initial SCF guess. Setting this variable will ignore the psi4
+        guess setting. If you use this variable, make sure you are passing a
         reasonable guess wfn to the function. This function does not validate
         the input `guess_wfn`.
-    occ: dict, default to an empty dict.
+    occ : dict, default={}
         A dictionary that specifies the customized occupation number. The
         occupation is obtained based on the aufbau occupation number of the
         current molecule to give the final set of occupation numbers for the SCF
-        calculation. All the str in this dictionary is case-insensitive.
+        calculation.
 
-        The structure of the dict:
-        {
-            "alpha": # for alpha spin
-            {
-                int or str: float,
-            }
-            "beta": # for beta spin
-            {
-                int or str: float,
-            }
-        }
-        The key-value pair (int: float): int refers to orbital index (0-based);
-        float refers to the customized occupation number (in the range of [0, 1]).
-        The key-value pair (str: float): str can be either ['homo', 'lumo'],
-        which refers to HOMO and LUMO orbital respectively; float refers to the
-        customized occupation number (in the range of [0, 1]).
+        The structure of the `occ` is:
 
-        Example:
-        >> H2 system: charge=0, mult=1
-        The aufbau occupation numbers for H2 are:
-        alpha occ: 1, 0, 0, 0, ...
-        beta occ: 1, 0, 0, 0, ...
-        >> Customized occ dictionary:
-        occ = {
-            "alpha": {"homo": 0.5}
-            "beta": {"3": 0.7}
-        }
-        >> Resulted occupation numbers:
-        alpha occ: 0.5, 0, 0, 0, ...
-        beta occ:  1,   0, 0, 0.7, ...
+        >>> {
+        ...    # for alpha spin
+        ...    "alpha": {
+        ...         0: 0.5,      # the 1st orbital (0-based)
+        ...         'homo': 0.6, # HOMO
+        ...         'lumo': 0.7, # LUMO
+        ...    },
+        ...    # for beta spin
+        ...    "beta": {
+        ...         2: 0.5,      # the 3rd orbital (0-based)
+        ...    },
+        ... }
 
-    verbose: int, default to 1
-        print level to the psi4 output file.
-        0 means print nothing. 1 means normal print level. A larger number means
-        more details.
-    orbital_energy_unit: str, default to 'eV'
+        All the integer index for orbitals is 0-based. The str index for
+        orbitals should be {'homo', 'lumo'}, and are case-insensitive.
+        All the occupation numbers should be in range of [0, 1].
+
+    verbose : int, default to 1
+        Print level to the psi4 output file.
+
+        - 0 means print nothing.
+        - 1 means normal print level.
+        - A larger number means more details.
+    orbital_energy_unit : {'eV', 'au'}, default='eV'
         The units of orbital energies used to print in the output.
-        Valid choices are ['au', 'eV'].
-        'au': atomic unit, hartree.
-        'eV': electronvolt.
+
+        - 'au': atomic unit, hartree.
+        - 'eV': electronvolt.
 
     Returns
     -------
-    wfn: psi4.core.RHF or psi4.core.UHF
+    wfn : psi4.core.RHF or psi4.core.UHF
         The SCF wavefunction.
-        1. Following members in the returned wfn object are updated:
-            wfn.S(): AO overlap matrix.
-            wfn.H(): Core matrix.
-            wfn.Ca(), wfn.Cb(): CO coefficient matrix.
-            wfn.Fa(), wfn.Fb(): Fock matrix.
-            wfn.Da(), wfn.Db(): density matrix.
-            wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc matrix.
-            wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.
-            wfn.energy(): total energy.
+        - Following members in the returned wfn object are updated:
 
-        2. Other members are not touched. Accessing and using other members
-        in the returned wfn may be a undefined behavior.
+            - `wfn.S()`: AO overlap matrix.
+            - `wfn.H()`: Core matrix.
+            - `wfn.Ca()`, `wfn.Cb()`: CO coefficient matrix.
+            - `wfn.Fa()`, `wfn.Fb()`: Fock matrix.
+            - `wfn.Da()`, `wfn.Db()`: density matrix.
+            - `wfn.Va()`, `wfn.Vb()`: DFA (just the DFA, if it is LOSC-DFA) Vxc
+              matrix.
+            - `wfn.epsilon_a()`, wfn.epsilon_b()`: orbital energies.
+            - `wfn.energy()`: total energy.
 
-        3. The input argument `occ` is added as a new attribute to the returned
-        wfn object as `wfn.losc_data['occ'] = occ`.
+
+
+          Other members are not touched. Accessing and using other members
+          in the returned wfn may be a undefined behavior.
+
+        - The input argument `occ` is added as a new attribute to the returned
+          wfn object as `wfn.losc_data['occ'] = occ`.
 
     Notes
     -----
-    1. The option settings are handeld by psi4 SCF module.
+    - The option settings are handeld by psi4 SCF module.
 
-    2. There are double memory cost for all the updated matrices/vectors in
-    the returned wfn (such as C, D, F matrices): one is for the allocation in
-    the python code, the other one is for the allocation in psi4.core C++ code.
-    At return, matrices/vectors will be copied from the python side to the psi4
-    C++ side code. This is limited by the psi4.core interface. We have to pay
-    the price.
+    - There are double memory cost for all the updated matrices/vectors in
+      the returned wfn (such as C, D, F matrices): one is for the allocation in
+      the python code, the other one is for the allocation in psi4.core C++
+      code. At return, matrices/vectors will be copied from the python side to
+      the psi4 C++ side code. This is limited by the psi4.core interface. We
+      have to pay the price.
+
+    Examples
+    --------
+    A simple example to run an SCF calculation for a system with fractional
+    number of electrons and non-aufbau occupation.
+
+    .. code-block:: python
+
+        import psi4
+        import psi4_losc.scf
+
+        # Create H2 molecule with charge=0 and mult=1.
+        # The aufbau occupation numbers for H2 are:
+        # alpha occ: 1, 0, 0, 0, ...
+        # beta occ:  1, 0, 0, 0, ...
+        H2 = psi4.geometry('''
+            0 1
+            H 0 0 0
+            H 1 0 0
+            ''')
+        psi4.set_options({'basis': '3-21g'})
+
+        # A customized occupation setting that gives:
+        # alpha occ: 0.5, 0, 0, 0, ...
+        # beta occ:  1,   0, 0, 0.7, ...
+        customized_occ = {
+            "alpha": {"homo": 0.5}, # update HOMO occ to be 0.5
+            "beta": {"3": 0.7},     # update 4-th orbital occ to be 0.7
+            }
+
+        # Do SCF-B3LYP calculation with the customized occupation.
+        psi4_losc.scf.scf('b3lyp', occ=customized_occ)
     """
     wfn = _scf(name, guess_wfn=guess_wfn, occ=occ, verbose=verbose,
                orbital_energy_unit=orbital_energy_unit)
@@ -582,68 +606,109 @@ def scf(name, guess_wfn=None, occ={}, verbose=1, orbital_energy_unit='eV'):
 
 
 def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1):
-    """
-    Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
+    """Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
-    This function supports SCF-LOSC (frozen-LO) calculations for integer/fractional
-    systems with aufbau/non-aufbau occupations:
-    (1) If you want to calculate integer system with aufbau occupations, use
-    `psi4.energy()` or `psi4_losc.scf.scf()` to generate the input `dfa_wfn`.
-    (2) If you want to calculate integer system with non-aufbau occupation, or
-    fractional system with aufbau/non-aufbau occupations, use `psi4_losc.scf.scf()`
-    to generate the input `dfa_wfn`.
 
     Parameters
     ----------
-    dfa_info: py_losc.DFAInfo
+    dfa_info : py_losc.DFAInfo
         The information of the parent DFA, including the weights of exchanges.
-    dfa_wfn: psi4.core.HF like psi4 object
+    dfa_wfn : psi4.core.HF like psi4 object
         The converged wavefunction from a parent DFA.
-    orbital_energy_unit: str, default to 'eV'
+    orbital_energy_unit: {'eV', 'au'}, default='eV'
         The units of orbital energies used to print in the output.
-        Valid choices are ['au', 'eV'].
-        'au': atomic unit, hartree.
-        'eV': electronvolt.
-    verbose: int, default to 1
-        print level. 0 means print nothing. 1 means normal print level. A larger
-        number means more details.
+
+        - 'au': atomic unit, hartree.
+        - 'eV': electronvolt.
+    verbose: int, default=1
+        print level.
+
+        - 0 means print nothing.
+        - 1 means normal print level.
+        - A larger number means more details.
 
     Returns
     -------
-    wfn: psi4.core.RHF or psi4.core.UHF
-        The wavefunction for the SCF-LOSC (frozen-LO) calculation.
-        1. Following members in the returned wfn object are calculated:
-            wfn.S(): AO overlap matrix.
-            wfn.H(): Core matrix.
-            wfn.Ca(), wfn.Cb(): CO coefficient matrix.
-            wfn.Fa(), wfn.Fb(): Fock matrix.
-            wfn.Da(), wfn.Db(): density matrix.
-            wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc matrix.
-            wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.
-            wfn.energy(): total energy.
+    wfn : psi4.core.RHF or psi4.core.UHF
+        The wavefunction for the SCF-LOSC calculation.
 
-        2. Accessing and using other members in the returned wfn is a undefined
-        behavior.
+        - Following members in the returned wfn object are calculated:
+
+            - `wfn.S()`: AO overlap matrix.
+            - `wfn.H()`: Core matrix.
+            - `wfn.Ca()`, `wfn.Cb()`: CO coefficient matrix.
+            - `wfn.Fa()`, `wfn.Fb()`: Fock matrix.
+            - `wfn.Da()`, `wfn.Db()`: density matrix.
+            - `wfn.Va()`, `wfn.Vb()`: DFA (just the DFA, if it is LOSC-DFA) Vxc
+              matrix.
+            - `wfn.epsilon_a()`, wfn.epsilon_b()`: orbital energies.
+            - `wfn.energy()`: total energy.
+
+        - Accessing and using other members in the returned wfn is a undefined
+          behavior.
 
     See Also
     --------
-    py_losc.DFAInfo(): constructor of the DFA information class.
-    psi4.energy(): return a DFA SCF wavefunction. psi4.energy() only supports
+    py_losc.DFAInfo : constructor of the DFA information class.
+    psi4.energy : return a DFA SCF wavefunction. psi4.energy() only supports
         calculations for integer systems with aufbau occupations.
-    psi4_losc.scf.scf(): return a DFA SCF wavefunction. `psi4_losc.scf.scf()`
-        supports calculations for integer/fractional systems with aufbau/non-aufbau
-        occupations.
+    scf : return a DFA SCF wavefunction. `psi4_losc.scf.scf()`
+        supports calculations for integer/fractional systems with
+        aufbau/non-aufbau occupations.
 
     Notes
     -----
-    1. The option settings are handled by psi4 SCF module.
+    - The option settings are handled by psi4 SCF module.
 
-    2. There are double memory cost for all the updated matrices/vectors in
-    the returned wfn (such as C, D, F matrices): one is for the allocation in
-    the python code, the other one is for the allocation in psi4.core C++ code.
-    At return, matrices/vectors will be copied from the python side to the psi4
-    C++ side code. This is limited by the psi4 core interface. We have to pay
-    the price.
+    - There are double memory cost for all the updated matrices/vectors in
+      the returned wfn (such as C, D, F matrices): one is for the allocation in
+      the python code, the other one is for the allocation in psi4.core C++
+      code. At return, matrices/vectors will be copied from the python side to
+      the psi4 C++ side code. This is limited by the psi4 core interface. We
+      have to pay the price.
+
+    - This function supports SCF-LOSC (frozen-LO) calculations for
+      integer/fractional systems with aufbau/non-aufbau occupations:
+
+      - If you want to calculate integer system with aufbau occupations, use
+        `psi4.energy` or `scf` to generate the input `dfa_wfn`.
+
+      - If you want to calculate integer system with non-aufbau occupation, or
+        fractional system with aufbau/non-aufbau occupations, use
+        `scf` to generate the input `dfa_wfn`.
+
+    Examples
+    --------
+    A simple example to run an SCF-LOSC calculation for a system with fractional
+    number of electrons and non-aufbau occupation.
+
+    .. code-block:: python
+
+        import psi4
+        import psi4_losc    # for psi4_losc.B3LYP
+        import psi4_losc.scf
+
+        # Create H2 molecule with charge=0 and mult=1.
+        H2 = psi4.geometry('''
+            0 1
+            H 0 0 0
+            H 1 0 0
+            ''')
+        psi4.set_options({'basis': '3-21g'})
+
+        # Specify an non-aufbau and fractional occupation.
+        customized_occ = {
+            "alpha": {"homo": 0.5}, # update HOMO occ to be 0.5
+            "beta": {"3": 0.7},     # update 4-th orbital occ to be 0.7
+            }
+
+        # First, do SCF-B3LYP calculation with the customized occupation.
+        # alpha occ: 0.5, 0, 0, 0, ...
+        # beta occ:  1,   0, 0, 0.7, ...
+        dfa_wfn = psi4_losc.scf.scf('b3lyp', occ=customized_occ)
+
+        # Second, do SCF-LOSC-B3LYP calculation with the customized occupation.
+        losc_wfn = psi4_losc.scf.scf_losc(psi4_losc.B3LYP, dfa_wfn)
     """
     _, _, losc_data = post_scf_losc(dfa_info, dfa_wfn, verbose=verbose,
                                     orbital_energy_unit=orbital_energy_unit,

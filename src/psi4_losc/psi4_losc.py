@@ -1,11 +1,10 @@
-"""
-Integrate post-SCF-LOSC and SCF-LOSC (frozen-LO) calculation with psi4 package.
+"""Extension to enable psi4 package to support post-SCF-LOSC and SCF-LOSC
+calculations for ground state integer systems.
 
-Notes
------
-This module ONLY suuports the calculations of integer systems. To perform
-calculations of fractional systems in order to test the delocalization error,
-you can use the extended SCF procedure provided in `psi4_losc/scf.py` module.
+See Also
+--------
+scf.py : including self-implemented SCF procedures to perform calculations of
+    fractional systems with aufbau or non-aufbau configurations.
 """
 
 import psi4
@@ -15,22 +14,22 @@ import psi4_losc.options as options
 from psi4_losc import utils
 from qcelemental import constants
 
-#: py_losc.DFAInfo object for B3LYP functional.
+#: `py_losc.DFAInfo` object for B3LYP functional.
 B3LYP = py_losc.DFAInfo(0.8, 0.2, 'B3LYP')
 
-#: py_losc.DFAInfo object for SVWN functional.
+#: `py_losc.DFAInfo` object for SVWN functional.
 SVWN = py_losc.DFAInfo(1.0, 0, 'SVWN')
 
-#: py_losc.DFAInfo object for BLYP functional.
+#: `py_losc.DFAInfo` object for BLYP functional.
 BLYP = py_losc.DFAInfo(1.0, 0, 'BLYP')
 
-#: py_losc.DFAInfo object for PBE functional.
+#: `py_losc.DFAInfo` object for PBE functional.
 PBE = py_losc.DFAInfo(1.0, 0, 'PBE')
 
-#: py_losc.DFAInfo object for pure GGA type functional.
+#: `py_losc.DFAInfo` object for pure GGA type functional.
 GGA = py_losc.DFAInfo(1.0, 0, 'Pure GGA functional')
 
-#: py_losc.DFAInfo object for PBE0 functional.
+#: `py_losc.DFAInfo` object for PBE0 functional.
 PBE0 = py_losc.DFAInfo(0.75, 0.25, 'PBE0')
 
 
@@ -60,70 +59,70 @@ def _validate_dfa_wfn(dfa_wfn):
         raise Exception('Sorry, LOSC does not support meta-GGA.')
 
 
-def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
-                  return_losc_data=False,
-                  window=None):
-    """
-    Perform the post-SCF-LOSC calculation based on a DFA wavefunction.
-
-    This function supports post-SCF LOSC calculations for integer/fractional
-    systems with aufbau/non-aufbau occupations:
-    (1) If you want to calculate integer system with aufbau occupations, use
-    `psi4.energy()` to get the input `dfa_wfn`.
-    (2) If you want to calculate integer/non-aufbau system or fractional system
-    (either aufbau or non-aufbau occupation), use `psi4_losc.scf.scf()`
-    to get the input `dfa_wfn`.
+def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
+                  verbose=1, return_losc_data=False, window=None):
+    """Perform the post-SCF-LOSC calculation for the associated DFA.
 
     Parameters
     ----------
-    dfa_info: py_losc.DFAInfo
+    dfa_info : py_losc.DFAInfo
         The information of the parent DFA, including the weights of exchanges.
-    dfa_wfn: psi4.core.HF
+    dfa_wfn : psi4.core.HF
         The converged wavefunction from a parent DFA.
-    orbital_energy_unit: str, default to 'eV'
+    orbital_energy_unit : {'eV', 'au'}, default to 'eV'
         The units of orbital energies used to print in the output.
-        Valid choices are ['au', 'eV'].
-        'au': atomic unit, hartree.
-        'eV': electronvolt.
-    verbose: int, default to 1
+
+        - 'au' : atomic unit, hartree.
+        - 'eV' : electronvolt.
+    verbose : int, default=1
         print level. 0 means print nothing. 1 means normal print level. A larger
         number means more details.
-    return_losc_data: bool, default to false.
+    return_losc_data : bool, default=false.
         Return the data of LOSC or not.
-    window: [float, float], default to None.
-        The orbital energy window in eV to select COs to do localization.
-        Select all COs whose energies are in the window. Default to None which
-        means dismiss the window setting and use all COs to do localization.
+    window : [float, float], optional
+        This variable specifies the orbital energy window in eV, which is used
+        to select ALL the COs whose energies are in this window to do the LOSC
+        localization. If not given, the default bahavior is to use ALL the COs
+        to do localization.
 
     Returns
     -------
-    energy: float
-        The total energy of LOSC-DFA.
-    eig: [np.array, ...]
-        All orbital energies (same number to basis set) from LOSC-DFA. For RKS,
-        It includes alpha orbital energies. For UKS, it includes alpha and beta
-        orbital energies in order.
-    losc_data: dict
-        Returned if `return_losc_data` is true. It contains the data of LOSC
-        calculations.
+    energy : float
+        The total energy from the post-SCF-LOSC-DFA calculation.
+    eig : [np.array, ...]
+        All orbital energies (same number to basis set) from post-SCF-LOSC-DFA.
+        For RKS, `eig` only includes the alpha orbital energies. For UKS,
+        `eig` includes both alpha and beta orbital energies in order.
+    losc_data : dict
+        `losc_data` will be returned, if `return_losc_data` is true.
+        If returned, `losc_data` contains the data of LOSC calculations.
 
     See Also
     --------
-    py_losc.DFAInfo(): constructor of the DFA information class.
-    psi4.energy(): return a DFA SCF wavefunction. psi4.energy() only supports
-        calculations for integer systems with aufbau occupations.
-    psi4_losc.scf.scf(): return a DFA SCF wavefunction. psi4_losc.scf.scf()
+    py_losc.DFAInfo : constructor of the DFA information class.
+    psi4.energy : psi4 SCF calculator, which only supports calculations for
+        integer systems with aufbau occupations.
+    psi4_losc.scf.scf: psi4_losc SCF calculator (self-implemented), which
         supports calculations for integer/fractional systems with
         aufbau/non-aufbau occupations.
+    post_scf_losc
+    psi4_losc.B3LYP, psi4_losc.GGA
 
     Notes
     -----
-    1. Ideally, we should be able to extract the weights of exchanges from the
-    psi4 superfunctional objects which can be accessed from psi4 wfn. However,
-    it looks like psi4 does not support this functionality well. So we require
-    the user take the responsibility to construct the py_losc.DFAInfo object
-    manually by himself. We provide several `py_losc.DFAInfo` objects for common
-    DFAs in `psi4_losc` module.
+    - Ideally, we would like to extract the weights of exchanges from the psi4
+      superfunctional objects. However, it looks like psi4 does not support this
+      functionality very well. So we require the user take the responsibility to
+      construct the `py_losc.DFAInfo` object manually.
+
+    - This function supports post-SCF-LOSC calculations for integer/fractional
+      systems with aufbau/non-aufbau occupations:
+
+      - If you want to calculate integer system with aufbau occupations, use
+        `psi4.energy` to get the input `dfa_wfn`.
+      - If you want to calculate integer/non-aufbau system or fractional system
+        (either aufbau or non-aufbau occupation), use `psi4_losc.scf.scf` to get
+        the input `dfa_wfn`.
     """
     # sanity-check of input dfa wfn.
     _validate_dfa_wfn(dfa_wfn)
@@ -334,53 +333,55 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
 
 def scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV', verbose=1,
              window=None):
-    """
-    Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
+    """Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.
 
     This function use `psi4.energy()` to do the SCF procedure.
     This function only supports calculations for integer systems.
 
     Parameters
     ----------
-    dfa_info: py_losc.DFAInfo
+    dfa_info : py_losc.DFAInfo
         The information of the parent DFA, including the weights of exchanges.
-    dfa_wfn: psi4.core.HF like psi4 object
+    dfa_wfn : psi4.core.HF
         The converged wavefunction from a parent DFA.
-    orbital_energy_unit: str, default to 'eV'
+    orbital_energy_unit : {'eV', 'au'}, default='eV'
         The units of orbital energies used to print in the output.
-        Valid choices are ['au', 'eV'].
-        'au': atomic unit, hartree.
-        'eV': electronvolt.
-    verbose: int
-        The print level to control `psi4_losc.post_scf_losc()` and
-        `psi4.energy()`.
-    window: [float, float], default to None.
+
+        - 'au': atomic unit, hartree.
+        - 'eV': electronvolt.
+    verbose : int, default=1
+        The print level to control `post_scf_losc` and `psi4.energy`.
+    window : [float, float], optional
         The orbital energy window in eV to select COs to do localization.
-        See `post_scf_losc()`.
+        See `post_scf_losc`.
 
     Returns
     -------
-    wfn: psi4.core.RHF or psi4.core.HF with LOSC behaviors.
+    wfn : psi4.core.RHF or psi4.core.UHF
+        The psi4 wavefunction object that has LOSC contribution included.
 
     See Also
     --------
-    psi4_losc.build_scf_wfn.py: update psi4 wfn objects to have LOSC hebaviors.
+    post_scf_losc
 
     Notes
     -----
-    1. The `psi4.energy()` function is used internally to drive the SCF
-    procedure. So, ideally, this function supports all the types of SCF
-    calculations that are supported by psi4, such as integer/aufbau systems,
-    MOM calculations. However, these are not fully tested. But for normal SCF,
-    meaning integer and aufbau system, this function works fine.
+    - The `psi4.energy` function is used internally to drive the SCF procedure.
+      So, ideally, this function supports all the types of SCF calculations that
+      are supported by psi4, such as integer/aufbau systems, MOM calculations.
+      However, these are not fully tested. But for normal SCF, meaning integer
+      and aufbau system, this function works fine.
 
-    2. SCF-LOSC (frozen-LO) requires to use the DFA wfn as the initial guess.
-    The psi4 guess setting for SCF will be ignored. To use DFA wfn as the
-    initial guess, currently it is limited by `psi4.energy()` interface in
-    which directly passing the wfn as an argument is rejected. So, the only
-    choice is to write the DFA wfn into scratch file, then let psi4 use
-    `guess read` to set up the initial guess. So, calling this function will
-    generate a wfn scratch file! You need to take care of it at the exit.
+    - SCF-LOSC requires to use the DFA wfn as the initial guess. The psi4 guess
+      setting for SCF will be ignored. To use DFA wfn as the initial guess,
+      currently it is limited by `psi4.energy` interface in which directly
+      passing the wfn as an argument is rejected. So, the only choice is to
+      write the DFA wfn into scratch file, then let psi4 use `guess read` option
+      to set up the initial guess. So, calling this function will generate a
+      psi4 wavefunction scratch file! You need to take care of it at the exit.
+
+
+    - This function only supports calculations for ground state integer systems.
     """
     # sanity-check of input dfa wfn.
     _validate_dfa_wfn(dfa_wfn)
