@@ -1,6 +1,8 @@
+=======
 py_losc
 =======
 
+------------
 Introduction
 ------------
 ``py_losc`` is the Python module that provides the Python interface for the LOSC
@@ -8,6 +10,7 @@ library. It wraps the ``losc`` C++ library with the help of `pybind11
 <https://pybind11.readthedocs.io/en/latest/>`_.
 
 
+----------
 References
 ----------
 

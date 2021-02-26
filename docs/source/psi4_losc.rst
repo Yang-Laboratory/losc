@@ -6,14 +6,15 @@ psi4_losc
 Introduction
 ------------
 
-``psi4_losc`` is a Python module that enables doing LOSC calculations in
-`psi4 <https://psicode.org/>`_, an open-source package to perform quantum
-chemistry calculations. The ``psi4_losc`` module interacts with the ``psi4``
-package via its Python interface to achieve LOSC calculation. Using this
-``psi4_losc`` module along with ``psi4`` (the `python model
+``psi4_losc`` is a Python module that extends the `psi4 <https://psicode.org/>`_,
+an open-source package for quantum chemistry calculations, to perform the
+calculations of LOSC method. The ``psi4_losc`` module interacts with the ``psi4``
+package via its Python interface. Using this ``psi4_losc`` module along with
+``psi4`` (the `python model
 <https://psicode.org/psi4manual/master/psiapi.html>`_ of psi4), you can
-perform post-SCF-LOSC and SCF-LOSC calculations for aufbau/non-aufbau systems
-with integer/fractional number of electrons.
+perform post-SCF-LOSC [#losc1]_ [#losc2]_ and SCF-LOSC [#scf-losc]_
+calculations for aufbau/non-aufbau systems
+with integer/fractional numbers of electrons.
 
 ---------------------
 
@@ -21,8 +22,10 @@ with integer/fractional number of electrons.
 Installing psi4
 ---------------
 
-``psi4_losc`` module is developed based on psi4 version ``1.3.2``.
-To have stable performance, it would be better to install this version of psi4.
+.. Warning:: ``psi4_losc`` module is developed based on psi4 version ``1.3.2``.
+   To have stable performance, it would be better to install this version of
+   psi4. Other versions of ``psi4`` are not tested.
+
 If you never use psi4 before, you are suggested to just install the conda binary
 package of psi4:
 
@@ -44,39 +47,45 @@ LOSC can significantly eliminate the delocalization error exisiting in
 conventional density functional approximations (DFAs), such as local density
 approximations (LDA), generalized gradient approximations (GGAs) and hybrid
 functionals like B3LYP. With minimal delocalization error from LOSC-DFA
-calculations, you can expect good description of physical properties from
-LOSC-DFA, such as the ionization potentials (IPs), electron affinities
+calculations, you can expect good description of physical properties,
+such as the ionization potentials (IPs), electron affinities
 (EAs), the photoemision spectra.
 
 For most cases, you would be interested in performing LOSC calculations for
 aufbau systems (ground-state) with integer number of electrons. There are two
-ways to apply LOSC to an associated DFA for these systems.
-One is the post-SCF-LOSC approach [#losc1]_ [#losc2]_, which means directly
-applying LOSC correction to the SCF-DFA calculations. In this approach,
-post-SCF-LOSC only corrects the total energy and orbital energies for the
-associated DFA. The electron density is not touched for LOSC to the DFA.
-The other approach is the SCF-LOSC approach [#scf-losc]_, which means using the
-LOSC effective Hamiltonian to correct the associated DFA Hamiltonian and
-perform the SCF calculation for LOSC-DFA. The total energy, orbital energies
-and electron densities are all corrected from this approach.
+ways to apply LOSC to an associated DFA:
 
-No matter doing SCF-LOSC or post-SCF-LOSC by using this ``psi4_losc`` module,
-an SCF-DFA calculation should always be performed in advance to generate
-the corresponding converged psi4 wavefunction object. Although psi4
-supports calculations with point group symmetry, LOSC does not support
-symmetry because the usage of localized orbitals. So you need to turn off
-the symmetry in psi4 calculation.
+1. the post-SCF-LOSC approach [#losc1]_ [#losc2]_
 
-In the following text, following two lines are assumed to be executed to
-import ``psi4`` and ``psi4_losc`` modules.
+    Directly applying LOSC correction to the SCF-DFA calculations.
+    In this approach, the total energy and orbital energies from the associated
+    DFA are corrected. The electron density is not corrected from LOSC.
+
+2. the SCF-LOSC approach [#scf-losc]_
+
+    Using the LOSC effective Hamiltonian to correct the associated DFA
+    Hamiltonian and perform the SCF calculation for LOSC-DFA.
+    In this approach, the total energy, orbital energies and electron
+    densities are all corrected.
+
+To perform the calculation of LOSC via ``psi4_losc``, always import following:
 
 .. code-block:: python
 
     import psi4
     import psi4_losc
 
-Now, taking a simple molecule, a stretched H2+ molecule with only one
-electron, as an example. You first calculate the SCF-DFA in psi4.
+In ``psi4_losc`` module, no matter doing SCF-LOSC or post-SCF-LOSC,
+an SCF calculation for the associated DFA should be performed in advance to
+generate the corresponding converged psi4 wavefunction object.
+
+.. note:: Although psi4 supports calculations with point group symmetry, LOSC
+   does not support symmetry because the usage of localized orbitals. So you
+   need to turn off the symmetry in psi4 calculation (set ``symettr c1`` for
+   the system).
+
+Now, taking a simple molecule, a stretched H2 molecule, as an example.
+You first calculate the SCF-DFA in psi4.
 
 .. code-block:: python
 
@@ -99,64 +108,63 @@ electron, as an example. You first calculate the SCF-DFA in psi4.
 
     # You would see E_dfa = -0.5765567776548441
 
-post-SCF-LOSC for ground state integer system
----------------------------------------------
+post-SCF-LOSC for integer system with aufbau occupation
+-------------------------------------------------------
 
-Following the aforementioned H2 example, let's do a post-SCF-LOSC calculation.
-You need to call the ``psi4_losc.post_scf_losc()`` function to perform the
-calculation. There are two key arguments you need to specify: the first one
+Following the aforementioned H2 example, you can do a post-SCF-LOSC calculation
+via calling ``psi4_losc.post_scf_losc()`` function.
+There are two key arguments you need to specify: the first one
 is the DFA functional type, and the second one the corresponding converged
 DFA wavefunction object. ``psi4_losc.post_scf_losc()`` will return two
 variables: the corrected total energy and orbital energies.
 
 .. code-block:: python
+   :emphasize-lines: 1-3
 
-    # do post-SCF-LOSC-B3LYP calculation
+    # do post-SCF-LOSC-B3LYP calculation to obtain corrected total energy
+    # and the orbital energies.
     E_losc, Orb_losc = psi4_losc.post_scf_losc(psi4_losc.B3LYP, dfa_wfn)
-
-    print(E_losc)
-    print(E_losc - E_dfa)
 
     # You would see total energies:
     # E_losc = -0.758073589993662
     # E_losc - E_dfa = 0.13428778258589236
-
-    print(Orb_losc)
+    print(E_losc)
+    print(E_losc - E_dfa)
 
     # You would see all LOSC corrected orbital energies in a.u. for
     # both alpha and beta spin:
     # [array([-6.98665404, -5.54668941, 24.04349262, 24.04349294]),
     #  array([-6.98665404, -5.54668941, 24.04349262, 24.04349294])]
+    print(Orb_losc)
 
 
-SCF-LOSC for ground state integer system
-----------------------------------------
+SCF-LOSC for integer system with aufbau occupation
+--------------------------------------------------
 
-Following the aforementioned H2 example, let's do an SCF-LOSC calculation.
-You need to call the ``psi4_losc.scf_losc()`` function to perform the
-calculation. The input arguments are very similar to
-``psi4_losc.post_scf_losc()`` function. But the return is a psi4 wavefunction
-object.
+Following the aforementioned H2 example, you can do an SCF-LOSC calculation via
+calling ``psi4_losc.scf_losc()`` function. The input arguments are very similar
+to ``psi4_losc.post_scf_losc()`` function. But the return type is a psi4
+wavefunction object.
 
 .. code-block:: python
+   :emphasize-lines: 1-2
 
-    # do SCF-LOSC-B3LYP calculation
+    # do SCF-LOSC-B3LYP calculation to obtain a LOSC-B3LYP wavefunction object.
     losc_wfn = psi4_losc.scf_losc(psi4_losc.B3LYP, dfa_wfn)
-
-    E_losc = losc_wfn.energy()
-    print(E_losc)
-    print(E_losc - E_dfa)
 
     # You would see total energies:
     # E_losc = xxx
     # E_losc - E_dfa = xxx
+    E_losc = losc_wfn.energy()
+    print(E_losc)
+    print(E_losc - E_dfa)
 
+    # You would see all LOSC corrected orbital energies in a.u. for alpha spin.
+    #  xxx
     import numpy as np
     Orb_losc = np.asarray(losc_wfn.epsilon_a())
     print(Orb_losc)
 
-    # You would see all LOSC corrected orbital energies in a.u. for alpha spin.
-    #  xxx
 
 ---------------------
 
@@ -164,122 +172,76 @@ object.
 Advanced
 --------
 
-TODO: fractional calculations.
+Setting energy window for LOSC calculation
+------------------------------------------
+
+The LOSC corrections are constructed from a set of localized orbitals (LOs).
+These LOs are obtained by a unitary transformation from a set of canonical
+orbitals (COs) from the associated DFA. In default (for
+``psi4_losc.post_scf_losc`` and ``psi4_losc.scf_losc``), all the COs (the same
+number of basis sets) are involved
+to perform the localization. As results, LOSC corrects all the orbital energies.
+To simplify the calculation, you can only select a subset of COs to perform the
+LOSC calculation, and you should expect this simplified approach to produce
+similar results from the calculation will all COs localized.
+
+``psi4_losc`` module accepts the selection of COs with an energy window
+(**in eV**) setting, that is selecting all the COs whose orbital energies are
+inside the window. To enable the window, you use the `window` key argument.
+
+.. code-block:: python
+
+    # do post-SCF-LOSC-B3LYP calculation with setting a window of -30 - 10 eV.
+    E_losc, Orb_losc = psi4_losc.post_scf_losc(psi4_losc.B3LYP, dfa_wfn,
+                                               window=[-30, 10])
+
+    # do SCF-LOSC-B3LYP calculation with setting a window of -30 - 10 eV.
+    losc_wfn = psi4_losc.scf_losc(psi4_losc.B3LYP, dfa_wfn, window=[-30, 10])
+
+.. note::
+   Using window setting in the calculation of LOSC reduces the space of LOs and
+   makes the calculation much faster. However, keep in mind that doing so
+   would only produce corrections to orbital energies of the selected COs.
+   **The orbital energies of non-selected COs will not be touched.**
+
+   **To use the window setting, you should select most of the valence orbitals.**
+   The usual energy window is -30 - 10 eV. Using this window
+   should give you very similar results in total energy, orbital energies and
+   electron density to the ones calculated from all COs localized.
+   Excluding the core orbitals to the localization is a reasonble choice.
+   This is because: (1) core orbitals usually are already localized, thus,
+   they do not contribute the total energy correction because of the integer
+   occupation number (see the LOSC energy correction formular [#losc1]_);
+   (2) the core orbital energies are not as much interesting as the valence
+   orbital energies.
 
 ---------------------
+
+
+Systems with fractional numbers of electrons or non-aufbau occupation
+---------------------------------------------------------------------
+Psi4 mainly supports the calculations of systems with integer number of
+electrons and aufbau occupations. However, it would be interesting to calculate
+systems with fractional number of electrons (such as study of the delocalization
+error) or non-aufbau occupation (such as :math:`\Delta`-SCF calculations).
+
+``psi4_losc.scf`` module provides the extended SCF procedure to enable
+calculations for systems with fractional numbers of electrons or non-aufbau
+occupation. See :ref:`this <psi4_losc__scf_label>` for more details.
 
 ----------
 References
 ----------
 
-**psi4_losc module**
+**psi4_losc Module**
 --------------------
 
-**psi4_losc: used psi4 Python API**
-***********************************
+.. This includes the full list of psi4 API used in psi4_losc module.
 
-Below is the complete list of psi4 Python interfaces that are used in
-``psi4_losc`` module.
+.. include:: psi4_api_ref__psi4_losc.rst
 
-- psi4.driver
-
-    - `driver.p4util.OptionsState
-      <https://psicode.org/psi4manual/master/optionshandling.html#handling-options-in-driver>`_
-
-        - OptionsState.restore()
-
-    - driver.scf_wavefunction_factory()
-
-- `psi4.core.clean()
-  <https://psicode.org/psi4manual/master/api/psi4.core.clean.html>`_
-- `psi4.core.get_active_molecule()
-  <https://psicode.org/psi4manual/master/api/psi4.core.get_active_molecule.html>`_
-- `psi4.core.get_option()
-  <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.get_option>`_
-- `psi4.core.set_local_option()
-  <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.set_local_option>`_
-
-- `psi4.core.BasisSet
-  <https://psicode.org/psi4manual/master/api/psi4.core.basisset>`_
-
-    - `nbf()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.nbf>`_
-    - `build()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.build>`_
-
-- `psi4.core.MintsHelper
-  <https://psicode.org/psi4manual/master/api/psi4.core.mintshelper>`_
-
-    - `ao_dipole()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_dipole>`_
-
-- `psi4.core.Wavefunction
-  <https://psicode.org/psi4manual/master/api/psi4.core.wavefunction>`_
-
-    - `molecule()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.molecule>`_
-    - `S()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.S>`_
-    - `Ca()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Ca>`_
-    - `Cb()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Cb>`_
-    - `Fa()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fa>`_
-    - `Fb()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fb>`_
-    - `Da()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Da>`_
-    - `Db()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Db>`_
-    - `nalphe()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nalpha>`_
-    - `nbeta()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nbeta>`_
-    - `epsilon_a()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_a>`_
-    - `epsilon_b()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_b>`_
-    - `energy()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.energy>`_
-    - `basisset()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.basisset>`_
-    - `same_a_b_orbs()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_orbs>`_
-    - `same_a_b_dens()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_dens>`_
-    - `build()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.build>`_
-
-- `psi4.core.HF
-  <https://psicode.org/psi4manual/master/api/psi4.core.hf>`_
-
-    - `functional()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.functional>`_
-
-- `psi4.core.SuperFunctional
-  <https://psicode.org/psi4manual/master/api/psi4.core.superfunctional>`_
-
-    - `is_x_lrc()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_x_lrc>`_
-    - `is_c_hybrid()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_c_hybrid>`_
-    - `is_meta()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_meta>`_
-
-- `psi4.core.Molecule
-  <https://psicode.org/psi4manual/master/api/psi4.core.molecule>`_
-
-    - `schoenflies_symbol()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.schoenflies_symbol>`_
-    - `print_out()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.print_out>`_
-    - `nuclear_repulsion_energy()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.nuclear_repulsion_energy>`_
-
-
-**psi4_losc: API**
-******************
+**API of psi4_losc module**
+***************************
 
 .. autodata:: psi4_losc.B3LYP
 .. autodata:: psi4_losc.BLYP
@@ -289,154 +251,28 @@ Below is the complete list of psi4 Python interfaces that are used in
 .. autofunction:: psi4_losc.post_scf_losc
 .. autofunction:: psi4_losc.scf_losc
 
+------------
 
-**psi4_losc.scf module**
+
+**psi4_losc.scf Module**
 ------------------------
 
-**psi4_losc.scf: used psi4 Python API**
-***************************************
+.. This includes the full list of psi4 API used in psi4_losc.scf module.
 
-Below is the complete list of psi4 Python interfaces that are used in
-``psi4_losc.scf`` module.
+.. include:: psi4_api_ref__psi4_losc__scf.rst
 
-- psi4.driver
+.. _psi4_losc__scf_label:
 
-    - `driver.p4util.OptionsState
-      <https://psicode.org/psi4manual/master/optionshandling.html#handling-options-in-driver>`_
+**API of psi4_losc.scf module**
+*******************************
 
-        - OptionsState.restore()
-
-    - driver.scf_wavefunction_factory()
-
-- `psi4.core.clean()
-  <https://psicode.org/psi4manual/master/api/psi4.core.clean.html>`_
-- `psi4.core.get_active_molecule()
-  <https://psicode.org/psi4manual/master/api/psi4.core.get_active_molecule.html>`_
-- `psi4.core.get_option()
-  <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.get_option>`_
-- `psi4.core.set_local_option()
-  <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.set_local_option>`_
-
-- `psi4.core.BasisSet
-  <https://psicode.org/psi4manual/master/api/psi4.core.basisset>`_
-
-    - `nbf()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.nbf>`_
-    - `build()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.build>`_
-
-- `psi4.core.MintsHelper
-  <https://psicode.org/psi4manual/master/api/psi4.core.mintshelper>`_
-
-    - `ao_dipole()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_dipole>`_
-    - `ao_eri()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_eri>`_
-
-- `psi4.core.Wavefunction
-  <https://psicode.org/psi4manual/master/api/psi4.core.wavefunction>`_
-
-    - `molecule()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.molecule>`_
-    - `Ca()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Ca>`_
-    - `Cb()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Cb>`_
-    - `Fa()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fa>`_
-    - `Fb()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fb>`_
-    - `Da()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Da>`_
-    - `Db()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Db>`_
-    - `nalphe()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nalpha>`_
-    - `nbeta()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nbeta>`_
-    - `epsilon_a()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_a>`_
-    - `epsilon_b()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_b>`_
-    - `energy()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.energy>`_
-    - `basisset()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.basisset>`_
-    - `same_a_b_orbs()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_orbs>`_
-    - `same_a_b_dens()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_dens>`_
-    - `build()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.build>`_
-
-- `psi4.core.Matrix
-  <https://psicode.org/psi4manual/master/api/psi4.core.matrix>`_
-
-- `psi4.core.JK
-  <https://psicode.org/psi4manual/master/api/psi4.core.jk>`_
-
-    - `build()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.build>`_
-    - `initialize()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.initialize>`_
-    - `compute()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.compute>`_
-    - `C_clear()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_clear>`_
-    - `C_left_add()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_left_add>`_
-    - `J()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.J>`_
-    - `K()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.K>`_
-
-- `psi4.core.HF
-  <https://psicode.org/psi4manual/master/api/psi4.core.hf>`_
-
-    - `form_Shalf()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.form_Shalf>`_
-    - `guess()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.guess>`_
-    - `functional()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.functional>`_
-    - `V_potential()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.V_potential>`_
-
-- `psi4.core.SuperFunctional
-  <https://psicode.org/psi4manual/master/api/psi4.core.superfunctional>`_
-
-    - `needs_xc()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.needs_xc>`_
-    - `x_alpha()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.x_alpha>`_
-
-- `psi4.core.Molecule
-  <https://psicode.org/psi4manual/master/api/psi4.core.molecule>`_
-
-    - `schoenflies_symbol()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.schoenflies_symbol>`_
-    - `print_out()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.print_out>`_
-    - `nuclear_repulsion_energy()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.nuclear_repulsion_energy>`_
-
-- `psi4.core.VBase
-  <https://psicode.org/psi4manual/master/api/psi4.core.vbase>`_
-
-    - `set_D()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.set_D>`_
-    - `compute_V()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.compute_V>`_
-    - `quadrature_values()
-      <https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.quadrature_values>`_
-
-
-**psi4_losc.scf: API**
-**********************
+.. Warning:: This module is not fully tested. Use it with caution.
 
 .. automodule:: psi4_losc.scf
     :members:
     :inherited-members:
+
+--------------------
 
 **Literature**
 --------------
@@ -445,11 +281,14 @@ Below is the complete list of psi4 Python interfaces that are used in
    systematic elimination of delocalization error in density functional
    approximations." National Science Review 5.2 (2018): 203-215.
    <https://doi.org/10.1093/nsr/nwx111>`_
+
 .. [#losc2] `Su, Neil Qiang, Aaron Mahler, and Weitao Yang.
    "Preserving symmetry and degeneracy in the localized orbital scaling
-   correction approach." The journal of physical chemistry letters 11.4
+   correction approach."
+   The journal of physical chemistry letters 11.4
    (2020): 1528-1535.
    <https://doi.org/10.1021/acs.jpclett.9b03888>`_
+
 .. [#scf-losc] `Mei, Yuncai, Zehua Chen, and Weitao Yang.
    "Self-Consistent Calculation of the Localized Orbital Scaling
    Correction for Correct Electron Densities and Energy-Level Alignments
