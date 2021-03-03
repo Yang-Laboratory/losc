@@ -67,3 +67,12 @@ if (BUILD_TEST)
 else()
     message(STATUS "Note: Tests are disabled. Use \"-DBUILD_TEST=On\" to build tests.")
 endif()
+
+# ==> build docs <==
+option(BUILD_DOC "Build documentation for Losc library" OFF)
+if (BUILD_DOC)
+    add_subdirectory(docs)
+else (BUILD_DOC)
+    message("Note: If you want to build documentation, use `-DBUILD_DOC=On"
+            "Doxygen will be required.")
+endif (BUILD_DOC)

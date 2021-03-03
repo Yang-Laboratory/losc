@@ -35,6 +35,7 @@ extensions = ["sphinx.ext.autodoc",
 "sphinx.ext.viewcode",
 "sphinx_rtd_theme",
 'sphinx.ext.autosectionlabel',
+'breathe',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -65,3 +66,6 @@ autosectionlabel_prefix_document = True
 autodoc_default_options = {
     'special-members': '__init__',
 }
+
+# -- Options for breathe -------------------------------------------------
+breathe_default_project = "losc"
