@@ -16,10 +16,6 @@ googletest/
 # extern
 extern*/
 
-# doxygen
-**/doxygen*/
-**/Doxyfile
-
 **/*.so
 **/tmp_*
 **/__pycache__
