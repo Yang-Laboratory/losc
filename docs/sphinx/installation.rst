@@ -34,8 +34,6 @@ Dependencies and tools
       generator.
     - `doxygen <https://www.doxygen.nl/index.html>`_: C/C++ documentation
       generator.
-    - `breathe <https://breathe.readthedocs.io/en/latest/>`_: an extension for
-      ``sphinx`` that provides a bridge between ``sphinx`` and ``doxygen``.
 
 ----------------------------
 Compile from the source code
