@@ -27,7 +27,7 @@ To use LOSC library in Python, all you need to do is ``import py_losc``.
 
 To implement post-SCF-LOSC and SCF-LOSC calculations in Python with
 the ``py_losc`` library, please refer to :ref:`this section
-<psi4_losc:using losc library in psi4 package>`, which demonstrates a real
+<psi4_losc:use losc library in psi4>`, which demonstrates a real
 example of using ``py_losc`` in psi4 package.
 
 -------------------------------
