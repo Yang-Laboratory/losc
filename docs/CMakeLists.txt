@@ -19,12 +19,11 @@ set(C_LOSC_DOXYGEN_HTML_OUTPUT "")
 # ==> Doxygen <==
 macro(build_doxygen module)
     set(DOXYGEN_INPUT_DIR ${CMAKE_SOURCE_DIR}/include/${module})
-    set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen/${module})
+    set(DOXYGEN_SOURCE_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen/${module})
+    set(DOXYGEN_OUTPUT_DIR ${DOXYGEN_SOURCE_ROOT_DIR})
 
-    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/Doxyfile.in)
-    set(DOXYFILE_OUT ${DOXYGEN_OUTPUT_DIR}/Doxyfile)
-    set(DOXYGEN_HTML_OUTPUT_DIR ${DOXYGEN_OUTPUT_DIR}/html)
-    set(DOXYGEN_HTML_OUTPUT ${DOXYGEN_OUTPUT_DIR}/html/index.html)
+    set(DOXYGEN_HTML_OUTPUT_DIR ${DOXYGEN_SOURCE_ROOT_DIR}/html)
+    set(DOXYGEN_HTML_OUTPUT ${DOXYGEN_HTML_OUTPUT_DIR}/index.html)
 
     if ("${module}" STREQUAL "losc")
         set(DOXYGEN_PROJECT_NAME "\"Localized Orbital Scaling Correction (LOSC) C++ library\"")
@@ -38,17 +37,21 @@ macro(build_doxygen module)
     message(STATUS "Build docs for module: ${module}")
 
     # create some directories that Doxygen won't create for us
-    file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
+    file(MAKE_DIRECTORY ${DOXYGEN_SOURCE_ROOT_DIR})
     file(MAKE_DIRECTORY ${DOXYGEN_HTML_OUTPUT_DIR})
+
+    # configure the configuration file for doxygen.
+    file(GLOB DOXYGEN_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*)
+    file(COPY ${DOXYGEN_SOURCE_FILES} DESTINATION ${DOXYGEN_SOURCE_ROOT_DIR})
+    set(DOXYFILE_IN ${DOXYGEN_SOURCE_ROOT_DIR}/Doxyfile.in)
+    set(DOXYFILE_OUT ${DOXYGEN_SOURCE_ROOT_DIR}/Doxyfile)
+    configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
     # print some informational message.
     message(STATUS "${module}: doxygen configuration file: ${DOXYFILE_OUT}")
     message(STATUS "${module}: DOXYGEN_INPUT_DIR: ${DOXYGEN_INPUT_DIR}")
-    message(STATUS "${module}: DOXYGEN_OUTPUT_DIR: ${DOXYGEN_OUTPUT_DIR}")
+    message(STATUS "${module}: DOXYGEN_SOURCE_ROOT_DIR: ${DOXYGEN_SOURCE_ROOT_DIR}")
     message(STATUS "${module}: DOXYGEN_HTML_OUTPUT: ${DOXYGEN_HTML_OUTPUT}")
-
-    # configure the configuration file for doxygen.
-    configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
     # build documentations for losc and c_losc modules with doxygen.
     add_custom_command(OUTPUT ${DOXYGEN_HTML_OUTPUT}
@@ -56,6 +59,7 @@ macro(build_doxygen module)
                        ${DOXYGEN_INPUT_DIR}
                        ${DOXYFILE_OUT}
                        losc c_losc py_losc_core
+                       ${DOXYGEN_SOURCE_FILES}
                        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
                        MAIN_DEPENDENCY ${DOXYFILE_OUT} ${DOXYFILE_IN}
                        COMMENT "Generating docs with doxygen"
