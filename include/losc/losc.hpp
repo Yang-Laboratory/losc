@@ -1,5 +1,5 @@
 /**
- * @file losc.hpp
+ * @file
  * @brief C++ interface for the localized orbital scaling correction (LOSC)
  * library.
  */

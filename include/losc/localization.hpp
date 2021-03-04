@@ -1,5 +1,5 @@
 /**
- * @file localization.hpp
+ * @file
  * @brief C++ interface for the LOSC localization.
  */
 
@@ -17,46 +17,33 @@ using std::string;
 using std::vector;
 
 /**
+ * @class __param__C_lo
+ * @param [in] C_lo LOs coefficient matrix under AOs with dimension of
+ * `[nbasis, nlo]`. The `i`-th column in `C_lo` matrix is the `i`-th LO.
+ */
+
+/**
  * @brief Base class for LOSC localization.
  */
 class LocalizerBase {
   protected:
+    /// @cond
     size_t nlo_;     /**< The number of LO. */
     size_t nbasis_;  /**< The number of AO basis. */
     size_t nsteps_;  /**< The number of iteration steps for the localization. */
     bool converged_; /**< The convergence of the localization. */
 
-    /**
-     * @brief LO basis coefficient matrix under AOs.
-     * @details Dimension: [nbasis, nlo]
-     *
-     * Relation between LO basis and AO via the coefficient matrix \f$C\f$ is
-     * \f[
-     * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
-     * \f]
-     * where \f$ \psi_i \f$ is the LO basis and \f$ \phi_\mu \f$ is the AO.
-     *
-     * @note
-     * Usually, LOSC localization uses the converged DFA COs as the LO basis.
-     */
+    // LO basis coefficient matrix under AOs.
+    // Dimension: [nbasis, nlo]
     ConstRefMat C_lo_basis_;
 
-    /**
-     * @brief Maximum iteration number of Jacobi-sweep algorithm for
-     * localization. Default: 1000
-     */
+    // Maximum iteration number of Jacobi-sweep algorithm for
     size_t js_max_iter_ = 1000;
 
-    /**
-     * @brief If use random permutation in Jacobi-sweep algorithm or not.
-     * Default: true
-     */
+    // If use random permutation in Jacobi-sweep algorithm or not.
     bool js_random_permutation_ = true;
 
-    /**
-     * @brief Convergence tolerance tolerance in Jacobi-sweep algorithm.
-     * Default: 1e-10
-     */
+    // Convergence tolerance tolerance in Jacobi-sweep algorithm.
     double js_tol_ = 1e-10;
 
     /**
@@ -72,17 +59,27 @@ class LocalizerBase {
      * @param U [in, out]: the initial U matrix is copied from `U_guess`.
      */
     void set_u_guess(RefMat U, ConstRefMat &U_guess, double threshold) const;
+    /// @endcond
 
   public:
     /**
-     * @brief LocalizerBase class constructor
+     * @class __param__C_lo_basis
      * @param [in] C_lo_basis: LO basis coefficient matrix under AOs with
-     * dimension of [nbasis, nlo]. See LocalizerBase::C_lo_basis_.
-     *
-     * @note
-     * 1. The initial guess is to set an identity U matrix.
+     * dimension of [nbasis, nlo]. The LO basis relates to the LOs via a unitary
+     * transformation matrix. Usually, the converged COs from the associated
+     * DFA are used as the LO basis. The `i`-th column of `C_lo_basis` is the
+     * `i`-th LO basis.
+     */
+
+    /**
+     * @brief Constructor of LocalizerBase
+     * @copydoc __param__C_lo_basis
      */
     LocalizerBase(ConstRefMat &C_lo_basis);
+
+    /**
+     * @brief Deconstructor of LocalizerBase
+     */
     virtual ~LocalizerBase();
 
     /**
@@ -113,71 +110,101 @@ class LocalizerBase {
     void set_convergence(double tol) { js_tol_ = tol; }
 
     /**
-     * @param [in] true_or_false: flag to do random permutation or not
-     * Jacobi-sweep algorithm.
+     * @brief Set to use random permutation for Jacobi-Sweep algorithm or not.
+     * @param [in] flag `True` for doing random permutation and `False`
+     * otherwise.
      */
     void set_random_permutation(bool flag) { js_random_permutation_ = flag; }
 
     /**
-     * @brief Calculate the LOs and the unitary transformation matrix.
-     *
-     * The calculated LOs are expanded under AOs via the following relation
-     * \f[
+     * @class __param__guess
+     * @param [in] guess Valid choices are
+     * `["identity", "random", "random_fixed_seed"]`. Default to "identity"
+     * - "identity": initial U matrix is set as an identity matrix.
+     * - "random": initial U matrix is set as a random unitary matrix.
+     * - "random_fixed_seed": initial U matrix is set as a random unitary matrix
+     * with fixed random seed.
+     */
+
+    /**
+     * @class __return__lo_U
+     * @return a vector of matrix `rst` with size of 2. `rst[0]` is the LO
+     * coefficient matrix. `rst[1]` is the corresponding U matrix.
+     * The relation between the LOs and AOs is
+     * \f$ \displaystyle
      * \psi_i = \sum_\mu C_{\mu i} \phi_{\mu},
-     * \f]
+     * \f$
      * in which \f$ \psi_i \f$ is the LO, \f$ C_{\mu i} \f$ is the LO
      * coefficient matrix and \f$ \phi_i \f$ is the AO.
-     * Dimension of LO coefficient matrix: [nbasis, nlo].
+     * The dimension of LO coefficient matrix is `[nbasis, nlo]`.
+     * The relation between the LOs and LO basis is
+     * \f$ \displaystyle
+     * \psi_i = \sum_j U_{\mu i} \phi_\mu,
+     * \f$
+     * in which \f$ \psi_i \f$ is the LO, \f$ U_{\mu i} \f$ is the U matrix
+     * and \f$ \phi_\mu \f$ is the LO basis.
+     * The dimension of the U matrix is `[nlo, nlo]`.
+     */
 
-     * The unitary matrix is associated with the LOs and LOs basis via the
-     * following relation.
-     * \f[
-     * \psi_i = \sum_j U_{i\mu} \phi_\mu,
-     * \f]
-     * in which \f$ psi_i\f$ is the LO, \f$ U_{i\mu} \f$ is the unitary matrix
-     * and \f$ \phi_\mu \f$ is the LO basis that expands the LO.
-     * Dimension of the U matrix: [nlo, nlo].
-     *
-     * @param guess: Valid choices are
-     * ["identity", "random", "random_fixed_seed"]. Default to "identity"
-     * "identity": initial U matrix is set as an identity matrix.
-     * "random": initial U matrix is set as a random unitary matrix.
-     * "random_fixed_seed": initial U matrix is set as a random unitary matrix
-     * with fixed random seed.
-     *
-     * @return a size 2 vector of matrix `rst`. `rst[0]` is the LO coefficient
-     * matrix. `rst[1]` is the corresponding U matrix.
+    /**
+     * @brief Calculate the coefficient matrix of LOs on AOs and the unitary
+     * transformation matrix.
+     * @copydoc __param__guess
+     * @copydoc __return__lo_U
      */
     virtual vector<LOSCMatrix> lo_U(const string &guess = "identity") = 0;
 
     /**
-     * @brief Calculate the LOs and the unitary transformation matrix.
-     *
-     * @param U_guess: the initial guess of U matrix. Its data will be copied
-     * for localization. Its unitarity will be verified and throw an exception
+     * @class __param__U_guess__threshold
+     * @param [in] U_guess the initial guess of U matrix. Its data will be
+     * copied. Its unitarity will be verified and throw an exception
      * if the validation fails.
-     * @param threshold: the threshold used to check the unitarity. Default to
-     * 1e-8.
+     * @param [in] threshold the threshold used to check the unitarity. Default
+     * to 1e-8.
+     */
+
+    /**
+     * @brief Calculate the LOs and the unitary transformation matrix.
+     * @copydoc __param__U_guess__threshold
+     * @copydoc __return__lo_U
      */
     virtual vector<LOSCMatrix> lo_U(ConstRefMat &U_guess,
                                     double threshold = 1e-8) = 0;
 
     /**
+     * @class __param__L
+     * @param [in, out] L A matrix with dimension of `[nbasis, nlo]`. The
+     * content of L is ignored. At exit, it stores the LO coefficient matrix
+     * under AO.
+     */
+
+    /**
+     * @class __param__U
+     * @param [in, out] U A matrix with dimension of `[nlo, nlo]`. At entrance,
+     * it stores a unitary matrix as the initial guess for the localization.
+     * The unitarity of the input U matrix is not verified. At exit, it is
+     * updated by the localization process.
+     */
+
+    /**
      * @brief The C interface to calculate the LOs and the unitary
-     * @param L [in, out]: Dimension of [nbasis, nlo]. The content of L is
-     * ignored. At exit, it is stores to be the LO coefficient matrix.
-     * @param U [in, out]: Dimension of [nlo, nlo]. At entrance, it stores a
-     * unitary matrix as the initial guess for the localization. The unitarity
-     * of the input U matrix is not verified. At exit, it is updated by the
-     * localization process.
+     * transformation matrix
+     * @copydoc __param__L
+     * @copydoc __param__U
      */
     virtual void C_API_lo_U(RefMat L, RefMat U) = 0;
 
     /**
+     * @class __return__C_lo
+     * @return The LO coefficient matrix `C_lo` under AO with dimension
+     * `[nbasis, nlo]`. The `i`-th column of `C_lo` is the `i`-th LO.
+     */
+
+    /**
      * @brief Calculate the LOs' coefficient matrix under AO.
-     *
-     * @param guess: a string represents the initial guess. See `lo_U`.
-     * @return the LOs' coefficient matrix under AO.
+     * @copydoc __param__guess
+     * @copydoc __return__C_lo
+     * @see losc::LocalizerBase::lo_U()
      */
     virtual LOSCMatrix lo(const string &guess = "identity")
     {
@@ -186,9 +213,9 @@ class LocalizerBase {
 
     /**
      * @brief Calculate the LOs' coefficient matrix under AO.
-     *
-     * @param U_guess: the initial guess of U matrix. See `lo_U`.
-     * @return the LOs' coefficient matrix under AO.
+     * @copydoc __param__U_guess__threshold
+     * @copydoc __return__C_lo
+     * @see losc::LocalizerBase::lo_U()
      */
     virtual LOSCMatrix lo(ConstRefMat &U_guess, double threshold = 1e-8)
     {
@@ -245,12 +272,13 @@ class LocalizerV2 : public LocalizerBase {
 
   public:
     /**
-     * @param [in] C_lo_basis: LO basis coefficient matrix under AO with
-     * dimension [nbasis, nlo]. See LocalizerV2::C_lo_basis_.
-     * @param [in] H_ao: Hamiltonian matrix under AO used in localization with
-     * dimension [nbasis, nbasis].
-     * @param [in] Dipole_ao: dipole matrix under AO in x, y and z order with
-     * dimension [nbasis, nbasis].
+     * @brief Constructor of LocalizerV2
+     * @copydoc __param__C_lo_basis
+     * @param [in] H_ao Hamiltonian matrix under AO used in localization with
+     * dimension `[nbasis, nbasis]`.
+     * @param [in] Dipole_ao a vector of dipole matrices under AO (in the order
+     * of x, y and z). The dimension of each dipole matrix is
+     * `[nbasis, nbasis]`.
      */
     LocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
                 const vector<RefConstMat> &Dipole_ao);
@@ -267,36 +295,41 @@ class LocalizerV2 : public LocalizerBase {
 
     /**
      * Return the relative cost function of LOSC localization v2.
-     *
-     * @note
-     * The cost function is defined as:
-     * F = (1 - gamma) (<r^2> - <r>^2) + gamma * C (<h^2> - <h>^2).
+     * @note The cost function is defined as:
+     * \f[
+     *  F = \sum_i (1 - \gamma)
+     *      \Big (
+     *          \langle i | \mathbf{r}^2| i \rangle - \langle i | \mathbf{r} |
+     *          i \rangle ^2
+     *      \Big) +
+     *      \gamma C
+     *      \Big (
+     *      \langle i | H^2| i \rangle - \langle i | H | i \rangle ^2
+     *      \Big).
+     * \f]
      * Since the unitary transformation does not change the trace of a matrix,
-     * the contributions from <r^2> and <h^2> are ignored. So it is the relative
-     * cost function as:
-     * F = (1 - gamma) <r>^2 + gamma * C <h>^2.
+     * The relative cost function is evaluated:
+     * \f[
+     *  F_{\rm{rel}} = \sum_i (1 - \gamma) \langle i | \mathbf{r} | i \rangle ^2
+     *                 + \gamma C \langle i | H | i \rangle ^2.
+     * \f]
      */
     double cost_func(ConstRefMat &lo) const override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
      * LOSC localization v2.
-     *
-     * @param guess: a string represents the initial guess.
-     * See LocalizerBase::lo_U.
-     * @return the LOs' coefficient matrix under AO.
-     * @see LocalizerBase::lo_U()
+     * @copydoc __param__guess
+     * @copydoc __return__C_lo
      */
     virtual vector<LOSCMatrix> lo_U(const string &guess = "identity") override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the
      * LOSC localization v2.
-     *
-     * @param U_guess: the initial guess of U matrix. See LocalizerBase::lo_U.
-     * @param threshold: the threshold used to check the unitarity. Default to
-     * 1e-8.
-     * @see LocalizerBase::lo_U()
+     * @copydoc __param__U_guess__threshold
+     * @copydoc __return__lo_U
+     * @see losc::LocalizerV2::lo_U(const string&)
      */
     virtual vector<LOSCMatrix> lo_U(ConstRefMat &U_guess,
                                     double threshold = 1e-8) override;
@@ -304,9 +337,8 @@ class LocalizerV2 : public LocalizerBase {
     /**
      * @brief Calculate the LOs and the unitary transformation matrix in an
      * in-out way from the LOSC localization v2.
-     *
-     * @see
-     * LocalizerBase::lo_U
+     * @copydoc __param__L
+     * @copydoc __param__U
      */
     virtual void C_API_lo_U(RefMat L, RefMat U) override;
 };

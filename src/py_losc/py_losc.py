@@ -60,7 +60,7 @@ class DFAInfo(core.DFAInfo):
         The total weights of GGA and LDA exchanges are
         :math:`1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80`.
         The total weights of HF exchanges is
-        :math:`a0 = 0.20`. To construct a ``DFAInfo`` object for B3LYP
+        :math:`a_0 = 0.20`. To construct a ``DFAInfo`` object for B3LYP
         functional, one should do the following
 
         .. code-block:: python
