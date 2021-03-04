@@ -1,7 +1,6 @@
 /**
- * @file losc.h
+ * @file
  * @brief C interface for localized orbital scaling correction (LOSC) library.
- *
  */
 
 #ifndef _LOSC_INCLUDE_C_LOSC_LOSC_H_
