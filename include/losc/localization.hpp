@@ -80,7 +80,7 @@ class LocalizerBase {
     /**
      * @brief Deconstructor of LocalizerBase
      */
-    virtual ~LocalizerBase();
+    virtual ~LocalizerBase() {}
 
     /**
      * Return the number of iteration steps for the most recent localization
@@ -282,6 +282,11 @@ class LocalizerV2 : public LocalizerBase {
      */
     LocalizerV2(ConstRefMat &C_lo_basis, ConstRefMat &H_ao,
                 const vector<RefConstMat> &Dipole_ao);
+
+    /**
+     * @brief Deconstructor of LocalizerV2
+     */
+    ~LocalizerV2() {}
 
     /**
      * set the localization parameter gamma.

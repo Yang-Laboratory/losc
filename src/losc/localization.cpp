@@ -41,7 +41,4 @@ LocalizerBase::LocalizerBase(ConstRefMat &C_lo_basis)
                                         "LO basis matrix under AO.");
     }
 }
-
-LocalizerBase::~LocalizerBase() {}
-
 } // namespace losc

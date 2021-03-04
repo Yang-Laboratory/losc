@@ -45,6 +45,11 @@ class LoscException : public std::runtime_error {
         make_message(msg.c_str());
     }
 
+    /**
+     * @brief Deconstructor of LoscException.
+     */
+    ~LoscException() {}
+
     const char *what() const noexcept override { return msg_.str().c_str(); }
 };
 
@@ -67,6 +72,11 @@ class DimensionError : public LoscException {
      * @param [in] msg the description of error.
      */
     DimensionError(const string &msg);
+
+    /**
+     * @brief Deconstructor of DimensionError.
+     */
+    ~DimensionError() {}
 };
 
 } // namespace exception

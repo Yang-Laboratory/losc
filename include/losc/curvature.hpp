@@ -127,12 +127,17 @@ class CurvatureBase {
      */
 
     /**
-     * @brief Curvature base class constructor.
+     * @brief Constructor of CurvatureBase.
      * @copydoc __param__CurvatureBase
      */
     CurvatureBase(const DFAInfo &dfa, ConstRefMat &df_pii,
                   ConstRefMat &df_Vpq_inv, ConstRefMat &grid_lo,
                   ConstRefVec &grid_weight);
+
+    /**
+     * @brief Deconstructor of CurvatureBase.
+     */
+    ~CurvatureBase() {}
 
     /* TODO:
      * Add a constructor that can support block-wise construction of grid_lo to
@@ -217,6 +222,11 @@ class CurvatureV1 : public CurvatureBase {
     }
 
     /**
+     * @brief Deconstructor of CurvatureV1.
+     */
+    ~CurvatureV1() {}
+
+    /**
      * @brief The C interface to calculate LOSC curvature version 1 in place.
      * @copydoc __param__K
      */
@@ -265,6 +275,11 @@ class CurvatureV2 : public CurvatureBase {
         : CurvatureBase(dfa, df_pii, df_Vpq_inv, grid_lo, grid_weight)
     {
     }
+
+    /**
+     * @brief Deconstructor of CurvatureV2.
+     */
+    ~CurvatureV2() {}
 
     /**
      * @brief The C interface to calculate LOSC curvature version 2 in place.
