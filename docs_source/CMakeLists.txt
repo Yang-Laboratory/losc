@@ -15,15 +15,26 @@ find_package(Sphinx REQUIRED)
 # some variables used to configure sphinx source files.
 set(LOSC_DOXYGEN_HTML_OUTPUT "")
 set(C_LOSC_DOXYGEN_HTML_OUTPUT "")
+set(DOCS_OUTPUT_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs)
+set(DOCS_SOURCE_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
+file(MAKE_DIRECTORY ${DOCS_OUTPUT_ROOT_DIR})
+file(MAKE_DIRECTORY ${DOCS_SOURCE_ROOT_DIR})
+# To let github pages to host the docs and use the read-the-docs theme,
+# an empty `.nojekyll` file should be placed in the root dir of docs.
+file(TOUCH ${DOCS_OUTPUT_ROOT_DIR}/.nojekyll)
 
 # ==> Doxygen <==
 macro(build_doxygen module)
+    set(DOXYGEN_SOURCE_ROOT_DIR ${DOCS_SOURCE_ROOT_DIR}/doxygen/${module})
     set(DOXYGEN_INPUT_DIR ${CMAKE_SOURCE_DIR}/include/${module})
-    set(DOXYGEN_SOURCE_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen/${module})
-    set(DOXYGEN_OUTPUT_DIR ${DOXYGEN_SOURCE_ROOT_DIR})
-
-    set(DOXYGEN_HTML_OUTPUT_DIR ${DOXYGEN_SOURCE_ROOT_DIR}/html)
+    set(DOXYGEN_OUTPUT_DIR ${DOCS_OUTPUT_ROOT_DIR}/doxygen/${module})
+    set(DOXYGEN_HTML_OUTPUT_DIR ${DOXYGEN_OUTPUT_DIR}/html)
     set(DOXYGEN_HTML_OUTPUT ${DOXYGEN_HTML_OUTPUT_DIR}/index.html)
+    set(DOXYGEN_LAYOUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/DoxygenLayout.xml)
+
+    # create some directories that Doxygen won't create for us
+    file(MAKE_DIRECTORY ${DOXYGEN_SOURCE_ROOT_DIR})
+    file(MAKE_DIRECTORY ${DOXYGEN_HTML_OUTPUT_DIR})
 
     if ("${module}" STREQUAL "losc")
         set(DOXYGEN_PROJECT_NAME "\"Localized Orbital Scaling Correction (LOSC) C++ library\"")
@@ -35,10 +46,6 @@ macro(build_doxygen module)
         message(FATAL_ERROR "Unknown module to build docs: ${module}")
     endif()
     message(STATUS "Build docs for module: ${module}")
-
-    # create some directories that Doxygen won't create for us
-    file(MAKE_DIRECTORY ${DOXYGEN_SOURCE_ROOT_DIR})
-    file(MAKE_DIRECTORY ${DOXYGEN_HTML_OUTPUT_DIR})
 
     # configure the configuration file for doxygen.
     file(GLOB DOXYGEN_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*)
@@ -79,29 +86,14 @@ message(STATUS "LOSC_DOXYGEN_HTML_OUTPUT: ${LOSC_DOXYGEN_HTML_OUTPUT}")
 message(STATUS "C_LOSC_DOXYGEN_HTML_OUTPUT: ${C_LOSC_DOXYGEN_HTML_OUTPUT}")
 
 # ==> Sphinx <==
-set(SPHINX_BUILD_ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
-set(SPHINX_BUILD_DIR ${SPHINX_BUILD_ROOT_DIR}/build)
-set(SPHINX_SOURCE_DIR ${SPHINX_BUILD_ROOT_DIR}/source)
-set(SPHINX_HTML_OUTPUT ${SPHINX_BUILD_DIR}/index.html)
-
-# copy sphinx source files to building directory
-file(MAKE_DIRECTORY ${SPHINX_BUILD_DIR})
-file(GLOB SPHINX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/sphinx/*)
-file(COPY ${SPHINX_SOURCE_FILES} DESTINATION ${SPHINX_SOURCE_DIR})
-
-# configure sphinx source files
-configure_file(${SPHINX_SOURCE_DIR}/losc.rst.in ${SPHINX_SOURCE_DIR}/losc.rst @ONLY)
-configure_file(${SPHINX_SOURCE_DIR}/c_losc.rst.in ${SPHINX_SOURCE_DIR}/c_losc.rst @ONLY)
-
-# print some informational message.
-message(STATUS "SPHINX_SOURCE_DIR: ${SPHINX_SOURCE_DIR}")
-message(STATUS "SPHINX_BUILD_DIR: ${SPHINX_BUILD_DIR}")
-message(STATUS "SPHINX_HTML_OUTPUT: ${SPHINX_HTML_OUTPUT}")
-
 # Only regenerate Sphinx when:
 # - Doxygen has rerun
 # - Our doc files have been updated
 # - The Sphinx config has been updated
+set(SPHINX_HTML_OUTPUT ${DOCS_OUTPUT_ROOT_DIR}/index.html)
+set(SPHINX_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sphinx)
+set(SPHINX_BUILD_DIR ${DOCS_OUTPUT_ROOT_DIR})
+file(GLOB SPHINX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/sphinx/*)
 add_custom_command(OUTPUT ${SPHINX_HTML_OUTPUT}
                    COMMAND
                    ${SPHINX_EXECUTABLE} -b html
@@ -123,4 +115,4 @@ add_custom_target(dosc_sphinx ALL DEPENDS ${SPHINX_HTML_OUTPUT})
 
 message(STATUS "Note: Enable to build the documentation.\n"
                "   After the building process, see documentation in:\n"
-               "   ${SPHINX_HTML_OUTPUT}")
+               "   ${DOCS_OUTPUT_ROOT_DIR}")

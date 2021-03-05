@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+============================================
 Localized Orbital Scaling Correction Library
 ============================================
 
@@ -16,12 +17,3 @@ Localized Orbital Scaling Correction Library
    LOSC C library <c_losc.rst>
    LOSC Python library <py_losc.rst>
    Using LOSC library in psi4 <psi4_losc.rst>
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

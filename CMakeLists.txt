@@ -71,7 +71,7 @@ endif()
 # ==> build docs <==
 option(BUILD_DOC "Build documentation for Losc library" OFF)
 if (BUILD_DOC)
-    add_subdirectory(docs)
+    add_subdirectory(docs_source)
 else (BUILD_DOC)
     message("Note: If you want to build documentation, use `-DBUILD_DOC=On"
             "Doxygen will be required.")

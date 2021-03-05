@@ -62,5 +62,5 @@ refer to ``<losc/eigen_def.hpp>``.
 Detailed References for the API
 -------------------------------
 
-Please refer `this section <@LOSC_DOXYGEN_HTML_OUTPUT@>`_ for the full
+Please refer `this section <./doxygen/losc/html/index.html>`_ for the full
 documentation of C++ interface of the LOSC library.

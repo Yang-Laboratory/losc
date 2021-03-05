@@ -47,5 +47,5 @@ the matrix is ALWAYS interpreted in row-wise (C-style) major. See
 Detailed References for the API
 -------------------------------
 
-Please refer `this section <@C_LOSC_DOXYGEN_HTML_OUTPUT@>`_ for the full
+Please refer `this section <./doxygen/c_losc/html/index.html>`_ for the full
 documentation of C++ interface of the LOSC library.
