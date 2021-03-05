@@ -57,9 +57,11 @@ class DFAInfo(core.DFAInfo):
 
         in which exchanges end with suffix ``_x`` and correlations end with
         suffix ``_c``, :math:`a_0=0.20`, :math:`a_x=0.72` and :math:`a_c=0.81`.
-        The total weights of GGA and LDA exchanges are
-        :math:`1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80`.
-        The total weights of HF exchanges is
+        **Only the exchanges are considered and the correlations are ignored.
+        The GGA and LDA exchanges are viewed the same type.** Therefore,
+        the total weights of GGA and LDA exchanges are
+        :math:`1 - a_0 + a_x \\times (1 - 1) = 1 - a_0 = 0.80`, and
+        the total weights of HF exchanges is
         :math:`a_0 = 0.20`. To construct a ``DFAInfo`` object for B3LYP
         functional, one should do the following
 

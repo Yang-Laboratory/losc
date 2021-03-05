@@ -5,7 +5,7 @@ LOSC Python library
 ------------
 Introduction
 ------------
-``py_losc`` is the Python library that provides the Python interface to do
+``py_losc`` is the Python module that provides the Python interface to do
 calculations of LOSC. It wraps the
 :ref:`LOSC C++ library <losc:losc c++ library>` with the help of
 `pybind11 library <https://pybind11.readthedocs.io/en/latest/>`_.
@@ -16,7 +16,8 @@ The functionalities provided in ``py_losc`` library are similar to the
 Basic Guide
 ------------
 
-To use LOSC library in Python, all you need to do is ``import py_losc``.
+To use Python interface for the LOSC library, all you need to do is
+``import py_losc``.
 
 - To construct LOSC curvature matrix,
   see :ref:`this section <py_losc:losc curvature>`.
@@ -26,7 +27,7 @@ To use LOSC library in Python, all you need to do is ``import py_losc``.
   see :ref:`this section <py_losc:LOSC corrections>`.
 
 To implement post-SCF-LOSC and SCF-LOSC calculations in Python with
-the ``py_losc`` library, please refer to :ref:`this section
+the ``py_losc`` module, please refer to :ref:`this section
 <psi4_losc:use losc library in psi4>`, which demonstrates a real
 example of using ``py_losc`` in psi4 package.
 

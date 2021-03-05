@@ -35,28 +35,28 @@ Data Structure
 --------------
 The main data structure in the LOSC C++ library is the representation of
 matrix/vector objects. In the LOSC C++ library, we use the
-popular `Eigen library <https://eigen.tuxfamily.org/dox/>`_ for the goal,
+popular `Eigen library <https://eigen.tuxfamily.org/dox/>`_,
 which lets us achieve the manipulation of matrices and vectors easily.
 Particularly, we use ``Eigen::Matrix`` to represent matrices, and
 ``Eigen::Vector`` to represent vectors.
 
 Being different to the default behavior in ``Eigen`` that the storage of matrix
-is column-wise (Fortran-style), the storage of matrix in LOSC C++ library
-is row-wise (C-style). Instead of declaring the row-wise ``Eigen::Matrix``
+is column-wise (Fortran-style), the storage of matrix in the LOSC C++ library
+is row-wise (C-style). To avoid declaring the row-wise ``Eigen::Matrix``
 in a cumbersome way being like
 
 .. code-block:: C++
 
    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-we define an alias ``LOSCMatrix`` in the ``<losc/eigen_def.hpp>`` header.
+an alias ``LOSCMatrix`` is defined in ``<losc/eigen_def.hpp>`` as
 
 .. code-block:: C++
 
    using LOSCMatrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-There is similar alias ``LOSCVector`` for the vector objects. For all
-the alias of ``Eigen`` types that are used the LOSC C++ library, please
+There is a similar alias ``LOSCVector`` for the vector objects. For other
+alias of ``Eigen`` types that are used the LOSC C++ library, please
 refer to ``<losc/eigen_def.hpp>``.
 
 Detailed References for the API

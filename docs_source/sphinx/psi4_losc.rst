@@ -278,22 +278,20 @@ References
 
 **Literature**
 --------------
-
-.. [#losc1] `Li, Chen, et al. "Localized orbital scaling correction for
-   systematic elimination of delocalization error in density functional
-   approximations." National Science Review 5.2 (2018): 203-215.
+.. [#losc1] Li, C.; Zheng, X.; Su, N. Q.; Yang, W. Localized Orbital Scaling
+   Correction for System- atic Elimination of Delocalization Error in
+   Density Functional Approximations.
+   `Natl. Sci. Rev. 2018, 5, 203−215. 203-215.
    <https://doi.org/10.1093/nsr/nwx111>`_
 
-.. [#losc2] `Su, Neil Qiang, Aaron Mahler, and Weitao Yang.
-   "Preserving symmetry and degeneracy in the localized orbital scaling
-   correction approach."
-   The journal of physical chemistry letters 11.4
-   (2020): 1528-1535.
+.. [#losc2] Su, N. Q.; Mahler, A.; Yang, W. Preserving Symmetry and
+   Degeneracy in the Localized Orbital Scaling Correction Approach. J.
+   `Phys. Chem. Lett. 2020, 11, 1528−1535.
    <https://doi.org/10.1021/acs.jpclett.9b03888>`_
 
-.. [#scf-losc] `Mei, Yuncai, Zehua Chen, and Weitao Yang.
-   "Self-Consistent Calculation of the Localized Orbital Scaling
-   Correction for Correct Electron Densities and Energy-Level Alignments
-   in Density Functional Theory."
-   The Journal of Physical Chemistry Letters 11.23 (2020): 10269-10277.
+.. [#scf-losc] Mei, Y.; Chen, Z.; Yang, W.
+   Self-Consistent Calculation of the Localized Orbital Scaling Correction
+   for Correct Electron Densities and Energy-Level Alignments in Density
+   Functional Theory.
+   `J. Phys. Chem. Lett. 2020, 11, 23, 10269–10277.
    <https://doi.org/10.1021/acs.jpclett.0c03133>`_

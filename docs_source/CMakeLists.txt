@@ -94,6 +94,7 @@ set(SPHINX_HTML_OUTPUT ${DOCS_OUTPUT_ROOT_DIR}/index.html)
 set(SPHINX_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sphinx)
 set(SPHINX_BUILD_DIR ${DOCS_OUTPUT_ROOT_DIR})
 file(GLOB SPHINX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/sphinx/*)
+file(GLOB SPHINX_PYTHON_SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/**/*.py)
 add_custom_command(OUTPUT ${SPHINX_HTML_OUTPUT}
                    COMMAND
                    ${SPHINX_EXECUTABLE} -b html
@@ -104,6 +105,7 @@ add_custom_command(OUTPUT ${SPHINX_HTML_OUTPUT}
                    DEPENDS
                    # Other docs files you want to track should go here (or in some variable)
                    ${SPHINX_SOURCE_FILES}
+                   ${SPHINX_PYTHON_SOURCE_FILES}
                    losc
                    c_losc
                    py_losc_core

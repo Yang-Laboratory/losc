@@ -18,8 +18,8 @@ The provided C interface (C header files) includes
     ================================  ======================================
     Header                              Description
     ================================  ======================================
-    ``<losc/matrix.h>``               provide the C interface of the matrix
-                                      object that is used in the LOSC library.
+    ``<losc/matrix.h>``               provide the C interface for the matrix
+                                      objects that are used in the LOSC library.
     ``<losc/curvature.h>``            for the LOSC curvature matrix.
     ``<losc/localization.h>``         for the LOSC localization.
     ``<losc/local_occupation.h>``     for the LOSC local occupation.
@@ -48,4 +48,4 @@ Detailed References for the API
 -------------------------------
 
 Please refer `this section <./doxygen/c_losc/html/index.html>`_ for the full
-documentation of C++ interface of the LOSC library.
+documentation of C interface of the LOSC library.

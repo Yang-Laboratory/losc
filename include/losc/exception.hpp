@@ -68,7 +68,7 @@ class DimensionError : public LoscException {
     DimensionError(ConstRefMat &A, size_t expected_row, size_t expected_col,
                    const string &msg);
     /**
-     * @brief Constructor of DimensionError for general case.
+     * @brief Constructor of DimensionError with a general message.
      * @param [in] msg the description of error.
      */
     DimensionError(const string &msg);

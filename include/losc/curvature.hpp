@@ -288,12 +288,12 @@ class CurvatureV2 : public CurvatureBase {
     virtual void C_API_kappa(RefMat K) const override;
 
     /**
-     * @brief Set parameter tau.
+     * @brief Set parameter \f$ \tau \f$.
      */
     void set_tau(double tau) { tau_ = tau; }
 
     /**
-     * @brief Set parameter zeta.
+     * @brief Set parameter \f$ \zeta \f$.
      */
     void set_zeta(double zeta) { zeta_ = zeta; }
 };

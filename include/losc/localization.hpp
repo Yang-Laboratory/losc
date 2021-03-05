@@ -95,9 +95,10 @@ class LocalizerBase {
     bool is_converged() const { return converged_; }
 
     /**
-     * Return the localization cost function value for the given LOs.
+     * @brief Return the localization cost function value for the given LOs.
+     * @copydoc __param__C_lo
      */
-    virtual double cost_func(ConstRefMat &lo) const = 0;
+    virtual double cost_func(ConstRefMat &C_lo) const = 0;
 
     /**
      * @brief Set the maximum iteration number for localization.
@@ -289,17 +290,18 @@ class LocalizerV2 : public LocalizerBase {
     ~LocalizerV2() {}
 
     /**
-     * set the localization parameter gamma.
+     * set the localization parameter \f$ \gamma \f$.
      */
     void set_gamma(double gamma) { gamma_ = gamma; }
 
     /**
-     * set the localization parameter c.
+     * set the localization parameter \f$ C \f$.
      */
     void set_c(double c) { c_ = c; }
 
     /**
-     * Return the relative cost function of LOSC localization v2.
+     * @brief Return the relative cost function of LOSC localization v2.
+     * @copydoc __param__C_lo
      * @note The cost function is defined as:
      * \f[
      *  F = \sum_i (1 - \gamma)
@@ -310,8 +312,9 @@ class LocalizerV2 : public LocalizerBase {
      *      \gamma C
      *      \Big (
      *      \langle i | H^2| i \rangle - \langle i | H | i \rangle ^2
-     *      \Big).
+     *      \Big),
      * \f]
+     * in which index `i` is summed over all LOs.
      * Since the unitary transformation does not change the trace of a matrix,
      * The relative cost function is evaluated:
      * \f[
@@ -319,7 +322,7 @@ class LocalizerV2 : public LocalizerBase {
      *                 + \gamma C \langle i | H | i \rangle ^2.
      * \f]
      */
-    double cost_func(ConstRefMat &lo) const override;
+    double cost_func(ConstRefMat &C_lo) const override;
 
     /**
      * @brief Calculate the LOs and the unitary transformation matrix from the

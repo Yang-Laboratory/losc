@@ -25,10 +25,13 @@ Dependencies and tools
 
     - `Python interpreter (3.7) <https://www.python.org/>`_
     - `Numpy <http://www.numpy.org/>`_
-    - `The psi4 package <https://psicode.org/>`_ for using ``psi4_losc`` module.
+    - `The psi4 package <https://psicode.org/>`_ for using the
+      ``psi4_losc`` module.
 
-- There is no need to build the documentation by yourself. However, if you
-  insist to do so, following dependencies and tools are necessary:
+- There is no need to build the documentation by yourself. You can find the
+  `online documentation <https://miocbb.github.io/losc>`_. However, if you
+  insist to generate the documentation that is corresponding to your local
+  version of the source code, you need the following dependencies and tools:
 
     - `sphinx <https://www.sphinx-doc.org/en/master/#>`_: python documentation
       generator.
@@ -39,22 +42,29 @@ Dependencies and tools
 Compile from the source code
 ----------------------------
 
-1. you can obtain the source code from the github
+#. you can obtain the source code from `the github repository
+   <https://github.com/Miocbb/losc>`_ via ``git clone``:
 
    .. code-block:: bash
 
-      >>> git clone https://github.com/Miocbb/losc.git
+        >>> git clone https://github.com/Miocbb/losc.git
 
-2. Navigate to the top level directory of the source code
+   Doing so requires you to have ``git`` installed in your system. If you do
+   not have access to ``git``, you can download the archive of the source
+   code from the `the github repository <https://github.com/Miocbb/losc>`_,
+   and extract the source manually.
+
+#. Navigate to the top level directory of the source code
    ``{top-level-losc-dir}``. It is suggested to separate the building files
    to the source files with creating a build directory ``{build_dir}``.
    Then run ``cmake`` to configure the building process.
 
    .. code-block:: bash
 
-       >>> mkdir {build_dir}
-       >>> cd {build_dir}
-       >>> cmake {top-level-losc-dir}
+        >>> cd {top-level-losc-dir}
+        >>> mkdir {build_dir}
+        >>> cd {build_dir}
+        >>> cmake {top-level-losc-dir}
 
    You can configure ``cmake`` with following options:
 
@@ -67,12 +77,12 @@ Compile from the source code
        - ``DBUILD_TEST``: Build the test or not. Default to off.
        - ``DBUILD_DOC``: Build the documentation or not. Default to off.
 
-3. Invoke ``make`` to build and install.
+#. Invoke ``make`` to build and install.
 
    .. code-block:: bash
 
       >>> make
-      >>> make install
+      >>> make install # installing is optional.
 
    or invoke``make`` in parallel with multiple processors.
 
@@ -80,23 +90,30 @@ Compile from the source code
 
       >>> make -j {number-of-processors}
 
-   .. Warning:: If you enable to build the documentation, run ``make`` with
-      multiple processors will raise error (something relates to the ``breathe``
-      extension). You can run ``make`` with a single processor at the end to
-      finish the building process for the documentation.
+   **If all you need is the C/C++ parts of the LOSC library, you are okay to
+   stop here. If you want to use the Python interface or the LOSC library
+   in psi4, please continue.**
 
-4. Configure running time for Python modules (``py_losc`` and ``psi4_losc``).
+#. Configure running time for Python modules (``py_losc`` and ``psi4_losc``).
 
    Append the path of ``py_losc`` and ``psi4_losc`` module to the ``PYTHONPATH``
    environment variable in your ``~/.zshrc`` or ``~/.bashrc`` file. This is to
    enable the Python interpreter to locate ``py_losc`` and ``psi4_losc`` modules
    and import them successfully at running time.
 
+   If you installed the LOSC library:
+
    .. code-block:: bash
 
       export PYTHONPATH=${PYTHONPATH}:{DCMAKE_INSTALL_PREFIX}/liblosc
 
-5. Running tests to verify the compilation/installing is optional.
+   If you only build the LOSC library and not install it:
+
+   .. code-block:: bash
+
+      export PYTHONPATH=${PYTHONPATH}:{build_dir}/src
+
+#. Running tests to verify the compilation/installing is optional.
 
     - To run tests for ``losc`` C++ library, remember to build tests for
       ``losc`` first with ``DBUILD_TEST=On``. Then run the executable losc test
