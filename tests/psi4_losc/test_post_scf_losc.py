@@ -4,7 +4,6 @@ Test code for post-SCF-LOSC calculation, `psi4_losc.post_scf_losc()`.
 
 import unittest
 import psi4
-import numpy as np
 import psi4_losc
 from psi4_losc import post_scf_losc
 
@@ -54,7 +53,7 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
                           'scf_type':   'df',
                           'e_convergence': 1e-8,
                           'maxiter': 100})
-        psi4_losc.options.curvature['df_molecular_fragment_size'] = 1
+        psi4_losc.options.set_param('curvature', 'df_molecular_fragment_size', 1)
 
     def run_mol_no_correction(self, mol, precision=7):
         """

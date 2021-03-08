@@ -6,8 +6,8 @@ LOSC implementation with psi4.
 import psi4
 import numpy as np
 from random import shuffle
-from psi4_losc import options
 from qcelemental import constants
+from psi4_losc import options
 
 
 def _local_print(print_level, verbose_level, *args):
@@ -161,7 +161,7 @@ def form_df_matrix(wfn, C_lo):
     nspin = len(C_lo)
     mol = wfn.molecule()
     frag_mol, whole_mol = split_molecule(mol, return_whole_mol=True,
-                                         frag_size=options.curvature['df_molecular_fragment_size'])
+                                         frag_size=options.get_param('curvature', 'df_molecular_fragment_size'))
     aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
     aux_bas = []
     nfitbasis = 0

@@ -5,7 +5,7 @@ SCF-LOSC-DFA calculations with compabilities for fractional systems.
 import psi4
 import numpy as np
 import py_losc
-from psi4_losc import post_scf_losc
+from psi4_losc.psi4_losc import post_scf_losc
 from psi4_losc import utils
 from psi4_losc import diis
 from psi4_losc import jk

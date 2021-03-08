@@ -174,6 +174,15 @@ wavefunction object.
 Advanced
 --------
 
+Configure LOSC calculations with options
+----------------------------------------
+
+You can configure the options for the LOSC calculations in ``psi4_losc`` module.
+These configurations include option settings related to LOSC curvatures,
+localizations and so on. See details in :ref:`this section
+<psi4_losc__options_label>`.
+
+
 Setting energy window for LOSC calculation
 ------------------------------------------
 
@@ -275,6 +284,19 @@ References
     :inherited-members:
 
 --------------------
+
+.. _psi4_losc__options_label:
+
+**Configure LOSC options in psi4_losc**
+---------------------------------------
+
+The configuration of LOSC calculation for `psi4_losc` module is controlled
+by `psi4_losc.options` variable. These configurations include the adjustments
+to the LOSC curvature, and localizations. The details are shown below.
+
+.. autodata:: psi4_losc.options
+.. autoclass:: psi4_losc.losc_options.Options
+    :members:
 
 **Literature**
 --------------

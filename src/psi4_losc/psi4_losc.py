@@ -10,9 +10,9 @@ scf.py : including self-implemented SCF procedures to perform calculations of
 import psi4
 import py_losc
 import numpy as np
-import psi4_losc.options as options
 from psi4_losc import utils
 from qcelemental import constants
+from psi4_losc import options
 
 #: `py_losc.DFAInfo` object for B3LYP functional.
 B3LYP = py_losc.DFAInfo(0.8, 0.2, 'B3LYP')
@@ -157,10 +157,10 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
     D = [np.asarray(dfa_wfn.Da()), np.asarray(dfa_wfn.Db())]
 
     # ====> !!! Start of LOSC !!! <====
-    if verbose >= 1:
-        options.show_options()
-    # ==> LOSC localization <==
+    # Print all losc settings.
+    local_print(1, f'{options}')
 
+    # ==> LOSC localization <==
     def select_CO(wfn, spin, window):
         """Return the CO index bounds."""
         eig = [np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b())][spin]
@@ -205,16 +205,16 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
         else:
             C_co_used = C_co[s]
         # create losc localizer object
-        if options.localization['version'] == 2:
+        localizer_version = options.get_param('localizer', 'version')
+        if localizer_version == 2:
             localizer = py_losc.LocalizerV2(C_co_used, H_ao[s], D_ao)
-            localizer.set_c(options.localization['v2_parameter_c'])
-            localizer.set_gamma(options.localization['v2_parameter_gamma'])
+            localizer.set_c(options.get_param('localizer', 'v2_parameter_c'))
+            localizer.set_gamma(options.get_param('localizer', 'v2_parameter_gamma'))
         else:
-            raise Exception('Detect non-supporting localization version.')
-        localizer.set_max_iter(options.localization['max_iter'])
-        localizer.set_convergence(options.localization['convergence'])
-        localizer.set_random_permutation(
-            options.localization['random_permutation'])
+            raise Exception(f'Detect non-supporting localization version: version={localizer_version}.')
+        localizer.set_max_iter(options.get_param('localizer', 'max_iter'))
+        localizer.set_convergence(options.get_param('localizer', 'convergence'))
+        localizer.set_random_permutation(options.get_param('localizer', 'random_permutation'))
         # compute LOs
         C_lo[s], U[s] = localizer.lo_U()
 
@@ -222,10 +222,8 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
         local_print(1, '')
         local_print(1, f'    ==> Localization status for spin: {s} <==')
         local_print(1, f'    iteration steps: {localizer.steps()}')
-        local_print(
-            1, f'    cost function value: {localizer.cost_func(C_lo[s])}')
-        local_print(
-            1, f'    convergence: {"True" if localizer.is_converged() else "False, Warning!!!"}')
+        local_print(1, f'    cost function value: {localizer.cost_func(C_lo[s])}')
+        local_print(1, f'    convergence: {"True" if localizer.is_converged() else "False, Warning!!!"}')
         local_print(1, '')
 
     # ==> LOSC curvature matrix <==
@@ -242,19 +240,20 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
     curvature = [None] * nspin
     for s in range(nspin):
         # build losc curvature matrix
-        if options.curvature['version'] == 2:
+        curvature_version = options.get_param('curvature', 'version')
+        if curvature_version == 2:
             curvature_helper = py_losc.CurvatureV2(dfa_info, df_pii[s],
                                                    df_Vpq_inv, grid_lo[s],
                                                    grid_w)
-            curvature_helper.set_tau(options.curvature['v2_parameter_tau'])
-            curvature_helper.set_zeta(options.curvature['v2_parameter_zeta'])
-        elif options.curvature['version'] == 1:
+            curvature_helper.set_tau(options.get_param('curvature', 'v2_parameter_tau'))
+            curvature_helper.set_zeta(options.get_param('curvature', 'v2_parameter_zeta'))
+        elif curvature == 1:
             curvature_helper = py_losc.CurvatureV1(dfa_info, df_pii[s],
                                                    df_Vpq_inv, grid_lo[s],
                                                    grid_w)
-            curvature_helper.set_tau(options.curvature['v1_parameter_tau'])
+            curvature_helper.set_tau(options.get_param('curvature', 'v1_parameter_tau'))
         else:
-            raise Exception('Detect un-supported curvature version.')
+            raise Exception(f'Detect un-supported curvature version: version={curvature_version}')
         # TODO: add curvature setting options.
         curvature[s] = curvature_helper.kappa()
 
