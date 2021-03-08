@@ -162,7 +162,7 @@ def form_df_matrix(wfn, C_lo):
     mol = wfn.molecule()
     frag_mol, whole_mol = split_molecule(mol, return_whole_mol=True,
                                          frag_size=options.get_param('curvature', 'df_molecular_fragment_size'))
-    aux_bas_name = psi4.core.get_global_option('DF_BASIS_SCF').lower()
+    aux_bas_name = options.get_param('curvature', 'df_basis').lower()
     aux_bas = []
     nfitbasis = 0
     for frag in frag_mol:

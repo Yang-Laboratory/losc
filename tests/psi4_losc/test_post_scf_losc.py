@@ -54,6 +54,7 @@ class TestPostSCFLOSCIntegerAufbau(unittest.TestCase):
                           'e_convergence': 1e-8,
                           'maxiter': 100})
         psi4_losc.options.set_param('curvature', 'df_molecular_fragment_size', 1)
+        psi4_losc.options.set_param('curvature', 'df_basis', '6-31g')
 
     def run_mol_no_correction(self, mol, precision=7):
         """

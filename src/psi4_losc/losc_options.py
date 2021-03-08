@@ -12,7 +12,8 @@ class Options():
         - `key`: the key of the option in `module`.
         - `value`: the value of the option in `module`.
 
-    All `module` and `key` values are str and case-insensitive.
+    **All `module` and `key` values are str and case-insensitive at input. The
+    case-insensitivity of `value` depends on the option.**
 
     - **The curvature module**: `module = "curvature"`
 
@@ -24,15 +25,19 @@ class Options():
             The parameter :math:`\\tau` in LOSC curvature version 1.
             Require `version=1` to use this setting.
         - v2_parameter_tau: float, default=1.2378
-              The parameter :math:`\\tau` in LOSC curvature version 2.
-              Require `version=2` to use this setting.
+            The parameter :math:`\\tau` in LOSC curvature version 2.
+            Require `version=2` to use this setting.
         - v2_parameter_zeta: float, default=8.0
-              The parameter :math:`\\zeta` in LOSC curvature version 2.
-              Require `version=2` to use this setting.
+            The parameter :math:`\\zeta` in LOSC curvature version 2.
+            Require `version=2` to use this setting.
         - df_molecular_fragment_size: int, default=2
-              The size in the number of atoms to split the module. This is used
-              to achieve the block-wise construction of two-electron integral of
-              curvature with density fitting.
+            The size in the number of atoms to split the module. This is used
+            to achieve the block-wise construction of two-electron integral of
+            curvature with density fitting.
+        - df_basis: str, default="aug-cc-pvtz-ri"
+            The basis set used in density fitting for LOSC curvature. The
+            name of basis set follows the rules in psi4. `df_basis` is
+            case-insensitive.
 
     - **The localizer module**: `module = "localizer"`
 
@@ -63,6 +68,7 @@ class Options():
                 'v2_parameter_tau': 1.2378,
                 'v2_parameter_zeta': 8.0,
                 'df_molecular_fragment_size': 2,
+                'df_basis': 'aug-cc-pvtz-ri',
             },
             'localizer': {
                 'version': 2,
