@@ -13,7 +13,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Download pybind11 library
 set(PYBIND11_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/pybind11")
 if(NOT EXISTS "${PYBIND11_SOURCE_DIR}")
-    message(STATUS "Download external library: pybind11.")
+    message(STATUS "Downloading external library: pybind11.")
     configure_file(cmake/download_pybind11.in download/pybind11/CMakeLists.txt)
     execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/pybind11"
@@ -28,7 +28,7 @@ find_package (Eigen3 REQUIRED NO_MODULE)
 if(Eigen3_FOUND)
     message(STATUS "Eigen3 library found.")
 else()
-    message(FETAL_ERROR "Not found Eigen3 library. Please install Eigen3 library.")
+    message(FATAL_ERROR "Eigen3 library not found. Please install Eigen3 library.")
 endif()
 
 # ==> build pybind11 <==
@@ -44,7 +44,7 @@ if (BUILD_TEST)
     # Download googletest library
     set(GOOGLE_TEST_SOURCE_DIR "${CMAKE_SOURCE_DIR}/external/googletest")
     if(NOT EXISTS "${GOOGLE_TEST_SOURCE_DIR}")
-        message(STATUS "Download external library: googletest.")
+        message(STATUS "Downloading external library: googletest.")
         configure_file(cmake/download_gtest.in download/googletest/CMakeLists.txt)
         execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/googletest"
