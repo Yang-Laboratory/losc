@@ -24,11 +24,29 @@ if(NOT EXISTS "${PYBIND11_SOURCE_DIR}")
 endif()
 
 # find Eigen3 library.
-find_package (Eigen3 REQUIRED NO_MODULE)
+find_package (Eigen3 NO_MODULE)
 if(Eigen3_FOUND)
     message(STATUS "Eigen3 library found.")
 else()
-    message(FATAL_ERROR "Eigen3 library not found. Please install Eigen3 library.")
+    # Download and build Eigen3
+    message(STATUS "Downloading external library: Eigen3.")
+    set(EXTERNAL_INSTALL_LOCATION "${CMAKE_SOURCE_DIR}/external")
+    configure_file(cmake/download_eigen3.in download/eigen3/CMakeLists.txt)
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/eigen3"
+    )
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} --build .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/download/eigen3"
+    )
+    # find Eigen3 again
+    find_package (Eigen3 REQUIRED NO_MODULE)
+    if(Eigen3_FOUND)
+        message(STATUS "External Eigen3 library is installed.")
+    else()
+        message(FATAL_ERROR "Eigen3 library not found. Please install Eigen3 library.")
+    endif()
 endif()
 
 # ==> build pybind11 <==
