@@ -7,7 +7,6 @@
 #define _LOSC_INCLUDE_LOSC_EXCEPTION_HPP_
 
 #include <losc/eigen_def.hpp>
-#include <sstream> // std::stringstream
 #include <stdexcept>
 #include <string>
 
@@ -33,7 +32,7 @@ class LoscException : public std::runtime_error {
     void make_message(const char *msg);
 
   protected:
-    stringstream msg_;
+    string msg_;
 
   public:
     /**
@@ -50,7 +49,7 @@ class LoscException : public std::runtime_error {
      */
     ~LoscException() {}
 
-    const char *what() const noexcept override { return msg_.str().c_str(); }
+    const char *what() const noexcept override { return msg_.c_str(); }
 };
 
 /**

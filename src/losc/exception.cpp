@@ -6,27 +6,33 @@ namespace exception {
 
 void LoscException::make_message(const char *msg)
 {
-    msg_ << std::endl;
-    msg_ << "Fatal error: " << msg << std::endl;
+    stringstream s;
+    s << std::endl;
+    s << "Fatal error: " << msg << std::endl;
+    msg_ = s.str();
 }
 
 DimensionError::DimensionError(ConstRefMat &A, size_t expected_row,
                                size_t expected_col, const string &msg)
     : LoscException("Wrong matrix dimension.")
 {
-    msg_ << "Description: " << msg << std::endl;
-    msg_ << "Details: "
+    stringstream s;
+    s << "Description: " << msg << std::endl;
+    s << "Details: "
          << "Current matrix dimension: [" << A.rows() << ", " << A.cols() << "]"
          << std::endl;
-    msg_ << "         "
+    s << "         "
          << "Expected matrix dimension: [" << expected_row << ", "
          << expected_col << "]" << std::endl;
+    msg_ = s.str();
 }
 
 DimensionError::DimensionError(const string &msg)
     : LoscException("Dimension error.")
 {
-    msg_ << "Description: " << msg << std::endl;
+    stringstream s;
+    s << "Description: " << msg << std::endl;
+    msg_ = s.str();
 }
 
 } // namespace exception
