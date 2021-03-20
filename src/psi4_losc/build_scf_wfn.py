@@ -12,7 +12,7 @@ import numpy as np
 _psi4_scf_wavefunction_factory = psi4.driver.scf_wavefunction_factory
 
 
-def _to_losc_wfn(wfn):
+def _to_losc_wfn(wfn, losc_data):
     """
     Update psi4 wfn methods to have LOSC contributions by overriding some
     key functions.
@@ -21,6 +21,9 @@ def _to_losc_wfn(wfn):
     original_form_F = self.form_F
     origninal_compute_E = self.compute_E
     nspin = 1 if wfn.same_a_b_orbs() and wfn.same_a_b_dens() else 2
+    curvature = losc_data.get('curvature', [])
+    C_lo = losc_data.get('C_lo', [])
+    E_losc = [0] # we need to use list to let inner function has modify access.
 
     def form_F():
         # Build DFA Fock matrix. This will update `wfn.Fa()` and `wfn.Fb()`.
@@ -33,26 +36,25 @@ def _to_losc_wfn(wfn):
         S = np.asarray(self.S())
         D = [np.asarray(self.Da()), np.asarray(self.Db())]
         F = [np.asarray(self.Fa()), np.asarray(self.Fb())]
-        self._E_losc = 0
+        E_losc[0] = 0
         for s in range(nspin):
             # build LOSC local occupation matrix
-            local_occ = py_losc.local_occupation(self._C_lo[s], S, D[s])
+            local_occ = py_losc.local_occupation(C_lo[s], S, D[s])
             # build LOSC effective Fock matrix
             H_losc = py_losc.ao_hamiltonian_correction(
-                S, self._C_lo[s], self._curvature[s], local_occ)
+                S, C_lo[s], curvature[s], local_occ)
             F[s][:] += H_losc
             # form LOSC energy correction
-            self._E_losc += py_losc.energy_correction(
-                self._curvature[s], local_occ)
+            E_losc[0] += py_losc.energy_correction(curvature[s], local_occ)
         if nspin == 1:
-            self._E_losc *= 2
+            E_losc[0] *= 2
 
     def compute_E():
         # Compute DFA total energy
         E_dfa = origninal_compute_E()
         # Add LOSC energy. Register LOSC energy into wfn energetics table.
-        self.set_energies('LOSC energy', self._E_losc)
-        E_tot = E_dfa + self._E_losc
+        self.set_energies('LOSC energy', E_losc[0])
+        E_tot = E_dfa + E_losc[0]
         return E_tot
 
     # override wfn methods.
@@ -95,10 +97,13 @@ def _scf_wavefunction_factory_extended_version(name, ref_wfn, reference, **kwarg
                 f"reference ({reference}) not supported for LOSC wavefunction.")
 
         # update to losc wfn.
-        _to_losc_wfn(wfn)
+        _to_losc_wfn(wfn, losc_data)
     return wfn
 
 
 # Here, we update `psi4.proc.scf_wavefunction_factory()` with the extended
 # version.
 psi4.driver.scf_wavefunction_factory = _scf_wavefunction_factory_extended_version
+# we need to update psi4.proc.scf_wavefunction_factory,
+# not psi4.driver.scf_wavefunction_factory.
+psi4.proc.scf_wavefunction_factory = _scf_wavefunction_factory_extended_version
