@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="localization_8hpp" kind="file" language="C++">
+    <compoundname>localization.hpp</compoundname>
+    <includes local="no">cstddef</includes>
+    <includes refid="eigen__def_8hpp" local="no">losc/eigen_def.hpp</includes>
+    <includes local="no">string</includes>
+    <includes local="no">vector</includes>
+    <includedby refid="losc_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/losc.hpp</includedby>
+    <incdepgraph>
+      <node id="35">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/localization.hpp</label>
+        <link refid="localization.hpp"/>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>losc/eigen_def.hpp</label>
+        <link refid="eigen__def_8hpp"/>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>string</label>
+      </node>
+      <node id="38">
+        <label>Eigen/Dense</label>
+      </node>
+      <node id="40">
+        <label>vector</label>
+      </node>
+      <node id="36">
+        <label>cstddef</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="41">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/localization.hpp</label>
+        <link refid="localization.hpp"/>
+        <childnode refid="42" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/losc.hpp</label>
+        <link refid="losc_8hpp"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classlosc_1_1LocalizerBase" prot="public">losc::LocalizerBase</innerclass>
+    <innerclass refid="classlosc_1_1LocalizerV2" prot="public">losc::LocalizerV2</innerclass>
+    <innernamespace refid="namespacelosc">losc</innernamespace>
+    <briefdescription>
+<para>C++ interface for the LOSC localization. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_LOSC_LOCALIZATION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_LOSC_LOCALIZATION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstddef&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="eigen__def_8hpp" kindref="compound">losc/eigen_def.hpp</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacelosc" kindref="compound">losc</ref><sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>std::string;</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>std::vector;</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28" refid="classlosc_1_1LocalizerBase" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classlosc_1_1LocalizerBase" kindref="compound">LocalizerBase</ref><sp/>{</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">protected</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>nlo_;<sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>nbasis_;<sp/><sp/></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>nsteps_;<sp/><sp/></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>converged_;<sp/></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>LO<sp/>basis<sp/>coefficient<sp/>matrix<sp/>under<sp/>AOs.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Dimension:<sp/>[nbasis,<sp/>nlo]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>C_lo_basis_;</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Maximum<sp/>iteration<sp/>number<sp/>of<sp/>Jacobi-sweep<sp/>algorithm<sp/>for</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>js_max_iter_<sp/>=<sp/>1000;</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>If<sp/>use<sp/>random<sp/>permutation<sp/>in<sp/>Jacobi-sweep<sp/>algorithm<sp/>or<sp/>not.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>js_random_permutation_<sp/>=<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Convergence<sp/>tolerance<sp/>tolerance<sp/>in<sp/>Jacobi-sweep<sp/>algorithm.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>js_tol_<sp/>=<sp/>1e-10;</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>set_u_guess(<ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>U,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;guess)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>set_u_guess(<ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>U,<sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;U_guess,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>threshold)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1LocalizerBase_1a2fe839092247fbd128aac1772d0cd017" kindref="member">LocalizerBase</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;C_lo_basis);</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"></highlight></codeline>
+<codeline lineno="83" refid="classlosc_1_1LocalizerBase_1a33a5199ded590d2bb6e9230df4aca3be" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a33a5199ded590d2bb6e9230df4aca3be" kindref="member">~LocalizerBase</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89" refid="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" kindref="member">steps</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>nsteps_;<sp/>}</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"></highlight></codeline>
+<codeline lineno="95" refid="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" kindref="member">is_converged</ref>()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>converged_;<sp/>}</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a71d327c6b83d118807d39fa0e940b79b" kindref="member">cost_func</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;C_lo)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"></highlight></codeline>
+<codeline lineno="106" refid="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" kindref="member">set_max_iter</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>max_iter)<sp/>{<sp/>js_max_iter_<sp/>=<sp/>max_iter;<sp/>}</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"></highlight></codeline>
+<codeline lineno="111" refid="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" kindref="member">set_convergence</ref>(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>tol)<sp/>{<sp/>js_tol_<sp/>=<sp/>tol;<sp/>}</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="118" refid="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" kindref="member">set_random_permutation</ref>(</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>flag)<sp/>{<sp/>js_random_permutation_<sp/>=<sp/>flag;<sp/>}</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>vector&lt;LOSCMatrix&gt;<sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;guess<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;identity&quot;</highlight><highlight class="normal">)<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"></highlight></codeline>
+<codeline lineno="172"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>vector&lt;LOSCMatrix&gt;<sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;U_guess,</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>threshold<sp/>=<sp/>1e-8)<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"></highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ac15cd3a62d73749f57206486ff7c9816" kindref="member">C_API_lo_U</ref>(<ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>L,<sp/><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>U)<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="197"><highlight class="normal"></highlight></codeline>
+<codeline lineno="210" refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">lo</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;guess<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;identity&quot;</highlight><highlight class="normal">)</highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(guess)[0];</highlight></codeline>
+<codeline lineno="213"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="214"><highlight class="normal"></highlight></codeline>
+<codeline lineno="221" refid="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/><ref refid="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" kindref="member">lo</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;U_guess,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>threshold<sp/>=<sp/>1e-8)</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="223"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(U_guess,<sp/>threshold)[0];</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="225"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"></highlight></codeline>
+<codeline lineno="232" refid="classlosc_1_1LocalizerV2" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classlosc_1_1LocalizerV2" kindref="compound">LocalizerV2</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase" kindref="compound">LocalizerBase</ref><sp/>{</highlight></codeline>
+<codeline lineno="233"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="239"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>H_ao_;</highlight></codeline>
+<codeline lineno="240"><highlight class="normal"></highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>vector&lt;RefConstMat&gt;<sp/>Dipole_ao_;</highlight></codeline>
+<codeline lineno="246"><highlight class="normal"></highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>c_<sp/>=<sp/>1000;</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"></highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>gamma_<sp/>=<sp/>0.707;</highlight></codeline>
+<codeline lineno="258"><highlight class="normal"></highlight></codeline>
+<codeline lineno="262"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>js_optimize_one_pair(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>i,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>j,</highlight></codeline>
+<codeline lineno="263"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>vector&lt;LOSCMatrix&gt;<sp/>&amp;D_lo,</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/>&amp;H_lo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;theta_val,</highlight></codeline>
+<codeline lineno="265"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;delta_val)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="270"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>js_rotate_one_pair(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>i,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>j,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>theta,</highlight></codeline>
+<codeline lineno="271"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>U,<sp/>vector&lt;LOSCMatrix&gt;<sp/>&amp;D_lo,</highlight></codeline>
+<codeline lineno="272"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/>&amp;H_lo)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="273"><highlight class="normal"></highlight></codeline>
+<codeline lineno="274"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="284"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1LocalizerV2" kindref="compound">LocalizerV2</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;C_lo_basis,<sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;H_ao,</highlight></codeline>
+<codeline lineno="285"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>vector&lt;RefConstMat&gt;<sp/>&amp;Dipole_ao);</highlight></codeline>
+<codeline lineno="286"><highlight class="normal"></highlight></codeline>
+<codeline lineno="290" refid="classlosc_1_1LocalizerV2_1a766642cf1ebd619521568385aa88f287" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1LocalizerV2_1a766642cf1ebd619521568385aa88f287" kindref="member">~LocalizerV2</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="291"><highlight class="normal"></highlight></codeline>
+<codeline lineno="295" refid="classlosc_1_1LocalizerV2_1ad970dcc0d2471ab2b2a1baf93b7c1d00" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerV2_1ad970dcc0d2471ab2b2a1baf93b7c1d00" kindref="member">set_gamma</ref>(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>gamma)<sp/>{<sp/>gamma_<sp/>=<sp/>gamma;<sp/>}</highlight></codeline>
+<codeline lineno="296"><highlight class="normal"></highlight></codeline>
+<codeline lineno="300" refid="classlosc_1_1LocalizerV2_1aa61ad3d4480d58f5564f16f4a17ba3c1" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerV2_1aa61ad3d4480d58f5564f16f4a17ba3c1" kindref="member">set_c</ref>(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>c)<sp/>{<sp/>c_<sp/>=<sp/>c;<sp/>}</highlight></codeline>
+<codeline lineno="301"><highlight class="normal"></highlight></codeline>
+<codeline lineno="325"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1a71d327c6b83d118807d39fa0e940b79b" kindref="member">cost_func</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;C_lo)<sp/></highlight><highlight class="keyword">const<sp/>override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="326"><highlight class="normal"></highlight></codeline>
+<codeline lineno="333"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>vector&lt;LOSCMatrix&gt;<sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;guess<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;identity&quot;</highlight><highlight class="normal">)<sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="334"><highlight class="normal"></highlight></codeline>
+<codeline lineno="342"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>vector&lt;LOSCMatrix&gt;<sp/><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;U_guess,</highlight></codeline>
+<codeline lineno="343"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>threshold<sp/>=<sp/>1e-8)<sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="344"><highlight class="normal"></highlight></codeline>
+<codeline lineno="351"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1LocalizerBase_1ac15cd3a62d73749f57206486ff7c9816" kindref="member">C_API_lo_U</ref>(<ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>L,<sp/><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>U)<sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="352"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="353"><highlight class="normal"></highlight></codeline>
+<codeline lineno="354"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>losc</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="355"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/>//_LOSC_SRC_LOCALIZATION_H_</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp"/>
+  </compounddef>
+</doxygen>

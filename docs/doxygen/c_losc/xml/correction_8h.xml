@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="correction_8h" kind="file" language="C++">
+    <compoundname>correction.h</compoundname>
+    <includes refid="matrix_8h" local="no">c_losc/matrix.h</includes>
+    <includes local="no">stddef.h</includes>
+    <includedby refid="losc_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</includedby>
+    <incdepgraph>
+      <node id="2">
+        <label>stddef.h</label>
+      </node>
+      <node id="1">
+        <label>c_losc/matrix.h</label>
+        <link refid="matrix_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="0">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/correction.h</label>
+        <link refid="correction.h"/>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="4">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</label>
+        <link refid="losc_8h"/>
+      </node>
+      <node id="3">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/correction.h</label>
+        <link refid="correction.h"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="correction_8h_1ae7142e16bc9d455bdf5cbd71d3c6e83d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>losc_matrix *</type>
+        <definition>losc_matrix* losc_ao_hamiltonian_correction</definition>
+        <argsstring>(const losc_matrix *S, const losc_matrix *C_lo, const losc_matrix *Curvature, const losc_matrix *LocalOcc)</argsstring>
+        <name>losc_ao_hamiltonian_correction</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>Curvature</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>LocalOcc</declname>
+        </param>
+        <briefdescription>
+<para>Calculate LOSC effective Hamiltonian under AO basis. </para>        </briefdescription>
+        <detaileddescription>
+<para>The LOSC effective Hamiltonian is constructed with LOs fixed. The expression of the effective Hamiltonian is shown as Eq. S25 in the supporting information of the original LOSC paper (<ulink url="https://doi.org/10.1093/nsr/nwx111">https://doi.org/10.1093/nsr/nwx111</ulink>). This effective Hamiltonian is exact in the developed version of SCF-LOSC (self-consistent LOSC). See reference (J. Phys. Chem. Lett. 2020, 11, 23, 10269-10277) for more details about how to perform reliable SCF-LOSC calculations. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AO overlap matrix with dimension [nbasis, nbasis].</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">Curvature</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Local occupation matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a LOSC effective Hamiltonian matrix with dimension <computeroutput>[nbasis, nbasis]</computeroutput> and return the matrix pointer. </para></simplesect>
+<simplesect kind="see"><para><ref refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" kindref="member">LoscCurvatureBase.kappa</ref>: Obtain the curvature matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="local__occupation_8h_1a71a2ee8bd0b1added7426c8810818cc1" kindref="member">losc_local_occupation()</ref>: Obtain the local occupation matrix. </para></simplesect>
+<simplesect kind="note"><para>Make sure all the input matrices are corrresponding to the same spin. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/correction.h" line="51" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8h_1ac9af3c2455aa31c0dfe64ddd430c7d49" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double energy_correction</definition>
+        <argsstring>(const losc_matrix *Curvature, const losc_matrix *LocalOcc)</argsstring>
+        <name>energy_correction</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>Curvature</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>LocalOcc</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the total energy correction from LOSC. </para>        </briefdescription>
+        <detaileddescription>
+<para>This is just the energy correction from LOSC, NOT the total energy of LOSC-DFA. Total energy of LOSC-DFA is: <computeroutput>E_losc_dfa = E_dfa + E_losc</computeroutput>.</para><para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">Curvature</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Local occupation matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The total energy correction from LOSC. </para></simplesect>
+<simplesect kind="see"><para><ref refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" kindref="member">LoscCurvatureBase.kappa</ref>: obtain the LOSC curvature matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="local__occupation_8h_1a71a2ee8bd0b1added7426c8810818cc1" kindref="member">losc_local_occupation()</ref>: obtain the LOSC local occupation matrix. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/correction.h" line="66" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8h_1a188f9d009970de3adbb33896670e0054" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double *</type>
+        <definition>double* orbital_energy_post_scf</definition>
+        <argsstring>(const losc_matrix *H_dfa, const losc_matrix *H_losc, const losc_matrix *C_co)</argsstring>
+        <name>orbital_energy_post_scf</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>H_dfa</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>H_losc</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>C_co</declname>
+        </param>
+        <briefdescription>
+<para>Calculate corrected orbital energy from LOSC in a post-SCF approach. </para>        </briefdescription>
+        <detaileddescription>
+<para>This function gives the final orbital energies WITH the correction from LOSC. Note the difference to the function <ref refid="correction_8h_1ac9af3c2455aa31c0dfe64ddd430c7d49" kindref="member">energy_correction()</ref> that only calculates the energy correction. The corrected orbital energies are the expectation values of converged DFA&apos;s COs on the LOSC-DFA Hamiltonian, that is, <formula id="0">\[ \epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}} | \psi_i \rangle. \]</formula> <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">H_dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The DFA Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">H_losc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The LOSC effective Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_co</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The coefficient matrix of converged DFA COs under AOs with dimension of <computeroutput>[nbasis, n]</computeroutput> (<computeroutput>n &lt;= nbasis</computeroutput>, which is the number of COs). You can choose whatever number of COs you want. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create an array of the corrected orbital energies from LOSC with size of <computeroutput>n</computeroutput> and return the pointer. The order of orbital energies match the order of input COs (order of columns in <computeroutput>C_co</computeroutput> matrix). </para></simplesect>
+<simplesect kind="see"><para><ref refid="correction_8h_1ae7142e16bc9d455bdf5cbd71d3c6e83d" kindref="member">losc_ao_hamiltonian_correction()</ref>: obtain the LOSC effective Hamiltonian under AOs. </para></simplesect>
+<simplesect kind="note"><para>This function only calculates the orbital energies for the single spin associated with the input matrices. </para></simplesect>
+<simplesect kind="note"><para>This function is just one of the ways to construct the LOSC corrected orbital energies in the post-SCF LOSC calculations. It is the way we used to produce results in the published paper for the post-SCF LOSC calculations. Besides this way, there are another two ways to calculate corrected orbital energies: (1) diagonalize the corrected LOSC-DFA Hamiltonian; (2) follow Eq. 11 of the original paper of LOSC to calculate the corrections to orbital energies. These three ways usually produce very similar results. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/correction.h" line="101" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC corrections. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_C_LOSC_CORRECTION_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_C_LOSC_CORRECTION_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="matrix_8h" kindref="compound">c_losc/matrix.h</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal">losc_matrix<sp/>*<ref refid="correction_8h_1ae7142e16bc9d455bdf5cbd71d3c6e83d" kindref="member">losc_ao_hamiltonian_correction</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*S,</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*C_lo,</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*Curvature,</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*LocalOcc);</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/><ref refid="correction_8h_1ac9af3c2455aa31c0dfe64ddd430c7d49" kindref="member">energy_correction</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*Curvature,</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*LocalOcc);</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<ref refid="correction_8h_1a188f9d009970de3adbb33896670e0054" kindref="member">orbital_energy_post_scf</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*H_dfa,</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*H_losc,</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*C_co);</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108"><highlight class="normal"></highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/correction.h"/>
+  </compounddef>
+</doxygen>

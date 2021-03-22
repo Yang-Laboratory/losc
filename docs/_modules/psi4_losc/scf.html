@@ -1,0 +1,930 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>psi4_losc.scf &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>psi4_losc.scf</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for psi4_losc.scf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Extended SCF procedure built on psi4 package to perform SCF-DFA and</span>
+<span class="sd">SCF-LOSC-DFA calculations with compabilities for fractional systems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">py_losc</span>
+<span class="kn">from</span> <span class="nn">psi4_losc.psi4_losc</span> <span class="kn">import</span> <span class="n">post_scf_losc</span>
+<span class="kn">from</span> <span class="nn">psi4_losc</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">psi4_losc</span> <span class="kn">import</span> <span class="n">diis</span>
+<span class="kn">from</span> <span class="nn">psi4_losc</span> <span class="kn">import</span> <span class="n">jk</span>
+<span class="kn">from</span> <span class="nn">qcelemental</span> <span class="kn">import</span> <span class="n">constants</span>
+
+
+<span class="k">def</span> <span class="nf">_scf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">guess_wfn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">losc_ref_wfn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">curvature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">C_lo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">dfa_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="p">{},</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the SCF (normal SCF-DFA or SCF-LOSC-DFA) calculation for general</span>
+<span class="sd">    systems.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the DFT functional or HF method. The style is the same as</span>
+<span class="sd">        `psi4.energy` function.</span>
+<span class="sd">    guess_wfn : psi4.core.RHF or psi4.core.UHF, default=None.</span>
+<span class="sd">        The wfn used to set the initial guess of the SCF calculation. This is</span>
+<span class="sd">        equivalent to copy guess_wfn.C (coefficient matrix) and guess_wfn.D</span>
+<span class="sd">        (density matrix) to the scf wavefunction object to initialize the SCF</span>
+<span class="sd">        calculation. Note: (1) setting this variable will ignore the psi4</span>
+<span class="sd">        guess setting; (2) if you use this variable, make sure you are</span>
+<span class="sd">        passing a reasonable guess wfn to the function. This function does not</span>
+<span class="sd">        check the validity the input.</span>
+<span class="sd">    losc_ref_wfn : psi4.core.RHF or psi4.core.UHF, default=None.</span>
+<span class="sd">        The wfn used to do SCF-LOSC (frozen-LO) calculation. This variable is</span>
+<span class="sd">        the flag to trigger SCF-LOSC (frozen-LO) calculation.</span>
+<span class="sd">    curvature : [np.array, ...]</span>
+<span class="sd">        The LOSC curvature matrix.</span>
+<span class="sd">    C_lo : [np.array, ...]</span>
+<span class="sd">        The LOSC LO coefficient matrix.</span>
+<span class="sd">    dfa_info : py_losc.DFAInfo, default=None.</span>
+<span class="sd">        DFA information of the weights of exchanges.</span>
+<span class="sd">    occ : dict, default to an empty dict.</span>
+<span class="sd">        A dictionary that specifies the customized occupation number. This</span>
+<span class="sd">        variable will be ignored and overwrite as `losc_ref_wfn.losc_data[&#39;occ&#39;]`</span>
+<span class="sd">        if the `losc_ref_wfn` is provided.</span>
+<span class="sd">    verbose : int, default=1</span>
+<span class="sd">        print level to the psi4 output file.</span>
+
+<span class="sd">        - 0 means print nothing.</span>
+<span class="sd">        - 1 means normal print level.</span>
+<span class="sd">        - A larger number means more details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wfn : psi4.core.RHF or psi4.core.UHF</span>
+<span class="sd">        The SCF wavefunction.</span>
+
+<span class="sd">        - Following members in the returned wfn object are updated:</span>
+
+<span class="sd">            - wfn.S(): AO overlap matrix.</span>
+<span class="sd">            - wfn.H(): Core matrix.</span>
+<span class="sd">            - wfn.Ca(), wfn.Cb(): CO coefficient matrix.</span>
+<span class="sd">            - wfn.Fa(), wfn.Fb(): Fock matrix.</span>
+<span class="sd">            - wfn.Da(), wfn.Db(): density matrix.</span>
+<span class="sd">            - wfn.Va(), wfn.Vb(): DFA (just the DFA, if it is LOSC-DFA) Vxc</span>
+<span class="sd">              matrix.</span>
+<span class="sd">            - wfn.epsilon_a(), wfn.epsilon_b(): orbital energies.</span>
+<span class="sd">            - wfn.energy(): total energy.</span>
+
+<span class="sd">        - Other members are not touched. Accessing and using other members</span>
+<span class="sd">          in the returned wfn may be a undefined behavior.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    - The option settins are handled by psi4 SCF module.</span>
+
+<span class="sd">    - For the updated matrices/vectors in returned wfn (such as C, D, F</span>
+<span class="sd">      matrices), although psi4.wfn objects provide interface to interact with</span>
+<span class="sd">      the internal data (such the interface `wfn.Fa()` that returns a shared_ptr</span>
+<span class="sd">      to internal Fock matrix), we do not map wfn internal matrices into python</span>
+<span class="sd">      to modify these matrices in place in python. The reason is that the</span>
+<span class="sd">      lifetime of the internal psi4.Matrix object managed by the shared_ptr is</span>
+<span class="sd">      hard to track in python. Take wfn.Fa matrix as example.</span>
+
+<span class="sd">      # 1. Map internal Fock matrix into python. Now `F` in python refers to the</span>
+<span class="sd">      # wfn.Fa matrix.</span>
+<span class="sd">      F = np.asarray(wfn.Fa())</span>
+
+<span class="sd">      # 2. psi4.core code internally changes the Fock matrix by doing something</span>
+<span class="sd">      # like</span>
+<span class="sd">      # wfn.Fa = std::make_shared(Matrix(nbf, nbf)); # this is in c++ psi4.core.</span>
+
+<span class="sd">      # 3. Now `F` in python no longer refers to `wfn.Fa()`, since wfn.Fa is</span>
+<span class="sd">      # updated.</span>
+
+<span class="sd">      Because of this issue, all the matrices those will be used to update wfn</span>
+<span class="sd">      are allocated and managed in python. I know this doubles the memory cost</span>
+<span class="sd">      (same matrix, such as Fock matrix, is allocated in both python and</span>
+<span class="sd">      psi4.core), but this makes the logic clearer and less chances to have bug.</span>
+<span class="sd">      At the return, the python matrix will be copied into wfn through the</span>
+<span class="sd">      interface. I know we don&#39;t like copy, but this is the price we have to</span>
+<span class="sd">      pay.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">update_C</span><span class="p">(</span><span class="n">occ_idx</span><span class="p">,</span> <span class="n">occ_val</span><span class="p">,</span> <span class="n">Cin</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">Cocc</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update C, Cocc and D matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">C</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Cin</span>
+        <span class="n">Cocc</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Cin</span><span class="p">[:,</span> <span class="n">occ_idx</span><span class="p">]</span>
+        <span class="n">D</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,ui,vi-&gt;uv&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">occ_val</span><span class="p">),</span> <span class="n">Cocc</span><span class="p">,</span> <span class="n">Cocc</span><span class="p">,</span>
+                         <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">optstash</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">p4util</span><span class="o">.</span><span class="n">OptionsState</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;PRINT&#39;</span><span class="p">])</span>
+
+    <span class="n">local_print</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">init_local_print</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># If we do DFT, we the reference should be either &#39;rks&#39; or &#39;uks&#39;.</span>
+    <span class="c1"># Using &#39;rhf` or `uhf` for DFT calculation will lead to error in</span>
+    <span class="c1"># psi4.core.HF constructor.</span>
+    <span class="n">is_hf</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;HF&#39;</span><span class="p">,</span> <span class="s1">&#39;SCF&#39;</span><span class="p">]:</span>
+        <span class="n">is_hf</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;RHF&#39;</span><span class="p">:</span>
+            <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">set_local_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">,</span> <span class="s1">&#39;RKS&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;UHF&#39;</span><span class="p">:</span>
+            <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">set_local_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">,</span> <span class="s1">&#39;UKS&#39;</span><span class="p">)</span>
+
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_active_molecule</span><span class="p">()</span>
+    <span class="c1"># print out molecule information</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">print_out</span><span class="p">()</span>
+
+    <span class="c1"># ==&gt; Sanity checks &lt;==</span>
+    <span class="c1"># TODO:</span>
+    <span class="c1"># Currenty only support c1 symmetry.</span>
+    <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">schoenflies_symbol</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;c1&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Current SCF code only supports C1 symmetry&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;au&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Invalid input for &quot;orbital_energy_unit&quot;. Choices are [&quot;eV&quot;, &quot;au&quot;].&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dfa_info</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;SCF-LOSC miss argument: dfa_info.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">curvature</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;SCF-LOSC miss argument: curvature.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">C_lo</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;SCF-LOSC miss argument: C_lo.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;---------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;          SCF-LOSC (frozen-LO)&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;             by Yuncai Mei&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;---------------------------------------&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;---------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;                  SCF&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;             by Yuncai Mei&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;---------------------------------------&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get psi4 settings</span>
+    <span class="n">maxiter</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;MAXITER&#39;</span><span class="p">)</span>
+    <span class="n">E_conv</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;E_CONVERGENCE&#39;</span><span class="p">)</span>
+    <span class="n">D_conv</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;D_CONVERGENCE&#39;</span><span class="p">)</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">)</span>
+    <span class="n">is_diis_rms</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;DIIS_RMS_ERROR&#39;</span><span class="p">)</span>
+    <span class="n">is_dfjk</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;SCF_TYPE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;DF&#39;</span><span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;BASIS&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">==&gt; SCF settings &lt;==&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Reference: </span><span class="si">{reference}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Basis set: </span><span class="si">{basis}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;MaxIter: </span><span class="si">{maxiter}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Energy convergence: </span><span class="si">{E_conv}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Density matrix convergence: </span><span class="si">{D_conv}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">is_rks</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;RKS&#39;</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="n">nspin</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_rks</span> <span class="k">else</span> <span class="mi">2</span>
+
+    <span class="c1"># Build an SCF wavefunction with the corresponding DFT functional.</span>
+    <span class="n">optstash</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">p4util</span><span class="o">.</span><span class="n">OptionsState</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;PRINT&#39;</span><span class="p">])</span>
+    <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">set_local_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;PRINT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Wavefunction</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">scf_wavefunction_factory</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">wfn</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
+    <span class="n">mintshelper</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MintsHelper</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">basisset</span><span class="p">())</span>
+
+    <span class="n">supfunc</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">functional</span><span class="p">()</span>
+    <span class="n">nbf</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">basisset</span><span class="p">()</span><span class="o">.</span><span class="n">nbf</span><span class="p">()</span>
+
+    <span class="c1"># Create the occupation number, including the fractional cases.</span>
+    <span class="n">nocc</span><span class="p">,</span> <span class="n">occ_idx</span><span class="p">,</span> <span class="n">occ_val</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">form_occ</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">occ</span><span class="p">)</span>
+    <span class="n">nelec</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">occ_val</span><span class="p">]</span>
+    <span class="n">is_integer</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_integer_system</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">occ</span><span class="p">)</span>
+    <span class="n">is_aufbau</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_aufbau_system</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">occ</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;=&gt; Occupation Number &lt;=&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Is integer system: </span><span class="si">{is_integer}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Is aufbau occupation: </span><span class="si">{is_aufbau}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;nelec_a: </span><span class="si">{nelec[0]}</span><span class="s2"> {f&#39; ! update and differ to wfn.nalpha(): nalpha={wfn.nalpha()}.&#39; if nelec[0] != wfn.nalpha() else &#39;&#39;}&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;nelec_b: </span><span class="si">{nelec[1]}</span><span class="s2"> {f&#39; ! update and differ to wfn.nbeta(): nbeta={wfn.nbeta()}.&#39; if nelec[1] != wfn.nbeta() else &#39;&#39;}&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_rks</span><span class="p">:</span>
+            <span class="n">local_print</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;{&quot;Alpha&quot; if s == 0 else &quot;Beta&quot;} Occupation Number:&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Occupation Number:&#39;</span><span class="p">)</span>
+        <span class="n">max_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">else</span> <span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">occ_idx_val</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">occ_val</span><span class="p">[</span><span class="n">s</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_idx</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">occ_val_t</span> <span class="o">=</span> <span class="n">occ_idx_val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;index=</span><span class="si">{:&lt;5d}</span><span class="s1"> occ=</span><span class="si">{:&lt;10f}</span><span class="s1">&#39;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">occ_val_t</span><span class="p">))</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ==&gt; Set up matrices &lt;==</span>
+    <span class="c1"># S, H matrix</span>
+    <span class="k">if</span> <span class="n">guess_wfn</span><span class="p">:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">guess_wfn</span><span class="o">.</span><span class="n">S</span><span class="p">())</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">guess_wfn</span><span class="o">.</span><span class="n">H</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mintshelper</span><span class="o">.</span><span class="n">ao_overlap</span><span class="p">())</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mintshelper</span><span class="o">.</span><span class="n">ao_potential</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mintshelper</span><span class="o">.</span><span class="n">ao_kinetic</span><span class="p">())</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">V</span> <span class="o">+</span> <span class="n">T</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mintshelper</span><span class="o">.</span><span class="n">one_electron_integrals</span><span class="p">()</span>
+            <span class="n">wfn</span><span class="o">.</span><span class="n">form_H</span><span class="p">()</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">H</span><span class="p">())</span>
+    <span class="c1"># S^(-1/2)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">)</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.e-16</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="c1"># D, F, C, Cocc, eigenvalue matrices/vectors.</span>
+    <span class="n">D_psi</span> <span class="o">=</span> <span class="p">[</span><span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">D_psi</span><span class="p">]</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">Cocc_psi</span> <span class="o">=</span> <span class="p">[</span><span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nocc</span><span class="p">[</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">Cocc</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Cocc_psi</span><span class="p">]</span>
+    <span class="n">eig</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nbf</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+        <span class="n">Vpot</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">V_potential</span><span class="p">()</span>
+        <span class="n">Vpot</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="n">Vxc_psi</span> <span class="o">=</span> <span class="p">[</span><span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+        <span class="n">Vxc</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">Vxc_psi</span><span class="p">]</span>
+
+    <span class="c1"># Set up DIIS helper object</span>
+    <span class="n">diis_helper</span> <span class="o">=</span> <span class="p">[</span><span class="n">diis</span><span class="o">.</span><span class="n">diis</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">diis_error</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbf</span><span class="p">,</span> <span class="n">nbf</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+
+    <span class="c1"># Set up JK builder</span>
+    <span class="k">if</span> <span class="n">is_integer</span> <span class="ow">and</span> <span class="n">is_aufbau</span><span class="p">:</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Use psi4.JK to calculate JK matrix.&quot;</span><span class="p">)</span>
+        <span class="n">jk_helper</span> <span class="o">=</span> <span class="n">jk</span><span class="o">.</span><span class="n">JK_psi4_jk</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">Cocc_psi</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># To make fractional or non-aufbau calculation available, we need to</span>
+        <span class="c1"># transform J and K matrices based on density matrix (explicitly</span>
+        <span class="c1"># constructed based on occupation number). psi4 JK class does not</span>
+        <span class="c1"># provide interface to accept density matrix as input to build J and K</span>
+        <span class="c1"># matrices. So here we only the choice to transform from AO ERI to MO</span>
+        <span class="c1"># ERI for J and K with help of psi4.MinsHelper library.</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Use psi4.MintsHelper to calculate JK matrix.&quot;</span><span class="p">)</span>
+        <span class="n">jk_helper</span> <span class="o">=</span> <span class="n">jk</span><span class="o">.</span><span class="n">JK_psi4_mints</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">occ_val</span><span class="p">[:</span><span class="n">nspin</span><span class="p">],</span> <span class="n">Cocc</span><span class="p">[:</span><span class="n">nspin</span><span class="p">])</span>
+
+    <span class="c1"># ==&gt; Set up initial guess &lt;==</span>
+    <span class="c1"># Build the initial C matrix as the initial guess.</span>
+    <span class="n">C_guess</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">guess_wfn</span><span class="p">:</span>
+        <span class="c1"># SCF for DFA: guess CO from the input guess_wfn.</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Set initial guess from a reference wavefunction.&quot;</span><span class="p">)</span>
+        <span class="n">C_guess</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">guess_wfn</span><span class="o">.</span><span class="n">Ca</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">guess_wfn</span><span class="o">.</span><span class="n">Cb</span><span class="p">())]</span>
+    <span class="k">elif</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+        <span class="c1"># SCF for LOSC-DFA: initial guess has to tbe losc_ref_wfn.</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Set initial guess from the parent DFA wavefunction.&quot;</span><span class="p">)</span>
+        <span class="n">C_guess</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">losc_ref_wfn</span><span class="o">.</span><span class="n">Ca</span><span class="p">()),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">losc_ref_wfn</span><span class="o">.</span><span class="n">Cb</span><span class="p">())]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># SCF for DFA: set guess from psi4 guess setting.</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Set initial guess from psi4 setting.&quot;</span><span class="p">)</span>
+        <span class="n">wfn</span><span class="o">.</span><span class="n">form_Shalf</span><span class="p">()</span>
+        <span class="n">wfn</span><span class="o">.</span><span class="n">guess</span><span class="p">()</span>
+        <span class="n">C_guess</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Ca</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Cb</span><span class="p">())]</span>
+    <span class="c1"># Use the initial C guess to update Cocc, C, D matrix.</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="n">update_C</span><span class="p">(</span><span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">occ_val</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">C_guess</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">C</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">Cocc</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">D</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+
+    <span class="c1"># ==&gt; SCF &lt;==</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">=&gt; SCF iterations &lt;=&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">                        Total Energy        Delta E     </span><span class="si">%s</span><span class="s2"> |[F,P]|</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="s2">&quot;   &quot;</span> <span class="k">if</span> <span class="n">is_dfjk</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;RMS&quot;</span> <span class="k">if</span> <span class="n">is_diis_rms</span> <span class="k">else</span> <span class="s2">&quot;MAX&quot;</span><span class="p">))</span>
+
+    <span class="n">Eold</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Enuc</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">molecule</span><span class="p">()</span><span class="o">.</span><span class="n">nuclear_repulsion_energy</span><span class="p">()</span>
+    <span class="n">reference_factor</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="k">if</span> <span class="n">is_rks</span> <span class="k">else</span> <span class="mf">1.0</span>
+    <span class="n">Exc</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">energy_table</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">scf_status</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DIIS&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">SCF_ITER</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Build Vxc by using psi4.potential object. So we need to feed the</span>
+        <span class="c1"># psi4.potential object with density matrix in psi4 matrix type.</span>
+        <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+            <span class="n">Vpot</span><span class="o">.</span><span class="n">set_D</span><span class="p">(</span><span class="n">D_psi</span><span class="p">)</span>
+            <span class="n">Vpot</span><span class="o">.</span><span class="n">compute_V</span><span class="p">(</span><span class="n">Vxc_psi</span><span class="p">)</span>
+
+        <span class="c1"># Build J and K matrices.</span>
+        <span class="n">jk_helper</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="n">jk_helper</span><span class="o">.</span><span class="n">J</span><span class="p">()</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">jk_helper</span><span class="o">.</span><span class="n">K</span><span class="p">()</span>
+        <span class="n">J_tot</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">J</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Build Fock and diis helper object.</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">E_losc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="c1"># build DFA Fock matrix</span>
+            <span class="n">G_tmp</span> <span class="o">=</span> <span class="n">J_tot</span> <span class="o">-</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">x_alpha</span><span class="p">()</span> <span class="o">*</span> <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">G_tmp</span><span class="p">)</span>
+            <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">G_tmp</span>
+            <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+                <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">+=</span> <span class="n">Vxc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="c1"># ==&gt; !!! The LOSC contribution in SCF: begin !!! &lt;==</span>
+            <span class="k">if</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+                <span class="c1"># build LOSC local occupation matrix</span>
+                <span class="n">local_occ</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">local_occupation</span><span class="p">(</span><span class="n">C_lo</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="c1"># build LOSC effective Fock matrix</span>
+                <span class="n">H_losc</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">ao_hamiltonian_correction</span><span class="p">(</span>
+                    <span class="n">S</span><span class="p">,</span> <span class="n">C_lo</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">curvature</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">local_occ</span><span class="p">)</span>
+                <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">+=</span> <span class="n">H_losc</span>
+                <span class="c1"># form LOSC energy correction</span>
+                <span class="n">E_losc</span> <span class="o">+=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">energy_correction</span><span class="p">(</span><span class="n">curvature</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">local_occ</span><span class="p">)</span>
+            <span class="c1"># ==&gt; !!! The LOSC contribution in SCF: end !!! &lt;==</span>
+
+            <span class="c1"># DIIS error build and update</span>
+            <span class="n">diis_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">diis_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diis_error</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">diis_helper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">diis_error</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1"># Calculate SCF energy.</span>
+        <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+            <span class="n">Exc</span> <span class="o">=</span> <span class="n">Vpot</span><span class="o">.</span><span class="n">quadrature_values</span><span class="p">()[</span><span class="s1">&#39;FUNCTIONAL&#39;</span><span class="p">]</span>
+        <span class="n">E_J</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">E_K</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">E_H</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">E_J</span> <span class="o">+=</span> <span class="n">reference_factor</span> <span class="o">*</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;pq,pq-&gt;&#39;</span><span class="p">,</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">J_tot</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">E_K</span> <span class="o">+=</span> <span class="n">reference_factor</span> <span class="o">*</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;pq,pq-&gt;&#39;</span><span class="p">,</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span>
+                          <span class="n">supfunc</span><span class="o">.</span><span class="n">x_alpha</span><span class="p">()</span> <span class="o">*</span> <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">E_H</span> <span class="o">+=</span> <span class="n">reference_factor</span> <span class="o">*</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;pq,pq-&gt;&#39;</span><span class="p">,</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">SCF_E</span> <span class="o">=</span> <span class="n">Enuc</span> <span class="o">+</span> <span class="n">E_H</span> <span class="o">+</span> <span class="n">E_J</span> <span class="o">+</span> <span class="n">E_K</span> <span class="o">+</span> <span class="n">Exc</span> <span class="o">+</span> <span class="n">E_losc</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCF_E</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_H&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_H</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_J&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_J</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_K&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_K</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_xc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Exc</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_G&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_J</span> <span class="o">+</span> <span class="n">E_K</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_hf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_H</span> <span class="o">+</span> <span class="n">E_J</span> <span class="o">+</span> <span class="n">E_K</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_losc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_losc</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_nuc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Enuc</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_dfa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Enuc</span> <span class="o">+</span> <span class="n">E_H</span> <span class="o">+</span> <span class="n">E_J</span> <span class="o">+</span> <span class="n">E_K</span> <span class="o">+</span> <span class="n">Exc</span>
+
+        <span class="c1"># Print iteration steps</span>
+        <span class="n">D_error</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">is_diis_rms</span><span class="p">:</span>  <span class="c1"># rms type error</span>
+            <span class="n">rms</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">m</span><span class="p">)))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">diis_error</span><span class="p">]</span>
+            <span class="n">D_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">rms</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># max type error</span>
+            <span class="n">D_error</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">diis_error</span><span class="p">])</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;   @</span><span class="si">%s%s</span><span class="s2"> iter </span><span class="si">%3s</span><span class="s2">: </span><span class="si">%20.14f</span><span class="s2">   </span><span class="si">%12.5e</span><span class="s2">   </span><span class="si">%-11.5e</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="s2">&quot;DF-&quot;</span> <span class="k">if</span> <span class="n">is_dfjk</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">SCF_ITER</span><span class="p">,</span>
+                     <span class="n">SCF_E</span><span class="p">,</span> <span class="p">(</span><span class="n">SCF_E</span> <span class="o">-</span> <span class="n">Eold</span><span class="p">),</span> <span class="n">D_error</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scf_status</span><span class="p">)))</span>
+
+        <span class="c1"># Check convergence</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">SCF_E</span> <span class="o">-</span> <span class="n">Eold</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">E_conv</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">D_error</span> <span class="o">&lt;</span> <span class="n">D_conv</span><span class="p">):</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Extrapolate Fock matrices and update C, Cocc, D and eigenvalues.</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="c1"># Form the extrapolated Fock matrix</span>
+            <span class="n">F_tmp</span> <span class="o">=</span> <span class="n">diis_helper</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">extrapolate</span><span class="p">()</span>
+            <span class="c1"># Diagonalize Fock matrix and update C related variables including</span>
+            <span class="c1"># wfn.epsilon, wfn.C, Cocc, wfn.D.</span>
+            <span class="n">H_tmp</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">F_tmp</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">eig</span><span class="p">[</span><span class="n">s</span><span class="p">][:],</span> <span class="n">C2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">H_tmp</span><span class="p">)</span>
+            <span class="n">C_new</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">C2</span><span class="p">)</span>
+            <span class="n">update_C</span><span class="p">(</span><span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">occ_val</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">C_new</span><span class="p">,</span> <span class="n">C</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">Cocc</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">D</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+
+        <span class="c1"># Save scf energy</span>
+        <span class="n">Eold</span> <span class="o">=</span> <span class="n">SCF_E</span>
+
+        <span class="k">if</span> <span class="n">SCF_ITER</span> <span class="o">==</span> <span class="n">maxiter</span><span class="p">:</span>
+            <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Maximum number of SCF cycles exceeded.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># print total energies</span>
+    <span class="n">func_type</span> <span class="o">=</span> <span class="s2">&quot;HF&quot;</span> <span class="k">if</span> <span class="n">is_hf</span> <span class="k">else</span> <span class="s2">&quot;DFA&quot;</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=&gt; Total Energy &lt;=&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Nuclear potential energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_nuc&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> core energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_H&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> J energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_J&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> K energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_K&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> G energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_G&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> XC energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_xc&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2"> total energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">func_type</span><span class="p">,</span> <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_dfa&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">losc_ref_wfn</span><span class="p">:</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;LOSC correction energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">energy_table</span><span class="p">[</span><span class="s1">&#39;E_losc&#39;</span><span class="p">]))</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;SCF total energy: </span><span class="si">{:.10f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">SCF_E</span><span class="p">))</span>
+
+    <span class="c1"># print orbital energies</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=&gt; Orbital Energy &lt;=&quot;</span><span class="p">)</span>
+    <span class="n">occ_idx_val</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">occ_idx</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">occ_val</span><span class="p">[</span><span class="n">s</span><span class="p">]))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">)]</span>
+    <span class="n">nbf</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">basisset</span><span class="p">()</span><span class="o">.</span><span class="n">nbf</span><span class="p">()</span>
+    <span class="n">eig_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="o">==</span> <span class="s1">&#39;au&#39;</span> <span class="k">else</span> <span class="n">constants</span><span class="o">.</span><span class="n">hartree2ev</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_rks</span><span class="p">:</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;{&#39;Alpha&#39; if s == 0 else &#39;Beta&#39;} orbital energy:&quot;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:&lt;5s}</span><span class="s2">  </span><span class="si">{:&lt;8s}</span><span class="s2">  </span><span class="si">{:&gt;14s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="s2">&quot;Occ&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;DFA (</span><span class="si">{orbital_energy_unit}</span><span class="s2">)&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbf</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:&lt;5d}</span><span class="s2">  </span><span class="si">{:&lt;8.5f}</span><span class="s2">  </span><span class="si">{:&gt;14.6f}</span><span class="s2">&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">occ_idx_val</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                <span class="n">eig</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">eig_factor</span><span class="p">))</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ==&gt; update wfn &lt;==</span>
+    <span class="c1"># Update energy.</span>
+    <span class="n">wfn</span><span class="o">.</span><span class="n">set_energy</span><span class="p">(</span><span class="n">SCF_E</span><span class="p">)</span>
+    <span class="c1"># Update matrices.</span>
+    <span class="c1"># S: AO overlap matrix.</span>
+    <span class="c1"># H: core matrix.</span>
+    <span class="c1"># F: Fock matrix.</span>
+    <span class="c1"># D: Density matrix.</span>
+    <span class="c1"># Vxc: DFA Vxc matrix.</span>
+    <span class="c1"># eig: orbital energy vector.</span>
+    <span class="n">wfn_S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">S</span><span class="p">())</span>
+    <span class="n">wfn_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">H</span><span class="p">())</span>
+    <span class="n">wfn_F</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Fa</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Fb</span><span class="p">())]</span>
+    <span class="n">wfn_C</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Ca</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Cb</span><span class="p">())]</span>
+    <span class="n">wfn_D</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Da</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Db</span><span class="p">())]</span>
+    <span class="n">wfn_Vxc</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Va</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">Vb</span><span class="p">())]</span>
+    <span class="n">wfn_eig</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_a</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_b</span><span class="p">())]</span>
+
+    <span class="n">wfn_S</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">S</span>
+    <span class="n">wfn_H</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">H</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="n">wfn_F</span><span class="p">[</span><span class="n">s</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+        <span class="n">wfn_D</span><span class="p">[</span><span class="n">s</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+        <span class="n">wfn_C</span><span class="p">[</span><span class="n">s</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+        <span class="n">wfn_eig</span><span class="p">[</span><span class="n">s</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">eig</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">needs_xc</span><span class="p">():</span>
+            <span class="n">wfn_Vxc</span><span class="p">[</span><span class="n">s</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">Vxc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+
+    <span class="c1"># restore psi4 options.</span>
+    <span class="n">optstash</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wfn</span>
+
+
+<div class="viewcode-block" id="scf"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.scf.scf">[docs]</a><span class="k">def</span> <span class="nf">scf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">guess_wfn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="p">{},</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the SCF calculation for a conventional DFA. It supports the</span>
+<span class="sd">    systems with fractional occupations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the psi4 superfunctional, including DFT functional or HF</span>
+<span class="sd">        method. The style is the same as `psi4.energy` function.</span>
+<span class="sd">    guess_wfn : psi4.core.RHF or psi4.core.UHF, default=None.</span>
+<span class="sd">        The wavefunction used to set the initial guess of the SCF calculation.</span>
+<span class="sd">        Setting this variable will copy the coefficient matrix from `guess_wfn`</span>
+<span class="sd">        as the initial SCF guess. Setting this variable will ignore the psi4</span>
+<span class="sd">        guess setting. If you use this variable, make sure you are passing a</span>
+<span class="sd">        reasonable guess wfn to the function. This function does not validate</span>
+<span class="sd">        the input `guess_wfn`.</span>
+<span class="sd">    occ : dict, default={}</span>
+<span class="sd">        A dictionary that specifies the customized occupation number. The</span>
+<span class="sd">        occupation is obtained based on the aufbau occupation number of the</span>
+<span class="sd">        current molecule to give the final set of occupation numbers for the SCF</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">        The structure of the `occ` is:</span>
+
+<span class="sd">        &gt;&gt;&gt; {</span>
+<span class="sd">        ...    # for alpha spin</span>
+<span class="sd">        ...    &quot;alpha&quot;: {</span>
+<span class="sd">        ...         0: 0.5,      # the 1st orbital (0-based)</span>
+<span class="sd">        ...         &#39;homo&#39;: 0.6, # HOMO</span>
+<span class="sd">        ...         &#39;lumo&#39;: 0.7, # LUMO</span>
+<span class="sd">        ...    },</span>
+<span class="sd">        ...    # for beta spin</span>
+<span class="sd">        ...    &quot;beta&quot;: {</span>
+<span class="sd">        ...         2: 0.5,      # the 3rd orbital (0-based)</span>
+<span class="sd">        ...    },</span>
+<span class="sd">        ... }</span>
+
+<span class="sd">        All the integer index for orbitals is 0-based. The str index for</span>
+<span class="sd">        orbitals should be {&#39;homo&#39;, &#39;lumo&#39;}, and are case-insensitive.</span>
+<span class="sd">        All the occupation numbers should be in range of [0, 1].</span>
+
+<span class="sd">    verbose : int, default to 1</span>
+<span class="sd">        Print level to the psi4 output file.</span>
+
+<span class="sd">        - 0 means print nothing.</span>
+<span class="sd">        - 1 means normal print level.</span>
+<span class="sd">        - A larger number means more details.</span>
+<span class="sd">    orbital_energy_unit : {&#39;eV&#39;, &#39;au&#39;}, default=&#39;eV&#39;</span>
+<span class="sd">        The units of orbital energies used to print in the output.</span>
+
+<span class="sd">        - &#39;au&#39;: atomic unit, hartree.</span>
+<span class="sd">        - &#39;eV&#39;: electronvolt.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wfn : psi4.core.RHF or psi4.core.UHF</span>
+<span class="sd">        The SCF wavefunction.</span>
+<span class="sd">        - Following members in the returned wfn object are updated:</span>
+
+<span class="sd">            - `wfn.S()`: AO overlap matrix.</span>
+<span class="sd">            - `wfn.H()`: Core matrix.</span>
+<span class="sd">            - `wfn.Ca()`, `wfn.Cb()`: CO coefficient matrix.</span>
+<span class="sd">            - `wfn.Fa()`, `wfn.Fb()`: Fock matrix.</span>
+<span class="sd">            - `wfn.Da()`, `wfn.Db()`: density matrix.</span>
+<span class="sd">            - `wfn.Va()`, `wfn.Vb()`: DFA (just the DFA, if it is LOSC-DFA) Vxc</span>
+<span class="sd">              matrix.</span>
+<span class="sd">            - `wfn.epsilon_a()`, wfn.epsilon_b()`: orbital energies.</span>
+<span class="sd">            - `wfn.energy()`: total energy.</span>
+
+
+
+<span class="sd">          Other members are not touched. Accessing and using other members</span>
+<span class="sd">          in the returned wfn may be a undefined behavior.</span>
+
+<span class="sd">        - The input argument `occ` is added as a new attribute to the returned</span>
+<span class="sd">          wfn object as `wfn.losc_data[&#39;occ&#39;] = occ`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The option settings are handeld by psi4 SCF module.</span>
+
+<span class="sd">    - There are double memory cost for all the updated matrices/vectors in</span>
+<span class="sd">      the returned wfn (such as C, D, F matrices): one is for the allocation in</span>
+<span class="sd">      the python code, the other one is for the allocation in psi4.core C++</span>
+<span class="sd">      code. At return, matrices/vectors will be copied from the python side to</span>
+<span class="sd">      the psi4 C++ side code. This is limited by the psi4.core interface. We</span>
+<span class="sd">      have to pay the price.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A simple example to run an SCF calculation for a system with fractional</span>
+<span class="sd">    number of electrons and non-aufbau occupation.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import psi4</span>
+<span class="sd">        import psi4_losc.scf</span>
+
+<span class="sd">        # Create H2 molecule with charge=0 and mult=1.</span>
+<span class="sd">        # The aufbau occupation numbers for H2 are:</span>
+<span class="sd">        # alpha occ: 1, 0, 0, 0, ...</span>
+<span class="sd">        # beta occ:  1, 0, 0, 0, ...</span>
+<span class="sd">        H2 = psi4.geometry(&#39;&#39;&#39;</span>
+<span class="sd">            0 1</span>
+<span class="sd">            H 0 0 0</span>
+<span class="sd">            H 1 0 0</span>
+<span class="sd">            &#39;&#39;&#39;)</span>
+<span class="sd">        psi4.set_options({&#39;basis&#39;: &#39;3-21g&#39;})</span>
+
+<span class="sd">        # A customized occupation setting that gives:</span>
+<span class="sd">        # alpha occ: 0.5, 0, 0, 0, ...</span>
+<span class="sd">        # beta occ:  1,   0, 0, 0.7, ...</span>
+<span class="sd">        customized_occ = {</span>
+<span class="sd">            &quot;alpha&quot;: {&quot;homo&quot;: 0.5}, # update HOMO occ to be 0.5</span>
+<span class="sd">            &quot;beta&quot;: {&quot;3&quot;: 0.7},     # update 4-th orbital occ to be 0.7</span>
+<span class="sd">            }</span>
+
+<span class="sd">        # Do SCF-B3LYP calculation with the customized occupation.</span>
+<span class="sd">        psi4_losc.scf.scf(&#39;b3lyp&#39;, occ=customized_occ)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">_scf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">guess_wfn</span><span class="o">=</span><span class="n">guess_wfn</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="n">occ</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+               <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="n">orbital_energy_unit</span><span class="p">)</span>
+
+    <span class="c1"># add new attributes</span>
+    <span class="n">wfn</span><span class="o">.</span><span class="n">losc_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;occ&#39;</span><span class="p">:</span> <span class="n">occ</span><span class="o">.</span><span class="n">copy</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">wfn</span></div>
+
+
+<div class="viewcode-block" id="scf_losc"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.scf.scf_losc">[docs]</a><span class="k">def</span> <span class="nf">scf_losc</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dfa_info : py_losc.DFAInfo</span>
+<span class="sd">        The information of the parent DFA, including the weights of exchanges.</span>
+<span class="sd">    dfa_wfn : psi4.core.HF like psi4 object</span>
+<span class="sd">        The converged wavefunction from a parent DFA.</span>
+<span class="sd">    orbital_energy_unit: {&#39;eV&#39;, &#39;au&#39;}, default=&#39;eV&#39;</span>
+<span class="sd">        The units of orbital energies used to print in the output.</span>
+
+<span class="sd">        - &#39;au&#39;: atomic unit, hartree.</span>
+<span class="sd">        - &#39;eV&#39;: electronvolt.</span>
+<span class="sd">    verbose: int, default=1</span>
+<span class="sd">        print level.</span>
+
+<span class="sd">        - 0 means print nothing.</span>
+<span class="sd">        - 1 means normal print level.</span>
+<span class="sd">        - A larger number means more details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wfn : psi4.core.RHF or psi4.core.UHF</span>
+<span class="sd">        The wavefunction for the SCF-LOSC calculation.</span>
+
+<span class="sd">        - Following members in the returned wfn object are calculated:</span>
+
+<span class="sd">            - `wfn.S()`: AO overlap matrix.</span>
+<span class="sd">            - `wfn.H()`: Core matrix.</span>
+<span class="sd">            - `wfn.Ca()`, `wfn.Cb()`: CO coefficient matrix.</span>
+<span class="sd">            - `wfn.Fa()`, `wfn.Fb()`: Fock matrix.</span>
+<span class="sd">            - `wfn.Da()`, `wfn.Db()`: density matrix.</span>
+<span class="sd">            - `wfn.Va()`, `wfn.Vb()`: DFA (just the DFA, if it is LOSC-DFA) Vxc</span>
+<span class="sd">              matrix.</span>
+<span class="sd">            - `wfn.epsilon_a()`, wfn.epsilon_b()`: orbital energies.</span>
+<span class="sd">            - `wfn.energy()`: total energy.</span>
+
+<span class="sd">        - Accessing and using other members in the returned wfn is a undefined</span>
+<span class="sd">          behavior.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    py_losc.DFAInfo : constructor of the DFA information class.</span>
+<span class="sd">    psi4.energy : return a DFA SCF wavefunction. psi4.energy() only supports</span>
+<span class="sd">        calculations for integer systems with aufbau occupations.</span>
+<span class="sd">    scf : return a DFA SCF wavefunction. `psi4_losc.scf.scf()`</span>
+<span class="sd">        supports calculations for integer/fractional systems with</span>
+<span class="sd">        aufbau/non-aufbau occupations.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The option settings are handled by psi4 SCF module.</span>
+
+<span class="sd">    - There are double memory cost for all the updated matrices/vectors in</span>
+<span class="sd">      the returned wfn (such as C, D, F matrices): one is for the allocation in</span>
+<span class="sd">      the python code, the other one is for the allocation in psi4.core C++</span>
+<span class="sd">      code. At return, matrices/vectors will be copied from the python side to</span>
+<span class="sd">      the psi4 C++ side code. This is limited by the psi4 core interface. We</span>
+<span class="sd">      have to pay the price.</span>
+
+<span class="sd">    - This function supports SCF-LOSC (frozen-LO) calculations for</span>
+<span class="sd">      integer/fractional systems with aufbau/non-aufbau occupations:</span>
+
+<span class="sd">      - If you want to calculate integer system with aufbau occupations, use</span>
+<span class="sd">        `psi4.energy` or `scf` to generate the input `dfa_wfn`.</span>
+
+<span class="sd">      - If you want to calculate integer system with non-aufbau occupation, or</span>
+<span class="sd">        fractional system with aufbau/non-aufbau occupations, use</span>
+<span class="sd">        `scf` to generate the input `dfa_wfn`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A simple example to run an SCF-LOSC calculation for a system with fractional</span>
+<span class="sd">    number of electrons and non-aufbau occupation.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import psi4</span>
+<span class="sd">        import psi4_losc    # for psi4_losc.B3LYP</span>
+<span class="sd">        import psi4_losc.scf</span>
+
+<span class="sd">        # Create H2 molecule with charge=0 and mult=1.</span>
+<span class="sd">        H2 = psi4.geometry(&#39;&#39;&#39;</span>
+<span class="sd">            0 1</span>
+<span class="sd">            H 0 0 0</span>
+<span class="sd">            H 1 0 0</span>
+<span class="sd">            &#39;&#39;&#39;)</span>
+<span class="sd">        psi4.set_options({&#39;basis&#39;: &#39;3-21g&#39;})</span>
+
+<span class="sd">        # Specify an non-aufbau and fractional occupation.</span>
+<span class="sd">        customized_occ = {</span>
+<span class="sd">            &quot;alpha&quot;: {&quot;homo&quot;: 0.5}, # update HOMO occ to be 0.5</span>
+<span class="sd">            &quot;beta&quot;: {&quot;3&quot;: 0.7},     # update 4-th orbital occ to be 0.7</span>
+<span class="sd">            }</span>
+
+<span class="sd">        # First, do SCF-B3LYP calculation with the customized occupation.</span>
+<span class="sd">        # alpha occ: 0.5, 0, 0, 0, ...</span>
+<span class="sd">        # beta occ:  1,   0, 0, 0.7, ...</span>
+<span class="sd">        dfa_wfn = psi4_losc.scf.scf(&#39;b3lyp&#39;, occ=customized_occ)</span>
+
+<span class="sd">        # Second, do SCF-LOSC-B3LYP calculation with the customized occupation.</span>
+<span class="sd">        losc_wfn = psi4_losc.scf.scf_losc(psi4_losc.B3LYP, dfa_wfn)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">losc_data</span> <span class="o">=</span> <span class="n">post_scf_losc</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                                    <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="n">orbital_energy_unit</span><span class="p">,</span>
+                                    <span class="n">return_losc_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dfa_name</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">functional</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+    <span class="n">occ</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">):</span>
+        <span class="n">occ</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;occ&#39;</span><span class="p">]</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">_scf</span><span class="p">(</span><span class="n">dfa_name</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="n">occ</span><span class="p">,</span> <span class="n">losc_ref_wfn</span><span class="o">=</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">dfa_info</span><span class="o">=</span><span class="n">dfa_info</span><span class="p">,</span>
+               <span class="n">curvature</span><span class="o">=</span><span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;curvature&#39;</span><span class="p">],</span> <span class="n">C_lo</span><span class="o">=</span><span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;C_lo&#39;</span><span class="p">],</span>
+               <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="n">orbital_energy_unit</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wfn</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

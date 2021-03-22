@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="local__occupation_8h" kind="file" language="C++">
+    <compoundname>local_occupation.h</compoundname>
+    <includes refid="matrix_8h" local="no">c_losc/matrix.h</includes>
+    <includes local="no">stddef.h</includes>
+    <includedby refid="losc_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</includedby>
+    <incdepgraph>
+      <node id="12">
+        <label>stddef.h</label>
+      </node>
+      <node id="10">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h</label>
+        <link refid="local_occupation.h"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>c_losc/matrix.h</label>
+        <link refid="matrix_8h"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="14">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</label>
+        <link refid="losc_8h"/>
+      </node>
+      <node id="13">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h</label>
+        <link refid="local_occupation.h"/>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="local__occupation_8h_1a71a2ee8bd0b1added7426c8810818cc1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>losc_matrix *</type>
+        <definition>losc_matrix* losc_local_occupation</definition>
+        <argsstring>(const losc_matrix *C_lo, const losc_matrix *S, const losc_matrix *D)</argsstring>
+        <name>losc_local_occupation</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>D</declname>
+        </param>
+        <briefdescription>
+<para>Create the local occupation matrix. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LO coefficient matrix with dimension <computeroutput>[nbasis, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AO overlap matrix with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">D</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Spin density matrix under AO with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a local occupation matrix with dimension <computeroutput>[nlo, nlo]</computeroutput> and return the pointer. </para></simplesect>
+<simplesect kind="see"><para>LoscLocalizerBase.lo: Obtain the LOs&apos; coefficient matrix. </para></simplesect>
+<simplesect kind="note"><para>The local occupation matrix is defined as <formula id="11">$\displaystyle \lambda_{ij} = \langle \phi_i|\rho|\phi_j \rangle $</formula>, where <formula id="12">$ \lambda_{ij} $</formula> is the local occupation matrix element, <formula id="13">$ \phi_i $</formula> and <formula id="14">$ \phi_j $</formula> are the i-th and j-th localized orbital and <formula id="15">$ \rho $</formula> is the spin density operator. In matrix form, local occupation matrix <formula id="16">$ L $</formula> is expressed as <formula id="17">$ L = C_{\rm{LO}}^T S D S C_{\rm{LO}} $</formula>. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h" line="33" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC local occupation number. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_C_LOSC_LOCAL_OCCUPATION_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_C_LOSC_LOCAL_OCCUPATION_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="matrix_8h" kindref="compound">c_losc/matrix.h</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal">losc_matrix<sp/>*<ref refid="local__occupation_8h_1a71a2ee8bd0b1added7426c8810818cc1" kindref="member">losc_local_occupation</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*C_lo,</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*S,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*D);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h"/>
+  </compounddef>
+</doxygen>

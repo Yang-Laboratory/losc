@@ -1,0 +1,582 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="classlosc_1_1LocalizerV2" kind="class" language="C++" prot="public">
+    <compoundname>losc::LocalizerV2</compoundname>
+    <basecompoundref refid="classlosc_1_1LocalizerBase" prot="public" virt="non-virtual">losc::LocalizerBase</basecompoundref>
+    <includes refid="localization_8hpp" local="no">localization.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classlosc_1_1LocalizerV2_1ae55cd872a399cf83584572d4a5af6249" prot="private" static="no" mutable="no">
+        <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref></type>
+        <definition>ConstRefMat losc::LocalizerV2::H_ao_</definition>
+        <argsstring></argsstring>
+        <name>H_ao_</name>
+        <briefdescription>
+<para>Hamiltonian matrix under AO used in LOSC localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para>In LOSC2 method, it is just the Hamiltonian of the parent DFA. Dimension: [nbasis, nbasis]. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="239" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="239" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classlosc_1_1LocalizerV2_1aef14380436db4a4a0eda25d9dbf33a5d" prot="private" static="no" mutable="no">
+        <type>const vector&lt; <ref refid="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" kindref="member">RefConstMat</ref> &gt;</type>
+        <definition>const vector&lt;RefConstMat&gt; losc::LocalizerV2::Dipole_ao_</definition>
+        <argsstring></argsstring>
+        <name>Dipole_ao_</name>
+        <briefdescription>
+<para>Dipole matrix under AO in order of x, y and z directions. </para>        </briefdescription>
+        <detaileddescription>
+<para>Dimension: [nbasis, nbasis]. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="245" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="245" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classlosc_1_1LocalizerV2_1ad0d2cbd556e10187362037b82ad00b0f" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double losc::LocalizerV2::c_</definition>
+        <argsstring></argsstring>
+        <name>c_</name>
+        <initializer>= 1000</initializer>
+        <briefdescription>
+<para>Parameter <formula id="31">$ C $</formula> in the cost function of localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="see"><para>Eq. 7 in the LOSC2 paper. Default to 1000. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="251" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="251" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classlosc_1_1LocalizerV2_1ab337154f24a8c81e9184d93558dea3e5" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double losc::LocalizerV2::gamma_</definition>
+        <argsstring></argsstring>
+        <name>gamma_</name>
+        <initializer>= 0.707</initializer>
+        <briefdescription>
+<para>Parameter <formula id="32">$\gamma$</formula> in the cost function of localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="see"><para>Eq. 7 in the LOSC2 paper. Default to 0.707. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="257" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="257" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1a7a5943989d39f4f39ca26121eaf7a19a" prot="private" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerV2::js_optimize_one_pair</definition>
+        <argsstring>(const size_t i, const size_t j, const vector&lt; LOSCMatrix &gt; &amp;D_lo, const LOSCMatrix &amp;H_lo, double &amp;theta_val, double &amp;delta_val) const </argsstring>
+        <name>js_optimize_one_pair</name>
+        <param>
+          <type>const size_t</type>
+          <declname>i</declname>
+        </param>
+        <param>
+          <type>const size_t</type>
+          <declname>j</declname>
+        </param>
+        <param>
+          <type>const vector&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt; &amp;</type>
+          <declname>D_lo</declname>
+        </param>
+        <param>
+          <type>const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &amp;</type>
+          <declname>H_lo</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>theta_val</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>delta_val</declname>
+        </param>
+        <briefdescription>
+<para>Internal function to calculate the optimal rotation angle. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="262" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1a35b58a57a791c92b7cbf9b92925dd6dd" prot="private" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerV2::js_rotate_one_pair</definition>
+        <argsstring>(const size_t i, const size_t j, const double theta, RefMat U, vector&lt; LOSCMatrix &gt; &amp;D_lo, LOSCMatrix &amp;H_lo) const </argsstring>
+        <name>js_rotate_one_pair</name>
+        <param>
+          <type>const size_t</type>
+          <declname>i</declname>
+        </param>
+        <param>
+          <type>const size_t</type>
+          <declname>j</declname>
+        </param>
+        <param>
+          <type>const double</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>U</declname>
+        </param>
+        <param>
+          <type>vector&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt; &amp;</type>
+          <declname>D_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &amp;</type>
+          <declname>H_lo</declname>
+        </param>
+        <briefdescription>
+<para>Internal function to rotate two orbitals: rotate D_lo, H_lo and U matrices. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="270" column="1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1aca94d948a92fedc075eac274418c2759" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>losc::LocalizerV2::LocalizerV2</definition>
+        <argsstring>(ConstRefMat &amp;C_lo_basis, ConstRefMat &amp;H_ao, const vector&lt; RefConstMat &gt; &amp;Dipole_ao)</argsstring>
+        <name>LocalizerV2</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo_basis</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>H_ao</declname>
+        </param>
+        <param>
+          <type>const vector&lt; <ref refid="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" kindref="member">RefConstMat</ref> &gt; &amp;</type>
+          <declname>Dipole_ao</declname>
+        </param>
+        <briefdescription>
+<para>Constructor of <ref refid="classlosc_1_1LocalizerV2" kindref="compound">LocalizerV2</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo_basis</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LO basis coefficient matrix under AOs with dimension of [nbasis, nlo]. The LO basis relates to the LOs via a unitary transformation matrix. Usually, the converged COs from the associated DFA are used as the LO basis. The <computeroutput>i</computeroutput>-th column of <computeroutput>C_lo_basis</computeroutput> is the <computeroutput>i</computeroutput>-th LO basis. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">H_ao</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Hamiltonian matrix under AO used in localization with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">Dipole_ao</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a vector of dipole matrices under AO (in the order of x, y and z). The dimension of each dipole matrix is <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="284" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1a766642cf1ebd619521568385aa88f287" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>losc::LocalizerV2::~LocalizerV2</definition>
+        <argsstring>()</argsstring>
+        <name>~LocalizerV2</name>
+        <briefdescription>
+<para>Deconstructor of <ref refid="classlosc_1_1LocalizerV2" kindref="compound">LocalizerV2</ref>. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="290" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="290" bodyend="290"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1ad970dcc0d2471ab2b2a1baf93b7c1d00" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerV2::set_gamma</definition>
+        <argsstring>(double gamma)</argsstring>
+        <name>set_gamma</name>
+        <param>
+          <type>double</type>
+          <declname>gamma</declname>
+        </param>
+        <briefdescription>
+<para>set the localization parameter <formula id="33">$ \gamma $</formula>. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="295" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="295" bodyend="295"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1aa61ad3d4480d58f5564f16f4a17ba3c1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerV2::set_c</definition>
+        <argsstring>(double c)</argsstring>
+        <name>set_c</name>
+        <param>
+          <type>double</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+<para>set the localization parameter <formula id="31">$ C $</formula>. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="300" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="300" bodyend="300"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1a52c39fbde8972dbf17f5e44e5c42f1fc" prot="public" static="no" const="yes" explicit="no" inline="no" virt="virtual">
+        <type>double</type>
+        <definition>double losc::LocalizerV2::cost_func</definition>
+        <argsstring>(ConstRefMat &amp;C_lo) const override</argsstring>
+        <name>cost_func</name>
+        <reimplements refid="classlosc_1_1LocalizerBase_1a71d327c6b83d118807d39fa0e940b79b">cost_func</reimplements>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <briefdescription>
+<para>Return the relative cost function of LOSC localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>The cost function is defined as: <formula id="34">\[ F = \sum_i (1 - \gamma) \Big ( \langle i | \mathbf{r}^2| i \rangle - \langle i | \mathbf{r} | i \rangle ^2 \Big) + \gamma C \Big ( \langle i | H^2| i \rangle - \langle i | H | i \rangle ^2 \Big), \]</formula> in which index <computeroutput>i</computeroutput> is summed over all LOs. Since the unitary transformation does not change the trace of a matrix, The relative cost function is evaluated: <formula id="35">\[ F_{\rm{rel}} = \sum_i (1 - \gamma) \langle i | \mathbf{r} | i \rangle ^2 + \gamma C \langle i | H | i \rangle ^2. \]</formula> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="325" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1a0379572f42f0df56d6885218bf159ca1" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>vector&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>virtual vector&lt;LOSCMatrix&gt; losc::LocalizerV2::lo_U</definition>
+        <argsstring>(const string &amp;guess=&quot;identity&quot;) override</argsstring>
+        <name>lo_U</name>
+        <reimplements refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45">lo_U</reimplements>
+        <param>
+          <type>const string &amp;</type>
+          <declname>guess</declname>
+          <defval>&quot;identity&quot;</defval>
+        </param>
+        <briefdescription>
+<para>Calculate the LOs and the unitary transformation matrix from the LOSC localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">guess</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Valid choices are <computeroutput>[&quot;identity&quot;, &quot;random&quot;, &quot;random_fixed_seed&quot;]</computeroutput>. Default to &quot;identity&quot;<itemizedlist>
+<listitem><para>&quot;identity&quot;: initial U matrix is set as an identity matrix.</para></listitem><listitem><para>&quot;random&quot;: initial U matrix is set as a random unitary matrix.</para></listitem><listitem><para>&quot;random_fixed_seed&quot;: initial U matrix is set as a random unitary matrix with fixed random seed.</para></listitem></itemizedlist>
+</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The LO coefficient matrix <computeroutput>C_lo</computeroutput> under AO with dimension <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column of <computeroutput>C_lo</computeroutput> is the <computeroutput>i</computeroutput>-th LO. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="333" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1ad569ff0364a060eb0d80a7bb2f0db4aa" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>vector&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>virtual vector&lt;LOSCMatrix&gt; losc::LocalizerV2::lo_U</definition>
+        <argsstring>(ConstRefMat &amp;U_guess, double threshold=1e-8) override</argsstring>
+        <name>lo_U</name>
+        <reimplements refid="classlosc_1_1LocalizerBase_1acf1d88c9931d396d370d5c7405263709">lo_U</reimplements>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>U_guess</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+          <defval>1e-8</defval>
+        </param>
+        <briefdescription>
+<para>Calculate the LOs and the unitary transformation matrix from the LOSC localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">U_guess</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the initial guess of U matrix. Its data will be copied. Its unitarity will be verified and throw an exception if the validation fails. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the threshold used to check the unitarity. Default to 1e-8.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a vector of matrix <computeroutput>rst</computeroutput> with size of 2. <computeroutput>rst[0]</computeroutput> is the LO coefficient matrix. <computeroutput>rst[1]</computeroutput> is the corresponding U matrix. The relation between the LOs and AOs is <formula id="25">$ \displaystyle \psi_i = \sum_\mu C_{\mu i} \phi_{\mu}, $</formula> in which <formula id="26">$ \psi_i $</formula> is the LO, <formula id="27">$ C_{\mu i} $</formula> is the LO coefficient matrix and <formula id="20">$ \phi_i $</formula> is the AO. The dimension of LO coefficient matrix is <computeroutput>[nbasis, nlo]</computeroutput>. The relation between the LOs and LO basis is <formula id="28">$ \displaystyle \psi_i = \sum_j U_{\mu i} \phi_\mu, $</formula> in which <formula id="26">$ \psi_i $</formula> is the LO, <formula id="29">$ U_{\mu i} $</formula> is the U matrix and <formula id="30">$ \phi_\mu $</formula> is the LO basis. The dimension of the U matrix is <computeroutput>[nlo, nlo]</computeroutput>. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerV2_1a0379572f42f0df56d6885218bf159ca1" kindref="member">losc::LocalizerV2::lo_U(const string&amp;)</ref> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="342" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerV2_1acde2a2b791a29449656b0cb0614fddec" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>void</type>
+        <definition>virtual void losc::LocalizerV2::C_API_lo_U</definition>
+        <argsstring>(RefMat L, RefMat U) override</argsstring>
+        <name>C_API_lo_U</name>
+        <reimplements refid="classlosc_1_1LocalizerBase_1ac15cd3a62d73749f57206486ff7c9816">C_API_lo_U</reimplements>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>L</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>U</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the LOs and the unitary transformation matrix in an in-out way from the LOSC localization v2. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">L</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A matrix with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The content of L is ignored. At exit, it stores the LO coefficient matrix under AO.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">U</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. At entrance, it stores a unitary matrix as the initial guess for the localization. The unitarity of the input U matrix is not verified. At exit, it is updated by the localization process. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="351" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc::LocalizerBase::steps</definition>
+        <argsstring>() const </argsstring>
+        <name>steps</name>
+        <briefdescription>
+<para>Return the number of iteration steps for the most recent localization performed by calling the <computeroutput><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U()</ref></computeroutput> and <computeroutput><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">lo()</ref></computeroutput> functions. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="89" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="89" bodyend="89"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool losc::LocalizerBase::is_converged</definition>
+        <argsstring>() const </argsstring>
+        <name>is_converged</name>
+        <briefdescription>
+<para>Return the convergence of the most recent localization performed by calling the <computeroutput><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">lo_U()</ref></computeroutput> and <computeroutput><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">lo()</ref></computeroutput> functions. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="95" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="95" bodyend="95"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerBase::set_max_iter</definition>
+        <argsstring>(size_t max_iter)</argsstring>
+        <name>set_max_iter</name>
+        <param>
+          <type>size_t</type>
+          <declname>max_iter</declname>
+        </param>
+        <briefdescription>
+<para>Set the maximum iteration number for localization. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="106" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="106" bodyend="106"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerBase::set_convergence</definition>
+        <argsstring>(double tol)</argsstring>
+        <name>set_convergence</name>
+        <param>
+          <type>double</type>
+          <declname>tol</declname>
+        </param>
+        <briefdescription>
+<para>Set the convergence of localization. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="111" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="111" bodyend="111"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::LocalizerBase::set_random_permutation</definition>
+        <argsstring>(bool flag)</argsstring>
+        <name>set_random_permutation</name>
+        <param>
+          <type>bool</type>
+          <declname>flag</declname>
+        </param>
+        <briefdescription>
+<para>Set to use random permutation for Jacobi-Sweep algorithm or not. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">flag</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>True</computeroutput> for doing random permutation and <computeroutput>False</computeroutput> otherwise. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="118" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="118" bodyend="118"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref></type>
+        <definition>virtual LOSCMatrix losc::LocalizerBase::lo</definition>
+        <argsstring>(const string &amp;guess=&quot;identity&quot;)</argsstring>
+        <name>lo</name>
+        <param>
+          <type>const string &amp;</type>
+          <declname>guess</declname>
+          <defval>&quot;identity&quot;</defval>
+        </param>
+        <briefdescription>
+<para>Calculate the LOs&apos; coefficient matrix under AO. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">guess</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Valid choices are <computeroutput>[&quot;identity&quot;, &quot;random&quot;, &quot;random_fixed_seed&quot;]</computeroutput>. Default to &quot;identity&quot;<itemizedlist>
+<listitem><para>&quot;identity&quot;: initial U matrix is set as an identity matrix.</para></listitem><listitem><para>&quot;random&quot;: initial U matrix is set as a random unitary matrix.</para></listitem><listitem><para>&quot;random_fixed_seed&quot;: initial U matrix is set as a random unitary matrix with fixed random seed.</para></listitem></itemizedlist>
+</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The LO coefficient matrix <computeroutput>C_lo</computeroutput> under AO with dimension <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column of <computeroutput>C_lo</computeroutput> is the <computeroutput>i</computeroutput>-th LO. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">losc::LocalizerBase::lo_U()</ref> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="210" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="210" bodyend="213"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref></type>
+        <definition>virtual LOSCMatrix losc::LocalizerBase::lo</definition>
+        <argsstring>(ConstRefMat &amp;U_guess, double threshold=1e-8)</argsstring>
+        <name>lo</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>U_guess</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+          <defval>1e-8</defval>
+        </param>
+        <briefdescription>
+<para>Calculate the LOs&apos; coefficient matrix under AO. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">U_guess</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the initial guess of U matrix. Its data will be copied. Its unitarity will be verified and throw an exception if the validation fails. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the threshold used to check the unitarity. Default to 1e-8.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The LO coefficient matrix <computeroutput>C_lo</computeroutput> under AO with dimension <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column of <computeroutput>C_lo</computeroutput> is the <computeroutput>i</computeroutput>-th LO. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kindref="member">losc::LocalizerBase::lo_U()</ref> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="221" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="221" bodyend="224"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>LOSC localization version 2. </para>    </briefdescription>
+    <detaileddescription>
+<para><simplesect kind="note"><para>This is the version used in the LOSC2 paper. </para></simplesect>
+<simplesect kind="see"><para>J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535. </para></simplesect>
+</para>    </detaileddescription>
+    <inheritancegraph>
+      <node id="47">
+        <label>losc::LocalizerV2</label>
+        <link refid="classlosc_1_1LocalizerV2"/>
+        <childnode refid="48" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="48">
+        <label>losc::LocalizerBase</label>
+        <link refid="classlosc_1_1LocalizerBase"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="49">
+        <label>losc::LocalizerV2</label>
+        <link refid="classlosc_1_1LocalizerV2"/>
+        <childnode refid="50" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="50">
+        <label>losc::LocalizerBase</label>
+        <link refid="classlosc_1_1LocalizerBase"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" line="232" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/localization.hpp" bodystart="232" bodyend="352"/>
+    <listofallmembers>
+      <member refid="classlosc_1_1LocalizerV2_1ad0d2cbd556e10187362037b82ad00b0f" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>c_</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1acde2a2b791a29449656b0cb0614fddec" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>C_API_lo_U</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1a52c39fbde8972dbf17f5e44e5c42f1fc" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>cost_func</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1aef14380436db4a4a0eda25d9dbf33a5d" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>Dipole_ao_</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1ab337154f24a8c81e9184d93558dea3e5" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>gamma_</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1ae55cd872a399cf83584572d4a5af6249" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>H_ao_</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>is_converged</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1a7a5943989d39f4f39ca26121eaf7a19a" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>js_optimize_one_pair</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1a35b58a57a791c92b7cbf9b92925dd6dd" prot="private" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>js_rotate_one_pair</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>lo</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>lo</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1a0379572f42f0df56d6885218bf159ca1" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>lo_U</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1ad569ff0364a060eb0d80a7bb2f0db4aa" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>lo_U</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1a2fe839092247fbd128aac1772d0cd017" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>LocalizerBase</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1aca94d948a92fedc075eac274418c2759" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>LocalizerV2</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1aa61ad3d4480d58f5564f16f4a17ba3c1" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>set_c</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>set_convergence</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1ad970dcc0d2471ab2b2a1baf93b7c1d00" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>set_gamma</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>set_max_iter</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>set_random_permutation</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>steps</name></member>
+      <member refid="classlosc_1_1LocalizerBase_1a33a5199ded590d2bb6e9230df4aca3be" prot="public" virt="virtual"><scope>losc::LocalizerV2</scope><name>~LocalizerBase</name></member>
+      <member refid="classlosc_1_1LocalizerV2_1a766642cf1ebd619521568385aa88f287" prot="public" virt="non-virtual"><scope>losc::LocalizerV2</scope><name>~LocalizerV2</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

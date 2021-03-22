@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>LOSC C library &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LOSC Python library" href="py_losc.html" />
+    <link rel="prev" title="LOSC C++ library" href="losc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LOSC C library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-structure">Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#detailed-references-for-the-api">Detailed References for the API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>LOSC C library</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/c_losc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="losc-c-library">
+<h1>LOSC C library<a class="headerlink" href="#losc-c-library" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The LOSC library provides a C interface to perform calculations of LOSC,
+including the construction of LOSC curvature matrix, LOSC localization,
+local occupation number and LOSC corrections. The C interface is developed
+by wrapping the <a class="reference internal" href="losc.html#losc-c-library"><span class="std std-ref">C++ interface</span></a> in C-style.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not sure about how to let C code handle the exceptions that may
+be thrown in the C++ code.</p>
+</div>
+<p>The provided C interface (C header files) includes</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Header</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/matrix.h&gt;</span></code></p></td>
+<td><p>provide the C interface for the matrix
+objects that are used in the LOSC library.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/curvature.h&gt;</span></code></p></td>
+<td><p>for the LOSC curvature matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/localization.h&gt;</span></code></p></td>
+<td><p>for the LOSC localization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/local_occupation.h&gt;</span></code></p></td>
+<td><p>for the LOSC local occupation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/correction.h&gt;</span></code></p></td>
+<td><p>for the LOSC corrections.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;losc/losc.h&gt;</span></code></p></td>
+<td><p>A convenient header that includes
+everything you need.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>In order to use the C interface of the LOSC library, following the
+<a class="reference internal" href="installation.html#installation"><span class="std std-ref">steps of installation</span></a>. Then all you
+need to do is to include the corresponding headers in your project
+to use the LOSC C library.</p>
+</div>
+<div class="section" id="data-structure">
+<h2>Data Structure<a class="headerlink" href="#data-structure" title="Permalink to this headline">¶</a></h2>
+<p>The LOSC C library defines matrix object with <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">losc_matrix</span></code> that is
+declared in <code class="docutils literal notranslate"><span class="pre">&lt;losc/matrix.h&gt;</span></code> header. You can call the constructor function
+<code class="docutils literal notranslate"><span class="pre">losc_matrix_create</span></code> to create a <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">losc_matrix</span></code> with any size,
+or you can pass a C pointer <code class="docutils literal notranslate"><span class="pre">double</span> <span class="pre">*</span></code> that points to an array to generate a
+<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">losc_matrix</span></code>, which does not own the data. Remember the storage of
+the matrix is ALWAYS interpreted in row-wise (C-style) major. See
+<code class="docutils literal notranslate"><span class="pre">&lt;losc/matrix.h&gt;</span></code> for more details.</p>
+</div>
+<div class="section" id="detailed-references-for-the-api">
+<h2>Detailed References for the API<a class="headerlink" href="#detailed-references-for-the-api" title="Permalink to this headline">¶</a></h2>
+<p>Please refer <a class="reference external" href="./doxygen/c_losc/html/index.html">this section</a> for the full
+documentation of C interface of the LOSC library.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="py_losc.html" class="btn btn-neutral float-right" title="LOSC Python library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="losc.html" class="btn btn-neutral float-left" title="LOSC C++ library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

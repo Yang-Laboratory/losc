@@ -1,0 +1,604 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="namespacelosc" kind="namespace" language="C++">
+    <compoundname>losc</compoundname>
+    <innerclass refid="classlosc_1_1CurvatureBase" prot="public">losc::CurvatureBase</innerclass>
+    <innerclass refid="classlosc_1_1CurvatureV1" prot="public">losc::CurvatureV1</innerclass>
+    <innerclass refid="classlosc_1_1CurvatureV2" prot="public">losc::CurvatureV2</innerclass>
+    <innerclass refid="classlosc_1_1DFAInfo" prot="public">losc::DFAInfo</innerclass>
+    <innerclass refid="classlosc_1_1LocalizerBase" prot="public">losc::LocalizerBase</innerclass>
+    <innerclass refid="classlosc_1_1LocalizerV2" prot="public">losc::LocalizerV2</innerclass>
+    <innernamespace refid="namespacelosc_1_1exception">losc::exception</innernamespace>
+    <innernamespace refid="namespacelosc_1_1utils">losc::utils</innernamespace>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" prot="public" static="no">
+        <type>Eigen::Matrix&lt; double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor &gt;</type>
+        <definition>using losc::LOSCMatrix = typedef Eigen::Matrix&lt;double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor&gt;</definition>
+        <argsstring></argsstring>
+        <name>LOSCMatrix</name>
+        <briefdescription>
+<para>Matrix object used in LOSC. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The storage order is row-wise (C-style), which is opposite to the <computeroutput>Eigen</computeroutput> default behavior. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="21" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" prot="public" static="no">
+        <type>Eigen::VectorXd</type>
+        <definition>using losc::LOSCVector = typedef Eigen::VectorXd</definition>
+        <argsstring></argsstring>
+        <name>LOSCVector</name>
+        <briefdescription>
+<para>Vector object used in LOSC. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="27" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" prot="public" static="no">
+        <type>const Ref&lt; const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::ConstRefMat = typedef const Ref&lt;const LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>ConstRefMat</name>
+        <briefdescription>
+<para>Constatnt reference to a constant LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="32" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" prot="public" static="no">
+        <type>const Ref&lt; const <ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref> &gt;</type>
+        <definition>using losc::ConstRefVec = typedef const Ref&lt;const LOSCVector&gt;</definition>
+        <argsstring></argsstring>
+        <name>ConstRefVec</name>
+        <briefdescription>
+<para>Constatnt reference to a constant LOSCVector object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="37" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" prot="public" static="no">
+        <type>Ref&lt; const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::RefConstMat = typedef Ref&lt;const LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>RefConstMat</name>
+        <briefdescription>
+<para>Reference to a constant LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="42" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="42" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1af53923e3150681c84270c02bf6a654b6" prot="public" static="no">
+        <type>Ref&lt; const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::RefConstVec = typedef Ref&lt;const LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>RefConstVec</name>
+        <briefdescription>
+<para>Reference to a constant LOSCVector object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="47" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" prot="public" static="no">
+        <type>Ref&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::RefMat = typedef Ref&lt;LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>RefMat</name>
+        <briefdescription>
+<para>Reference to a LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="52" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a1dedf36275248282fcc77b4cd5e892b9" prot="public" static="no">
+        <type>Ref&lt; <ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref> &gt;</type>
+        <definition>using losc::RefVec = typedef Ref&lt;LOSCVector&gt;</definition>
+        <argsstring></argsstring>
+        <name>RefVec</name>
+        <briefdescription>
+<para>Reference to a LOSCVector object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="57" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1ad490768841d2f8f4b32c7b6a5adf8fbe" prot="public" static="no">
+        <type>const Map&lt; const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::ConstMapMat = typedef const Map&lt;const LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>ConstMapMat</name>
+        <briefdescription>
+<para>Constatnt map to a constant LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="62" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="62" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1ae76eda885d00475b86de74be8e03e53a" prot="public" static="no">
+        <type>const Map&lt; const <ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref> &gt;</type>
+        <definition>using losc::ConstMapVec = typedef const Map&lt;const LOSCVector&gt;</definition>
+        <argsstring></argsstring>
+        <name>ConstMapVec</name>
+        <briefdescription>
+<para>Constatnt map to a constant LOSCVetor object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="67" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a173b853213fea71c9cfd91fbe0de1f01" prot="public" static="no">
+        <type>Map&lt; const <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::MapConstMat = typedef Map&lt;const LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>MapConstMat</name>
+        <briefdescription>
+<para>Map to a constant LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="72" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a3001affd040a7ad0a09604de1baac44f" prot="public" static="no">
+        <type>Map&lt; const <ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref> &gt;</type>
+        <definition>using losc::MapConstVec = typedef Map&lt;const LOSCVector&gt;</definition>
+        <argsstring></argsstring>
+        <name>MapConstVec</name>
+        <briefdescription>
+<para>Map to a constant LOSCVetor object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="77" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="77" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1ae41af6b51eec9b509dda5d600d02266c" prot="public" static="no">
+        <type>Map&lt; <ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref> &gt;</type>
+        <definition>using losc::MapMat = typedef Map&lt;LOSCMatrix&gt;</definition>
+        <argsstring></argsstring>
+        <name>MapMat</name>
+        <briefdescription>
+<para>Map to a LOSCMatrix object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="82" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="82" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="eigen__def_8hpp_1a0084d0d06d4f4d663a214587d4eaf102" prot="public" static="no">
+        <type>Map&lt; <ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref> &gt;</type>
+        <definition>using losc::MapVec = typedef Map&lt;LOSCVector&gt;</definition>
+        <argsstring></argsstring>
+        <name>MapVec</name>
+        <briefdescription>
+<para>Map to a LOSCVetor object. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" line="87" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp" bodystart="87" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="correction_8hpp_1a70cacaeb1a24172447dac12d6bf902be" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref></type>
+        <definition>LOSCMatrix losc::ao_hamiltonian_correction</definition>
+        <argsstring>(ConstRefMat &amp;S, ConstRefMat &amp;C_lo, ConstRefMat &amp;Curvature, ConstRefMat &amp;LocalOcc)</argsstring>
+        <name>ao_hamiltonian_correction</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>Curvature</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>LocalOcc</declname>
+        </param>
+        <briefdescription>
+<para>Calculate LOSC effective Hamiltonian under AO basis. </para>        </briefdescription>
+        <detaileddescription>
+<para>The LOSC effective Hamiltonian is used for self-consistent LOSC (SCF-LOSC) calculations. This function constructs the LOSC effective Hamiltonian with fixed LOs. This LOSC effective Hamiltonian is used as an APPROXIMATION in the original LOSC paper (see <ulink url="https://doi.org/10.1093/nsr/nwx111">https://doi.org/10.1093/nsr/nwx111</ulink>). In addition, this LOSC effective Hamiltonian is used as the EXACT one in the developed version of the SCF-LOSC (see J. Phys. Chem. Lett. 2020, 11, 23, 10269-10277).</para><para>The expression of the LOSC effective Hamiltonian is shown as the Eq. S25 in the supporting information of the paper of original LOSC, and the Eq. 12 in the paper of the developed version.</para><para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AOs overlap matrix with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">Curvature</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC local occupation matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the LOSC effective Hamiltonian with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>.</para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">losc::LocalizerV2::lo()</ref>: return the LOs coefficient matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kindref="member">losc::CurvatureBase::kappa()</ref>: return the LOSC curvature matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="local__occupation_8hpp_1a2b32509da0db9e4dda89c09457708513" kindref="member">losc::local_occupation()</ref>: return the LOSC local occupation matrix. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="53" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8hpp_1aec1318ccac401d8a4da9f06874d390ad" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double losc::energy_correction</definition>
+        <argsstring>(ConstRefMat &amp;Curvature, ConstRefMat &amp;LocalOcc)</argsstring>
+        <name>energy_correction</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>Curvature</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>LocalOcc</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the total energy correction from LOSC. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">Curvature</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC local occupation matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The total energy correction from LOSC. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kindref="member">losc::CurvatureBase::kappa()</ref>: return the LOSC curvature matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="local__occupation_8hpp_1a2b32509da0db9e4dda89c09457708513" kindref="member">losc::local_occupation()</ref>: return the LOSC local occupation matrix. </para></simplesect>
+<simplesect kind="note"><para>This is just the energy correction from LOSC, NOT the total energy of LOSC-DFA. Total energy of LOSC-DFA is <computeroutput>E_losc_dfa = E_dfa + E_losc</computeroutput>. </para></simplesect>
+<simplesect kind="note"><para>This function only calculates the energy correction of the single spin associated with the input matrices. The total LOSC energy correction involves the contributions from both alpha and beta spins. Thus, you may need to call this function twice (for unrestricted KS calculation definitely). </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="71" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8hpp_1aa41ad43c2da822b197aac0e52adbe17e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>vector&lt; double &gt;</type>
+        <definition>vector&lt;double&gt; losc::orbital_energy_post_scf</definition>
+        <argsstring>(ConstRefMat &amp;H_dfa, ConstRefMat &amp;H_losc, ConstRefMat &amp;C_co)</argsstring>
+        <name>orbital_energy_post_scf</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>H_dfa</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>H_losc</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_co</declname>
+        </param>
+        <briefdescription>
+<para>Calculate corrected orbital energy from LOSC in a post-SCF approach. </para>        </briefdescription>
+        <detaileddescription>
+<para>This function gives the FINAL orbital energies. The corrections from LOSC are applied at the return. This is the difference to the <ref refid="correction_8hpp_1aec1318ccac401d8a4da9f06874d390ad" kindref="member">losc::energy_correction()</ref>.</para><para>The corrected orbital energies are defined as the expectation values of converged DFA COs on the LOSC-DFA Hamiltonian, that is, <formula id="0">$ \epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}} | \psi_i \rangle. $</formula></para><para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">H_dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The DFA Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">H_losc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The LOSC effective Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_co</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The coefficient matrix of converged DFA COs under AOs with dimension of <computeroutput>[nbasis, n]</computeroutput> (<computeroutput>n &lt;= nbasis</computeroutput>, which is the number of COs). You can choose whatever number of COs you want.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector of the corrected orbital energies from LOSC with size of <computeroutput>n</computeroutput>. The order of orbital energies matches the order of the input COs coefficient matrix (the order of columns in <computeroutput>C_co</computeroutput> matrix). </para></simplesect>
+<simplesect kind="see"><para><ref refid="correction_8hpp_1a70cacaeb1a24172447dac12d6bf902be" kindref="member">losc::ao_hamiltonian_correction()</ref>: return the LOSC effective Hamiltonian under AOs.</para></simplesect>
+<simplesect kind="note"><para>This function only calculates the orbital energies for the single spin associated with the input matrices. </para></simplesect>
+<simplesect kind="note"><para>This function is just one of the ways to construct the LOSC corrected orbital energies in the post-SCF LOSC calculations. It is the way we used to produce results in the published paper for the post-SCF LOSC calculations. Besides this way, there are another two ways to calculate corrected orbital energies: (1) diagonalize the corrected LOSC-DFA Hamiltonian; (2) follow Eq. 11 of the original paper of LOSC to calculate the corrections to orbital energies. These three ways usually produce very similar results. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="121" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8hpp_1a2cfadfd785ed6fa231612c73f6bacbd1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::C_API_ao_hamiltonian_correction</definition>
+        <argsstring>(ConstRefMat &amp;S, ConstRefMat &amp;C_lo, ConstRefMat &amp;Curvature, ConstRefMat &amp;LocalOcc, RefMat H_losc)</argsstring>
+        <name>C_API_ao_hamiltonian_correction</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>Curvature</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>LocalOcc</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>H_losc</declname>
+        </param>
+        <briefdescription>
+<para>The C interface to calculate LOSC effective Hamiltonian under AOs. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AOs overlap matrix with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">Curvature</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOSC local occupation matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">H_losc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a matrix with dimension of [nbasis, nbasis] at the input. At exit, it is updated to store the LOSC effective Hamiltonian.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">losc::LocalizerV2::lo()</ref>: return the LOs coefficient matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kindref="member">losc::CurvatureBase::kappa()</ref>: return the LOSC curvature matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="local__occupation_8hpp_1a2b32509da0db9e4dda89c09457708513" kindref="member">losc::local_occupation()</ref>: return the LOSC local occupation matrix. </para></simplesect>
+<simplesect kind="see"><para><ref refid="correction_8hpp_1a70cacaeb1a24172447dac12d6bf902be" kindref="member">losc::ao_hamiltonian_correction()</ref> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="132" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="correction_8hpp_1a067d28c3f79f24697c9a380b2d296de4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::C_API_orbital_energy_post_scf</definition>
+        <argsstring>(ConstRefMat &amp;H_dfa, ConstRefMat &amp;H_losc, ConstRefMat &amp;C_co, double *eig)</argsstring>
+        <name>C_API_orbital_energy_post_scf</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>H_dfa</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>H_losc</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_co</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>eig</declname>
+        </param>
+        <briefdescription>
+<para>C interface to calculate the corrected orbital energies from LOSC in a post-SCF approach. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">H_dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The DFA Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">H_losc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The LOSC effective Hamiltonian under AOs with dimension of <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_co</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The coefficient matrix of converged DFA COs under AOs with dimension of <computeroutput>[nbasis, n]</computeroutput> (<computeroutput>n &lt;= nbasis</computeroutput>, which is the number of COs). You can choose whatever number of COs you want. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">eig</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a array with size of at least <computeroutput>n</computeroutput> (the number of input COs). At exit, the first <computeroutput>n</computeroutput> number of elements of <computeroutput>eig</computeroutput> are updated to be the LOSC-DFA orbital energies. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="see"><para><ref refid="correction_8hpp_1aa41ad43c2da822b197aac0e52adbe17e" kindref="member">losc::orbital_energy_post_scf()</ref></para></simplesect>
+<simplesect kind="note"><para>This function only calculates the orbital energies for the single spin associated with the input matrices. </para></simplesect>
+<simplesect kind="note"><para>This function is just one of the ways to construct the LOSC corrected orbital energies in the post-SCF LOSC calculations. It is the way we used to produce results in the published paper for the post-SCF LOSC calculations. Besides this way, there are another two ways to calculate corrected orbital energies: (1) diagonalize the corrected LOSC-DFA Hamiltonian; (2) follow Eq. 11 of the original paper of LOSC to calculate the corrections to orbital energies. These three ways usually produce very similar results. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="146" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="local__occupation_8hpp_1a2b32509da0db9e4dda89c09457708513" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref></type>
+        <definition>LOSCMatrix losc::local_occupation</definition>
+        <argsstring>(ConstRefMat &amp;C_lo, ConstRefMat &amp;S, ConstRefMat &amp;D)</argsstring>
+        <name>local_occupation</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>D</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the local occupation matrix. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AO overlap matrix with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">D</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Spin density matrix under AO with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The local occupation matrix with dimension <computeroutput>[nlo, nlo]</computeroutput>.</para></simplesect>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">losc::LocalizerV2::lo()</ref>: Obtain the LOs&apos; coefficient matrix. </para></simplesect>
+<simplesect kind="note"><para>The local occupation matrix is defined as <formula id="18">$\displaystyle \lambda_{ij} = \langle \phi_i|\rho|\phi_j \rangle $</formula>, where <formula id="19">$ \lambda_{ij} $</formula> is the local occupation matrix element, <formula id="20">$ \phi_i $</formula> and <formula id="21">$ \phi_j $</formula> are the i-th and j-th localized orbital and <formula id="22">$ \rho $</formula> is the spin density operator. In matrix form, local occupation matrix <formula id="23">$ L $</formula> is expressed as <formula id="24">$ L = C_{\rm{LO}}^T S D S C_{\rm{LO}} $</formula>. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/local_occupation.hpp" line="45" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="local__occupation_8hpp_1ae8e6a700378d5952142984980b621bd3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::C_API_local_occupation</definition>
+        <argsstring>(ConstRefMat &amp;C_lo, ConstRefMat &amp;S, ConstRefMat &amp;D, RefMat LocalOcc)</argsstring>
+        <name>C_API_local_occupation</name>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>S</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>D</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>LocalOcc</declname>
+        </param>
+        <briefdescription>
+<para>C interface to calculate the local occupation matrix. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">S</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>AO overlap matrix with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">D</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Spin density matrix under AO with dimension <computeroutput>[nbasis, nbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">LocalOcc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A matrix with dimension <computeroutput>[nlo, nlo]</computeroutput>. At entrance, its data is ignored. At exit, it stores the local occupation matrix.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="see"><para><ref refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kindref="member">losc::LocalizerV2::lo()</ref>: Obtain the LOs&apos; coefficient matrix. </para></simplesect>
+<simplesect kind="note"><para>The local occupation matrix is defined as <formula id="18">$\displaystyle \lambda_{ij} = \langle \phi_i|\rho|\phi_j \rangle $</formula>, where <formula id="19">$ \lambda_{ij} $</formula> is the local occupation matrix element, <formula id="20">$ \phi_i $</formula> and <formula id="21">$ \phi_j $</formula> are the i-th and j-th localized orbital and <formula id="22">$ \rho $</formula> is the spin density operator. In matrix form, local occupation matrix <formula id="23">$ L $</formula> is expressed as <formula id="24">$ L = C_{\rm{LO}}^T S D S C_{\rm{LO}} $</formula>. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/local_occupation.hpp" line="54" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp" line="12" column="1"/>
+  </compounddef>
+</doxygen>

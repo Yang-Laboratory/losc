@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Full list of psi4 Python API used in psi4_losc.scf module &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><strong>Full list of psi4 Python API used in psi4_losc.scf module</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/psi4_api_ref__psi4_losc__scf.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="full-list-of-psi4-python-api-used-in-psi4-losc-scf-module">
+<h1><strong>Full list of psi4 Python API used in psi4_losc.scf module</strong><a class="headerlink" href="#full-list-of-psi4-python-api-used-in-psi4-losc-scf-module" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The list may not be complete. The list is for the package
+developers to show the interaction between <code class="docutils literal notranslate"><span class="pre">psi4_losc.scf</span></code> module and
+<code class="docutils literal notranslate"><span class="pre">psi4</span></code> Python API.</p>
+</div>
+<ul>
+<li><p>psi4.driver</p>
+<blockquote>
+<div><ul>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/optionshandling.html#handling-options-in-driver">driver.p4util.OptionsState</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>OptionsState.restore()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>driver.scf_wavefunction_factory()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.clean.html">psi4.core.clean()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.get_active_molecule.html">psi4.core.get_active_molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.get_option">psi4.core.get_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.set_local_option">psi4.core.set_local_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.basisset">psi4.core.BasisSet</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.nbf">nbf()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.mintshelper">psi4.core.MintsHelper</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_dipole">ao_dipole()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_eri">ao_eri()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.wavefunction">psi4.core.Wavefunction</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.molecule">molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Ca">Ca()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Cb">Cb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fa">Fa()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fb">Fb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Da">Da()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Db">Db()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nalpha">nalphe()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nbeta">nbeta()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_a">epsilon_a()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_b">epsilon_b()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.energy">energy()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.basisset">basisset()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_orbs">same_a_b_orbs()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_dens">same_a_b_dens()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.matrix">psi4.core.Matrix</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.jk">psi4.core.JK</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.build">build()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.initialize">initialize()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.compute">compute()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_clear">C_clear()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_left_add">C_left_add()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.J">J()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.K">K()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.hf">psi4.core.HF</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.form_Shalf">form_Shalf()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.guess">guess()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.functional">functional()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.V_potential">V_potential()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.superfunctional">psi4.core.SuperFunctional</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.needs_xc">needs_xc()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.x_alpha">x_alpha()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.molecule">psi4.core.Molecule</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.schoenflies_symbol">schoenflies_symbol()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.print_out">print_out()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.nuclear_repulsion_energy">nuclear_repulsion_energy()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.vbase">psi4.core.VBase</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.set_D">set_D()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.compute_V">compute_V()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.quadrature_values">quadrature_values()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

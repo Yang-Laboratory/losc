@@ -1,0 +1,315 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="matrix_8h" kind="file" language="C++">
+    <compoundname>matrix.h</compoundname>
+    <includes local="no">stddef.h</includes>
+    <includedby refid="correction_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/correction.h</includedby>
+    <includedby refid="curvature_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h</includedby>
+    <includedby refid="local__occupation_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h</includedby>
+    <includedby refid="localization_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/localization.h</includedby>
+    <includedby refid="losc_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</includedby>
+    <incdepgraph>
+      <node id="29">
+        <label>stddef.h</label>
+      </node>
+      <node id="28">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h</label>
+        <link refid="matrix.h"/>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="32">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</label>
+        <link refid="losc_8h"/>
+      </node>
+      <node id="35">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/localization.h</label>
+        <link refid="localization_8h"/>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/local_occupation.h</label>
+        <link refid="local__occupation_8h"/>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h</label>
+        <link refid="matrix.h"/>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h</label>
+        <link refid="curvature_8h"/>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/correction.h</label>
+        <link refid="correction_8h"/>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="matrix_8h_1a375976ff01daddcdd19db17443e679d4" prot="public" static="no">
+        <name>losc_matrix_free</name>
+        <param><defname>ptr</defname></param>
+        <initializer>_losc_matrix_free(&amp;(ptr))</initializer>
+        <briefdescription>
+<para>Free the losc_matrix. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a pointer with type <computeroutput>losc_matrix *</computeroutput>. At exit, <computeroutput>ptr</computeroutput> is set to null. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="49" column="9" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="matrix_8h_1ae76ed75ef051b6abe40c26bd0f0f6c6c" prot="public" static="no">
+        <type>struct losc_matrix</type>
+        <definition>typedef struct losc_matrix losc_matirx</definition>
+        <argsstring></argsstring>
+        <name>losc_matirx</name>
+        <briefdescription>
+<para>losc_matrix </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>The complete definition of losc_matrix is hid. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="145" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="matrix_8h_1ad311065567c9564354d981b0e20dcc5d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>losc_matrix *</type>
+        <definition>losc_matrix* losc_matrix_create</definition>
+        <argsstring>(size_t row, size_t col)</argsstring>
+        <name>losc_matrix_create</name>
+        <param>
+          <type>size_t</type>
+          <declname>row</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>col</declname>
+        </param>
+        <briefdescription>
+<para>Create a LOSC matrix object with data allocated. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">row</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of rows. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">col</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of columns. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a matrix and return the pointer. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="30" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="matrix_8h_1a5d794457eefed524c1c8f663752d440f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>losc_matrix *</type>
+        <definition>losc_matrix* losc_matrix_create_from_data</definition>
+        <argsstring>(size_t row, size_t col, double *data)</argsstring>
+        <name>losc_matrix_create_from_data</name>
+        <param>
+          <type>size_t</type>
+          <declname>row</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>col</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+<para>Create a LOSC matrix object with data owned externally. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">row</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of rows. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">col</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of columns. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>data</computeroutput> points to an array which represents a matrix with dimension of <computeroutput>[row, col]</computeroutput>. The matrix is assumed to be stored in row-major. The size of the array is assumed to be at least <computeroutput>row x col</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a matrix and return the pointer. </para></simplesect>
+<simplesect kind="note"><para>This created matrix does not own the data. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="42" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="matrix_8h_1a2910ee4712befb7dde7313d73f2ce60d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double *</type>
+        <definition>double* losc_matrix_data</definition>
+        <argsstring>(losc_matrix *m)</argsstring>
+        <name>losc_matrix_data</name>
+        <param>
+          <type>losc_matrix *</type>
+          <declname>m</declname>
+        </param>
+        <briefdescription>
+<para>Return the pointer that points to the head of matrix data. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">m</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a losc_matrix pointer. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="56" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="matrix_8h_1ab881e977471e1520eea01710bb5ae76b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>const double *</type>
+        <definition>const double* losc_matrix_data_const</definition>
+        <argsstring>(const losc_matrix *m)</argsstring>
+        <name>losc_matrix_data_const</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>m</declname>
+        </param>
+        <briefdescription>
+<para>Return the const pointer that points to the head of matrix data. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">m</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a const losc_matrix pointer. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="62" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="matrix_8h_1ab5e96c9265b9502b28f9d2772820874f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc_matrix_rows</definition>
+        <argsstring>(const losc_matrix *m)</argsstring>
+        <name>losc_matrix_rows</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>m</declname>
+        </param>
+        <briefdescription>
+<para>Return the number of rows. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="67" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="matrix_8h_1aa7dfb30397b461b4475527012dd0d8da" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc_matrix_cols</definition>
+        <argsstring>(const losc_matrix *m)</argsstring>
+        <name>losc_matrix_cols</name>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>m</declname>
+        </param>
+        <briefdescription>
+<para>Return the number of columns. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h" line="72" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface of matrix used in LOSC. </para>    </briefdescription>
+    <detaileddescription>
+<para>The struct losc_matrix is used to represent matrix object and shared between the C code and C++ LOSC library. The C users only need the interface as provided in this header file to use struct losc_matrix. The implementation of struct losc_matrix is hid. </para>    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="10"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_C_LOSC_MATRIX_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_C_LOSC_MATRIX_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22" refid="matrix_8h_1ae76ed75ef051b6abe40c26bd0f0f6c6c" refkind="member"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">losc_matrix<sp/><ref refid="matrix_8h_1ae76ed75ef051b6abe40c26bd0f0f6c6c" kindref="member">losc_matirx</ref>;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal">losc_matrix<sp/>*<ref refid="matrix_8h_1ad311065567c9564354d981b0e20dcc5d" kindref="member">losc_matrix_create</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>row,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>col);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal">losc_matrix<sp/>*<ref refid="matrix_8h_1a5d794457eefed524c1c8f663752d440f" kindref="member">losc_matrix_create_from_data</ref>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>row,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>col,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*data);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49" refid="matrix_8h_1a375976ff01daddcdd19db17443e679d4" refkind="member"><highlight class="preprocessor">#define<sp/>losc_matrix_free(ptr)<sp/>_losc_matrix_free(&amp;(ptr))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>_losc_matrix_free(losc_matrix<sp/>**pptr_m);</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<ref refid="matrix_8h_1a2910ee4712befb7dde7313d73f2ce60d" kindref="member">losc_matrix_data</ref>(losc_matrix<sp/>*m);</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<ref refid="matrix_8h_1ab881e977471e1520eea01710bb5ae76b" kindref="member">losc_matrix_data_const</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*m);</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="matrix_8h_1ab5e96c9265b9502b28f9d2772820874f" kindref="member">losc_matrix_rows</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*m);</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="matrix_8h_1aa7dfb30397b461b4475527012dd0d8da" kindref="member">losc_matrix_cols</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*m);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/matrix.h"/>
+  </compounddef>
+</doxygen>

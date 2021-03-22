@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.11">
+  <compound refid="structLoscCurvatureBase" kind="struct"><name>LoscCurvatureBase</name>
+    <member refid="structLoscCurvatureBase_1a4900682372374495e2592d65438fc553" kind="variable"><name>nlo</name></member>
+    <member refid="structLoscCurvatureBase_1a85e3641b37eec42c0456b098985a7896" kind="variable"><name>nfitbasis</name></member>
+    <member refid="structLoscCurvatureBase_1af3790a69d3506df31df50f9679ed4d4f" kind="variable"><name>npts</name></member>
+    <member refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" kind="variable"><name>kappa</name></member>
+  </compound>
+  <compound refid="structLoscCurvatureV1" kind="struct"><name>LoscCurvatureV1</name>
+    <member refid="structLoscCurvatureV1_1a0f3dc840dd991c49a1b70b4c5e908e8d" kind="variable"><name>p_base</name></member>
+    <member refid="structLoscCurvatureV1_1aa7f66feac18f102e1b68e0b09e24c154" kind="variable"><name>set_tau</name></member>
+  </compound>
+  <compound refid="structLoscCurvatureV2" kind="struct"><name>LoscCurvatureV2</name>
+    <member refid="structLoscCurvatureV2_1ae477ffe64f858d0515ba3e89419ce9f8" kind="variable"><name>p_base</name></member>
+    <member refid="structLoscCurvatureV2_1a1fe08db02c7f27e408735107e30bcbb4" kind="variable"><name>set_tau</name></member>
+    <member refid="structLoscCurvatureV2_1a1eb952b1b52568d6a34f22f56f70fb5b" kind="variable"><name>set_zeta</name></member>
+  </compound>
+  <compound refid="structLoscLocalizerBase" kind="struct"><name>LoscLocalizerBase</name>
+    <member refid="structLoscLocalizerBase_1aca3a9c52da93e57fc52a5f773576dca4" kind="variable"><name>set_max_iter</name></member>
+    <member refid="structLoscLocalizerBase_1ab87d4668bf48f4fabbaffedc779954c4" kind="variable"><name>set_convergence</name></member>
+    <member refid="structLoscLocalizerBase_1a914ea2ad2081c4873a9014f13fe2a4c4" kind="variable"><name>set_random_permutation</name></member>
+    <member refid="structLoscLocalizerBase_1afe38df9a2c0c9ed648f94d849c373a5f" kind="variable"><name>lo_U</name></member>
+  </compound>
+  <compound refid="structLoscLocalizerV2" kind="struct"><name>LoscLocalizerV2</name>
+    <member refid="structLoscLocalizerV2_1a7d1a4a1a2d8e5abc2a869c6232bab2c9" kind="variable"><name>p_base</name></member>
+  </compound>
+  <compound refid="namespacestd" kind="namespace"><name>std</name>
+  </compound>
+  <compound refid="correction_8h" kind="file"><name>correction.h</name>
+    <member refid="correction_8h_1ae7142e16bc9d455bdf5cbd71d3c6e83d" kind="function"><name>losc_ao_hamiltonian_correction</name></member>
+    <member refid="correction_8h_1ac9af3c2455aa31c0dfe64ddd430c7d49" kind="function"><name>energy_correction</name></member>
+    <member refid="correction_8h_1a188f9d009970de3adbb33896670e0054" kind="function"><name>orbital_energy_post_scf</name></member>
+  </compound>
+  <compound refid="curvature_8h" kind="file"><name>curvature.h</name>
+    <member refid="curvature_8h_1aac161e97c99cde467b4b76e1e7b1386e" kind="define"><name>losc_dfa_info_free</name></member>
+    <member refid="curvature_8h_1a2aff30e298f0252a3c2bdedaf4ca1e35" kind="define"><name>losc_curvature_v1_free</name></member>
+    <member refid="curvature_8h_1a017385863d6f76e5fa3cef809f854e2d" kind="define"><name>losc_curvature_v2_free</name></member>
+    <member refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kind="typedef"><name>LoscDFAInfo</name></member>
+    <member refid="curvature_8h_1aca776544f0e58421421a682c484725fa" kind="typedef"><name>LoscCurvatureBase</name></member>
+    <member refid="curvature_8h_1a2c64ce74e5c1e87285685db8f97f0cb2" kind="typedef"><name>LoscCurvatureV1</name></member>
+    <member refid="curvature_8h_1af722251fe22de24673de50f6864e0f5b" kind="typedef"><name>LoscCurvatureV2</name></member>
+    <member refid="curvature_8h_1a0d2c1f71095f4601fab58490cf386005" kind="function"><name>losc_dfa_info_create</name></member>
+    <member refid="curvature_8h_1a7ffd173b20f088e1aa048916781bd062" kind="function"><name>losc_curvature_v1_create</name></member>
+    <member refid="curvature_8h_1a0fdab291d65674e52f43d3eae8f74cd0" kind="function"><name>losc_curvature_v2_create</name></member>
+  </compound>
+  <compound refid="local__occupation_8h" kind="file"><name>local_occupation.h</name>
+    <member refid="local__occupation_8h_1a71a2ee8bd0b1added7426c8810818cc1" kind="function"><name>losc_local_occupation</name></member>
+  </compound>
+  <compound refid="localization_8h" kind="file"><name>localization.h</name>
+    <member refid="localization_8h_1ae440be4d1540fe1e1a23478fb91aa052" kind="define"><name>losc_localizer_v2_free</name></member>
+    <member refid="localization_8h_1a28e015c53a94025d706ead475ae0e7d2" kind="typedef"><name>LoscLocalizerBase</name></member>
+    <member refid="localization_8h_1a134b89ac19e1e601efd713d36aa69f4c" kind="typedef"><name>LoscLocalizerV2</name></member>
+    <member refid="localization_8h_1ae4379e9a966e6a082a70c9a12ddb23a7" kind="function"><name>losc_localizer_v2_create</name></member>
+  </compound>
+  <compound refid="losc_8h" kind="file"><name>losc.h</name>
+  </compound>
+  <compound refid="matrix_8h" kind="file"><name>matrix.h</name>
+    <member refid="matrix_8h_1a375976ff01daddcdd19db17443e679d4" kind="define"><name>losc_matrix_free</name></member>
+    <member refid="matrix_8h_1ae76ed75ef051b6abe40c26bd0f0f6c6c" kind="typedef"><name>losc_matirx</name></member>
+    <member refid="matrix_8h_1ad311065567c9564354d981b0e20dcc5d" kind="function"><name>losc_matrix_create</name></member>
+    <member refid="matrix_8h_1a5d794457eefed524c1c8f663752d440f" kind="function"><name>losc_matrix_create_from_data</name></member>
+    <member refid="matrix_8h_1a2910ee4712befb7dde7313d73f2ce60d" kind="function"><name>losc_matrix_data</name></member>
+    <member refid="matrix_8h_1ab881e977471e1520eea01710bb5ae76b" kind="function"><name>losc_matrix_data_const</name></member>
+    <member refid="matrix_8h_1ab5e96c9265b9502b28f9d2772820874f" kind="function"><name>losc_matrix_rows</name></member>
+    <member refid="matrix_8h_1aa7dfb30397b461b4475527012dd0d8da" kind="function"><name>losc_matrix_cols</name></member>
+  </compound>
+  <compound refid="dir_381de07644c13531ab49759878f1b148" kind="dir"><name>/home/yuncai/Documents/Server/losc/include/c_losc</name>
+  </compound>
+  <compound refid="dir_d44c64559bbebec7f509842c48db8b23" kind="dir"><name>/home/yuncai/Documents/Server/losc/include</name>
+  </compound>
+</doxygenindex>

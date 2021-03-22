@@ -1,0 +1,970 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>LOSC Python library &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Use LOSC library in psi4" href="psi4_losc.html" />
+    <link rel="prev" title="LOSC C library" href="c_losc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LOSC Python library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-guide">Basic Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-py_losc">Detailed References for the API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dfa-representation-in-losc-library">DFA Representation in LOSC Library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#losc-curvature">LOSC Curvature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#losc-localization">LOSC Localization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#losc-local-occupation">LOSC Local Occupation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#losc-corrections">LOSC Corrections</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>LOSC Python library</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/py_losc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="losc-python-library">
+<h1>LOSC Python library<a class="headerlink" href="#losc-python-library" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">py_losc</span></code> is the Python module that provides the Python interface to do
+calculations of LOSC. It wraps the
+<a class="reference internal" href="losc.html#losc-c-library"><span class="std std-ref">LOSC C++ library</span></a> with the help of
+<a class="reference external" href="https://pybind11.readthedocs.io/en/latest/">pybind11 library</a>.
+The functionalities provided in <code class="docutils literal notranslate"><span class="pre">py_losc</span></code> library are similar to the
+<a class="reference internal" href="losc.html#losc-c-library"><span class="std std-ref">LOSC C++ library</span></a>.</p>
+</div>
+<div class="section" id="basic-guide">
+<h2>Basic Guide<a class="headerlink" href="#basic-guide" title="Permalink to this headline">¶</a></h2>
+<p>To use Python interface for the LOSC library, all you need to do is
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">py_losc</span></code>.</p>
+<ul class="simple">
+<li><p>To construct LOSC curvature matrix,
+see <a class="reference internal" href="#losc-curvature"><span class="std std-ref">this section</span></a>.</p></li>
+<li><p>To perform LOSC localization,
+see <a class="reference internal" href="#losc-localization"><span class="std std-ref">this section</span></a>.</p></li>
+<li><p>To calculate LOSC corrections,
+see <a class="reference internal" href="#losc-corrections"><span class="std std-ref">this section</span></a>.</p></li>
+</ul>
+<p>To implement post-SCF-LOSC and SCF-LOSC calculations in Python with
+the <code class="docutils literal notranslate"><span class="pre">py_losc</span></code> module, please refer to <a class="reference internal" href="psi4_losc.html#use-losc-library-in-psi4"><span class="std std-ref">this section</span></a>, which demonstrates a real
+example of using <code class="docutils literal notranslate"><span class="pre">py_losc</span></code> in psi4 package.</p>
+</div>
+<div class="section" id="module-py_losc">
+<span id="detailed-references-for-the-api"></span><h2>Detailed References for the API<a class="headerlink" href="#module-py_losc" title="Permalink to this headline">¶</a></h2>
+<p>Python interface for localized orbital scaling correction (LOSC) library.</p>
+<p class="rubric">Notes</p>
+<p>All the matrices are represented and stored in the 2-dimensional
+<cite>numpy.array</cite> object. The storage order of matrices is required to be
+C-style (row major). If the input matrix is not C-style, it will be converted
+interanally.</p>
+<p>Following notations are used in the docstrings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>LO: the localized orbital.</p></li>
+<li><p>AO: the atomic orbitals.</p></li>
+<li><p>CO: the canonical orbital.</p></li>
+<li><p>nlo: the number of LOs.</p></li>
+<li><p>nbasis: the number of AOs.</p></li>
+<li><p>nfitbasis: the number of fitting basis for density fitting.</p></li>
+<li><p>npts: the number of grids.</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="dfa-representation-in-losc-library">
+<h3>DFA Representation in LOSC Library<a class="headerlink" href="#dfa-representation-in-losc-library" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="py_losc.DFAInfo">
+<em class="property">class </em><code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">DFAInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gga_x</span></em>, <em class="sig-param"><span class="n">hf_x</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#DFAInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.DFAInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+<dl class="py method">
+<dt id="py_losc.DFAInfo.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gga_x</span></em>, <em class="sig-param"><span class="n">hf_x</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#DFAInfo.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.DFAInfo.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor of DFAInfo class that represents a DFA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The description of the DFA. Default to an empty string.</p></li>
+<li><p><strong>hf_x</strong> (<em>float</em>) – The weight of HF exchange in the DFA.</p></li>
+<li><p><strong>gga_x</strong> (<em>float</em>) – The total weights of ALL GGA and LDA type exchange in the DFA.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>B3LYP functional is</p>
+<div class="math notranslate nohighlight">
+\[E^{\rm{B3LYP}}_{\rm{xc}} = E^{\rm{LDA}}_{\rm{x}} +
+a_0 (E^{\rm{HF}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) +
+a_x (E^{\rm{GGA}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) +
+E^{\rm{LDA}}_{\rm{c}} + a_c (E^{\rm{GGA}}_{\rm{c}} -
+E^{\rm{LDA}}_{\rm{c}}),\]</div>
+<p>in which exchanges end with suffix <code class="docutils literal notranslate"><span class="pre">_x</span></code> and correlations end with
+suffix <code class="docutils literal notranslate"><span class="pre">_c</span></code>, <span class="math notranslate nohighlight">\(a_0=0.20\)</span>, <span class="math notranslate nohighlight">\(a_x=0.72\)</span> and <span class="math notranslate nohighlight">\(a_c=0.81\)</span>.
+<strong>Only the exchanges are considered and the correlations are ignored.
+The GGA and LDA exchanges are viewed the same type.</strong> Therefore,
+the total weights of GGA and LDA exchanges are
+<span class="math notranslate nohighlight">\(1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80\)</span>, and
+the total weights of HF exchanges is
+<span class="math notranslate nohighlight">\(a_0 = 0.20\)</span>. To construct a <code class="docutils literal notranslate"><span class="pre">DFAInfo</span></code> object for B3LYP
+functional, one should do the following</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b3lyp</span> <span class="o">=</span> <span class="n">DFAInfo</span><span class="p">(</span><span class="mf">0.80</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="s2">&quot;B3LYP&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.DFAInfo.gga_x">
+<code class="sig-name descname">gga_x</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.DFAInfo</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#py_losc.DFAInfo.gga_x" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The weight of the total GGA type exchange of the DFA.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.DFAInfo.hf_x">
+<code class="sig-name descname">hf_x</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.DFAInfo</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#py_losc.DFAInfo.hf_x" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The weight of HF exchange of the DFA.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.DFAInfo.name">
+<code class="sig-name descname">name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.DFAInfo</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#py_losc.DFAInfo.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The description of the DFA.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="losc-curvature">
+<h3>LOSC Curvature<a class="headerlink" href="#losc-curvature" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="py_losc.CurvatureV1">
+<em class="property">class </em><code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">CurvatureV1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span><span class="p">:</span> <span class="n">py_losc.py_losc.DFAInfo</span></em>, <em class="sig-param"><span class="n">df_pii</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">df_vpq_inv</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_lo</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_weight</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#CurvatureV1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.CurvatureV1" title="Permalink to this definition">¶</a></dt>
+<dd><p>LOSC curvature matrix version 1.</p>
+<p class="rubric">References</p>
+<p>Eq. 10 in the original LOSC paper <a class="reference external" href="https://doi.org/10.1093/nsr/nwx11">https://doi.org/10.1093/nsr/nwx11</a>.</p>
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span><span class="p">:</span> <span class="n">py_losc.py_losc.DFAInfo</span></em>, <em class="sig-param"><span class="n">df_pii</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">df_vpq_inv</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_lo</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_weight</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#CurvatureV1.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.CurvatureV1.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor of LOSC curvature version1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dfa_info</strong> (<a class="reference internal" href="#py_losc.DFAInfo" title="py_losc.DFAInfo"><em>DFAInfo</em></a>) – The information for the DFA.</p></li>
+<li><p><strong>df_pii</strong> (<em>numpy.array</em>) – The three-center integral <span class="math notranslate nohighlight">\(\langle p | ii \rangle\)</span>
+used in density fitting, in which index <cite>p</cite> refers to the =
+fitting basis and index <cite>i</cite> refers to the LO. The dimension of
+<cite>df_pii</cite> is [nfitbasis, nlo].</p></li>
+<li><p><strong>df_Vpq_inv</strong> (<em>numpy.array</em>) – The inverse of integral matrix
+<span class="math notranslate nohighlight">\(\langle p | 1/\mathbf{r} | q \rangle\)</span> used in density
+fitting, in which indices <cite>p</cite> and <cite>q</cite> refer to the fitting basis.
+The dimension of <cite>df_Vpq_inv</cite> is [nfitbasis, nfitbasis].</p></li>
+<li><p><strong>grid_lo</strong> (<em>numpy.array</em>) – The LOs values on grid points. The dimension of <cite>grid_lo</cite> is
+[npts, nlo].</p></li>
+<li><p><strong>grid_weight</strong> (<em>numpy.array</em>) – The weights for numerical integral over grid points. The
+dimension of <cite>grid_lo</cite> is [npts, ].</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.DFAInfo" title="py_losc.DFAInfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DFAInfo()</span></code></a>, <a class="reference internal" href="#py_losc.LocalizerV2" title="py_losc.LocalizerV2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LocalizerV2()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.kappa">
+<code class="sig-name descname">kappa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#py_losc.CurvatureV1.kappa" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The LOSC curvature matrix with dimension [nlo, nlo].</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.nfitbasis">
+<code class="sig-name descname">nfitbasis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV1.nfitbasis" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of fitting basis in density fitting.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.nlo">
+<code class="sig-name descname">nlo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV1.nlo" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of LOs.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.npts">
+<code class="sig-name descname">npts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV1.npts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of grid points.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV1.set_tau">
+<code class="sig-name descname">set_tau</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureV1</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.CurvatureV1.set_tau" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tau</strong> (<em>float</em>) – The curvature V1 parameter tau.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="py_losc.CurvatureV2">
+<em class="property">class </em><code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">CurvatureV2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.DFAInfo</span></em>, <em class="sig-param"><span class="n">df_pii</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">df_vpq_inv</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_lo</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_weight</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#CurvatureV2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.CurvatureV2" title="Permalink to this definition">¶</a></dt>
+<dd><p>LOSC curvature matrix version 2.</p>
+<p class="rubric">References</p>
+<p>Eq. 8 in the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).</p>
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.DFAInfo</span></em>, <em class="sig-param"><span class="n">df_pii</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">df_vpq_inv</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_lo</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">grid_weight</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#CurvatureV2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.CurvatureV2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curvature version 2 class constructor.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.CurvatureV1" title="py_losc.CurvatureV1"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CurvatureV1()</span></code></a>, <a class="reference internal" href="#py_losc.LocalizerV2" title="py_losc.LocalizerV2"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LocalizerV2()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Same interface for input parameters as <cite>CurvatureV1.__init__</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.kappa">
+<code class="sig-name descname">kappa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#py_losc.CurvatureV2.kappa" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The LOSC curvature matrix with dimension [nlo, nlo].</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.nfitbasis">
+<code class="sig-name descname">nfitbasis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV2.nfitbasis" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of fitting basis in density fitting.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.nlo">
+<code class="sig-name descname">nlo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV2.nlo" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of LOs.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.npts">
+<code class="sig-name descname">npts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.CurvatureV2.npts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of grid points.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.set_tau">
+<code class="sig-name descname">set_tau</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureV2</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.CurvatureV2.set_tau" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tau</strong> (<em>float</em>) – The curvature V2 parameter tau.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.CurvatureV2.set_zeta">
+<code class="sig-name descname">set_zeta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.CurvatureV2</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.CurvatureV2.set_zeta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>zeta</strong> (<em>float</em>) – The curvature V2 parameter zeta.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="losc-localization">
+<h3>LOSC Localization<a class="headerlink" href="#losc-localization" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="py_losc.LocalizerV2">
+<em class="property">class </em><code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">LocalizerV2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C_lo_basis</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">H_ao</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">D_ao</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#LocalizerV2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.LocalizerV2" title="Permalink to this definition">¶</a></dt>
+<dd><p>LOSC localization version 2.</p>
+<p class="rubric">References</p>
+<p>Eq. 7 in the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535).</p>
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C_lo_basis</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">H_ao</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">D_ao</span><span class="p">:</span> <span class="n">List<span class="p">[</span>numpy.ndarray<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_losc/py_losc.html#LocalizerV2.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_losc.LocalizerV2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor of LOSC localizerV2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C_lo_basis</strong> (<em>numpy.array</em>) – The coefficient matrix of LO basis that is expanded under AO with
+dimension [nbasis, nlo]. <code class="docutils literal notranslate"><span class="pre">C_lo_basis[:,</span> <span class="pre">i]</span></code> is the coefficient of
+the i-th LO basis. The LO basis refers to a set of MOs that
+will be unitary transformed to be the LOs. The basis is usually
+being the COs from the associated DFA.</p></li>
+<li><p><strong>H_ao</strong> (<em>numpy.array</em>) – The Hamiltonian matrix under AO representation for the associated
+DFA. The dimension is [nbasis, nbasis].</p></li>
+<li><p><strong>D_ao</strong> (<em>list of numpy.array</em>) – The dipole matrix under AO representation for x, y and z directions.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.cost_func">
+<code class="sig-name descname">cost_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em>, <em class="sig-param"><span class="n">lo</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#py_losc.LocalizerV2.cost_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the localization cost function value for the given LOs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lo</strong> (<em>numpy.array</em>) – The LOs coefficient matrix under AOs with dimension [nbasis, nlo].</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The cost function value in hartree.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.is_converged">
+<code class="sig-name descname">is_converged</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#py_losc.LocalizerV2.is_converged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the convergence of the most recent localization performed by
+calling the <cite>lo_U()</cite> and <cite>lo()</cite> functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The convergence of localization.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.lo">
+<code class="sig-name descname">lo</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_losc.LocalizerV2.lo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>lo(self: py_losc.py_losc_core.LocalizerBase, guess: str = ‘identity’) -&gt; numpy.ndarray[numpy.float64[m, n]]</p>
+<blockquote>
+<div><p>Calculate the LOs’ coefficient matrix under AO.</p>
+<dl class="simple">
+<dt>guess<span class="classifier">{‘identity’, ‘random’, ‘random_fixed_seed’}, default=’identity’</span></dt><dd><p>Initial guess of the unitary matrix to do localization.</p>
+<ul class="simple">
+<li><p>‘identity’: initial U matrix is set as an identity matrix.</p></li>
+<li><p>‘random’: initial U matrix is set as a random unitary matrix.</p></li>
+<li><p>‘random_fixed_seed’: initial U matrix is set as a random unitary
+matrix with fixed random seed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>C_lo<span class="classifier">numpy.array</span></dt><dd><p>The LO coefficient matrix. <code class="docutils literal notranslate"><span class="pre">C_lo[:,</span> <span class="pre">i]</span></code> is the coefficients of
+the i-th LO represented on AO.</p>
+</dd>
+</dl>
+<p>lo_U</p>
+</div></blockquote>
+</li>
+<li><p>lo(self: py_losc.py_losc_core.LocalizerBase, U_guess: numpy.ndarray[numpy.float64[m, n], flags.c_contiguous], threshold: float = 1e-08) -&gt; numpy.ndarray[numpy.float64[m, n]]</p>
+<blockquote>
+<div><p>Calculate the LOs’ coefficient matrix under AO with a given U matrix as
+the initial guess.</p>
+<dl class="simple">
+<dt>U_guess<span class="classifier">numpy.array</span></dt><dd><p>The initial guess of U matrix. Its data will be copied for
+localization. Its unitarity will be verified and throw an exception
+if the validation fails.</p>
+</dd>
+<dt>threshold<span class="classifier">float, default=1.0e-8</span></dt><dd><p>The threshold used to check the unitarity.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>C_lo<span class="classifier">numpy.array</span></dt><dd><p>The LO coefficient matrix. <code class="docutils literal notranslate"><span class="pre">C_lo[:,</span> <span class="pre">i]</span></code> is the coefficients of
+the i-th LO represented on AO.</p>
+</dd>
+</dl>
+<p>lo_U</p>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.lo_U">
+<code class="sig-name descname">lo_U</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_losc.LocalizerV2.lo_U" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>lo_U(self: py_losc.py_losc_core.LocalizerBase, guess: str = ‘identity’) -&gt; List[numpy.ndarray[numpy.float64[m, n]]]</p>
+<blockquote>
+<div><p>Calculate the LOs and the unitary transformation matrix.</p>
+<dl class="simple">
+<dt>guess<span class="classifier">{‘identity’, ‘random’, ‘random_fixed_seed’}, default=’identity’</span></dt><dd><p>Initial guess of the unitary matrix to do localization.</p>
+<ul class="simple">
+<li><p>‘identity’: initial U matrix is set as an identity matrix.</p></li>
+<li><p>‘random’: initial U matrix is set as a random unitary matrix.</p></li>
+<li><p>‘random_fixed_seed’: initial U matrix is set as a random unitary
+matrix with fixed random seed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>C_lo<span class="classifier">numpy.array</span></dt><dd><p>The LO coefficient matrix. <code class="docutils literal notranslate"><span class="pre">C_lo[:,</span> <span class="pre">i]</span></code> is the coefficients of
+the i-th LO represented on AO.</p>
+</dd>
+<dt>U<span class="classifier">numpy.array</span></dt><dd><p>The corresponding unitary transformation matrix for <cite>C_lo</cite>.
+<code class="docutils literal notranslate"><span class="pre">U[:,</span> <span class="pre">i]</span></code> corresponds to the transformation of i-th LO.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>lo_U(self: py_losc.py_losc_core.LocalizerBase, U_guess: numpy.ndarray[numpy.float64[m, n], flags.c_contiguous], threshold: float = 1e-08) -&gt; List[numpy.ndarray[numpy.float64[m, n]]]</p>
+<blockquote>
+<div><p>Calculate the LOs and the unitary transformation matrix with a given
+U matrix as the initial guess.</p>
+<dl class="simple">
+<dt>U_guess<span class="classifier">numpy.array</span></dt><dd><p>The initial guess of U matrix. Its data will be copied for
+localization. Its unitarity will be verified and throw an exception
+if the validation fails.</p>
+</dd>
+<dt>threshold<span class="classifier">float, default=1.0e-8</span></dt><dd><p>The threshold used to check the unitarity.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>C_lo<span class="classifier">numpy.array</span></dt><dd><p>The LO coefficient matrix. <code class="docutils literal notranslate"><span class="pre">C_lo[:,</span> <span class="pre">i]</span></code> is the coefficients of
+the i-th LO represented on AO.</p>
+</dd>
+<dt>U<span class="classifier">numpy.array</span></dt><dd><p>The corresponding unitary transformation matrix for <cite>C_lo</cite>.
+<code class="docutils literal notranslate"><span class="pre">U[:,</span> <span class="pre">i]</span></code> corresponds to the transformation of i-th LO.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.set_c">
+<code class="sig-name descname">set_c</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerV2</span></em>, <em class="sig-param"><span class="n">c</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.LocalizerV2.set_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the localization parameter c.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.set_convergence">
+<code class="sig-name descname">set_convergence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.LocalizerV2.set_convergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the convergence tolerance for localization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tol</strong> (<em>float</em>) – The convergence tolerance.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.set_gamma">
+<code class="sig-name descname">set_gamma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerV2</span></em>, <em class="sig-param"><span class="n">gamma</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.LocalizerV2.set_gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the localization parameter gamma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.set_max_iter">
+<code class="sig-name descname">set_max_iter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.LocalizerV2.set_max_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the maximum iteration number for localization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>max_iter</strong> (<em>int</em>) – The maximum number of iterations.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.set_random_permutation">
+<code class="sig-name descname">set_random_permutation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#py_losc.LocalizerV2.set_random_permutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the flag to perform random permutation or not in the localization
+with Jacobi-Sweep algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flag</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="py_losc.LocalizerV2.steps">
+<code class="sig-name descname">steps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">py_losc.py_losc_core.LocalizerBase</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#py_losc.LocalizerV2.steps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of iteration steps for the most recent localization
+performed by calling the <cite>lo_U</cite> and <cite>lo</cite> functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The number of iterations.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="losc-local-occupation">
+<h3>LOSC Local Occupation<a class="headerlink" href="#losc-local-occupation" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="py_losc.local_occupation">
+<code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">local_occupation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg1</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg2</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#py_losc.local_occupation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the LOSC local occupation matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C_lo</strong> (<em>numpy.array</em>) – The LO coefficient matrix. <code class="docutils literal notranslate"><span class="pre">C_lo[:,</span> <span class="pre">i]</span></code> is the coefficients of
+the i-th LO represented on AO.</p></li>
+<li><p><strong>S</strong> (<em>numpy.ndarray</em>) – The AO overlap matrix with dimension [nbasis, nbasis].</p></li>
+<li><p><strong>D</strong> (<em>numpy.ndarray</em>) – The spin density matrix under AO with dimension [nbasis, nbasis].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The local occupation matrix with dimension [nlo, nlo].</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.LocalizerV2.lo" title="py_losc.LocalizerV2.lo"><code class="xref py py-func docutils literal notranslate"><span class="pre">LocalizerV2.lo()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>The local occupation matrix is defined as</p>
+<div class="math notranslate nohighlight">
+\[\lambda_{ij} = \langle \phi_i|\rho|\phi_j \rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda_{ij}\)</span> is the local occupation matrix element,
+<span class="math notranslate nohighlight">\(\phi_i\)</span> and <span class="math notranslate nohighlight">\(\phi_j\)</span> are the i-th and j-th localized orbital
+and <span class="math notranslate nohighlight">\(\rho\)</span> is the spin density operator.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="losc-corrections">
+<h3>LOSC Corrections<a class="headerlink" href="#losc-corrections" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="py_losc.ao_hamiltonian_correction">
+<code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">ao_hamiltonian_correction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg1</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg2</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg3</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#py_losc.ao_hamiltonian_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate LOSC effective Hamiltonian under AO basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>numpy.ndarray</em>) – AO overlap matrix with dimension [nbasis, nbasis].</p></li>
+<li><p><strong>C_lo</strong> (<em>numpy.array</em>) – LO coefficient matrix under AO basis with dimension of [nbasis, nbasis].
+The coefficients of i-th LO is the i-th column of <cite>C_lo</cite>.</p></li>
+<li><p><strong>Curvature</strong> (<em>numpy.array</em>) – LOSC curvature matrix with dimension [nlo, nlo].</p></li>
+<li><p><strong>LocalOcc</strong> (<em>numpy.array</em>) – LOSC local occupation matrix with dimension [nlo, nlo].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The LOSC effective Hamiltonian under AOs with dimension [nbasis, nbasis].</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.CurvatureV1.kappa" title="py_losc.CurvatureV1.kappa"><code class="xref py py-func docutils literal notranslate"><span class="pre">CurvatureV1.kappa()</span></code></a>, <a class="reference internal" href="#py_losc.CurvatureV2.kappa" title="py_losc.CurvatureV2.kappa"><code class="xref py py-func docutils literal notranslate"><span class="pre">CurvatureV2.kappa()</span></code></a>, <a class="reference internal" href="#py_losc.local_occupation" title="py_losc.local_occupation"><code class="xref py py-func docutils literal notranslate"><span class="pre">local_occupation()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>The LOSC effective Hamiltonian is constructed with LOs fixed. The
+expression of the effective Hamiltonian is shown as Eq. S25 in the
+supporting information of the <a class="reference external" href="https://doi.org/10.1093/nsr/nwx111">original LOSC paper</a>. This effective Hamiltonian is exact
+in the <a class="reference external" href="https://doi.org/10.1021/acs.jpclett.0c03133">developed version of SCF-LOSC</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="py_losc.energy_correction">
+<code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">energy_correction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg1</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#py_losc.energy_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the total energy correction from LOSC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Curvature</strong> (<em>numpy.ndarray</em>) – The LOSC curvature matrix with dimension [nlo, nlo].</p></li>
+<li><p><strong>LocalOcc</strong> (<em>numpy.ndarray</em>) – The LOSC local occupation matrix with dimension [nlo, nlo].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The correction from LOSC to the total energy.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.CurvatureV1.kappa" title="py_losc.CurvatureV1.kappa"><code class="xref py py-func docutils literal notranslate"><span class="pre">CurvatureV1.kappa()</span></code></a>, <a class="reference internal" href="#py_losc.CurvatureV2.kappa" title="py_losc.CurvatureV2.kappa"><code class="xref py py-func docutils literal notranslate"><span class="pre">CurvatureV2.kappa()</span></code></a>, <a class="reference internal" href="#py_losc.local_occupation" title="py_losc.local_occupation"><code class="xref py py-func docutils literal notranslate"><span class="pre">local_occupation()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>This is just the energy correction from LOSC, NOT the total energy of
+LOSC-DFA. Total energy of LOSC-DFA is <code class="docutils literal notranslate"><span class="pre">E_losc_dfa</span> <span class="pre">=</span> <span class="pre">E_dfa</span> <span class="pre">+</span> <span class="pre">E_losc</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="py_losc.orbital_energy_post_scf">
+<code class="sig-prename descclassname">py_losc.</code><code class="sig-name descname">orbital_energy_post_scf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg1</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">arg2</span><span class="p">:</span> <span class="n">numpy.ndarray<span class="p">[</span>numpy.float64<span class="p">[</span>m<span class="p">, </span>n<span class="p">]</span><span class="p">, </span>flags.c_contiguous<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>float<span class="p">]</span><a class="headerlink" href="#py_losc.orbital_energy_post_scf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate corrected orbital energy from LOSC in a post-SCF approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>H_dfa</strong> (<em>np.ndarray</em><em> [</em><em>nbasis</em><em>, </em><em>nbasis</em><em>]</em>) – The DFA Hamiltonian under AOs.</p></li>
+<li><p><strong>H_losc</strong> (<em>np.ndarray</em><em> [</em><em>nbasis</em><em>, </em><em>nbasis</em><em>]</em>) – The LOSC effective Hamiltonian under AOs.</p></li>
+<li><p><strong>C_co</strong> (<em>np.ndarray</em><em> [</em><em>nbasis</em><em>, </em><em>n</em><em>]</em><em>, </em><em>n &lt;= basis</em><em>, </em><em>which is the number of COs.</em>) – The coefficient matrix of converged COs under AOs from DFA.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>out</strong> – The corrected orbital energies from LOSC with size of n. The order of
+orbital energies match the order of input COs (order of columns in
+C_co matrix).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#py_losc.ao_hamiltonian_correction" title="py_losc.ao_hamiltonian_correction"><code class="xref py py-func docutils literal notranslate"><span class="pre">ao_hamiltonian_correction()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>This function gives the final corrected orbital energies from LOSC.
+Note the difference to the function <cite>energy_correction</cite>.</p>
+<p>The corrected orbital energies are the expectation values of converged
+DFA’s COs on the LOSC-DFA Hamiltonian, that is,</p>
+<div class="math notranslate nohighlight">
+\[\epsilon_i = \langle \psi_i | H_{\rm{dfa}} + H_{\rm{losc}}
+| \psi_i \rangle.\]</div>
+<p>This is just one of the ways to calculate the LOSC corrected orbital
+energy in a post-SCF LOSC calculation. It is the way usually used to produce
+results in the <a class="reference external" href="https://doi.org/10.1093/nsr/nwx111">published paper</a>
+for the post-SCF LOSC calculations. Besides this way, there are another two
+ways to calculate corrected orbital energies: (1) diagonalize the corrected
+LOSC-DFA Hamiltonian; (2) Follow
+<a class="reference external" href="https://doi.org/10.1093/nsr/nwx111">Eq. 11</a> to calculate the corrections
+to orbital energies. These three ways usually produce similar results.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="psi4_losc.html" class="btn btn-neutral float-right" title="Use LOSC library in psi4" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="c_losc.html" class="btn btn-neutral float-left" title="LOSC C library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

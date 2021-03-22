@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="classlosc_1_1DFAInfo" kind="class" language="C++" prot="public">
+    <compoundname>losc::DFAInfo</compoundname>
+    <includes refid="curvature_8hpp" local="no">curvature.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classlosc_1_1DFAInfo_1aaa683c129b17a1526285f76d764529ad" prot="private" static="no" mutable="no">
+        <type>const string</type>
+        <definition>const string losc::DFAInfo::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <briefdescription>
+<para>DFA name. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="27" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classlosc_1_1DFAInfo_1ac412d4a0a53c326c3bfc915f66fbe2a2" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double losc::DFAInfo::gga_x_</definition>
+        <argsstring></argsstring>
+        <name>gga_x_</name>
+        <briefdescription>
+<para>Total weights of all GGA and LDA type exchanges. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="28" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classlosc_1_1DFAInfo_1a3345033eb56b61be1b8c20f75aa1b30a" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double losc::DFAInfo::hf_x_</definition>
+        <argsstring></argsstring>
+        <name>hf_x_</name>
+        <briefdescription>
+<para>Total weights of Hatree-Fock exchange. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="29" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classlosc_1_1DFAInfo_1a5ecf185245453970c29fe819ae4a95b5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>losc::DFAInfo::DFAInfo</definition>
+        <argsstring>(double gga_x, double hf_x, const string &amp;name=&quot;&quot;)</argsstring>
+        <name>DFAInfo</name>
+        <param>
+          <type>double</type>
+          <declname>gga_x</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>hf_x</declname>
+        </param>
+        <param>
+          <type>const string &amp;</type>
+          <declname>name</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+<para>Constructor of <ref refid="classlosc_1_1DFAInfo" kindref="compound">DFAInfo</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">gga_x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The total weights of all GGA and LDA type exchanges. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">hf_x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The total weights of HF exchanges. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The name of the DFA. Default to an empty string. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="par"><title>Example</title><para>Taking B3LYP functional as an example. The B3LYP functional is <formula id="3">\[ E^{\rm{B3LYP}}_{\rm{xc}} = E^{\rm{LDA}}_{\rm{x}} + a_0 (E^{\rm{HF}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) + a_x (E^{\rm{GGA}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) + E^{\rm{LDA}}_{\rm{c}} + a_c (E^{\rm{GGA}}_{\rm{c}} - E^{\rm{LDA}}_{\rm{c}}), \]</formula> in which exchanges end with suffix <computeroutput>_x</computeroutput> and correlations end with suffix <computeroutput>_c</computeroutput>, <formula id="4">$ a_0=0.20 $</formula>, <formula id="5">$ a_x=0.72 $</formula> and <formula id="6">$ a_c=0.81 $</formula>. Only the exchanges are considered and the correlations are ignored. The GGA and LDA exchanges are viewed as the same type. Therefore, the total weights of GGA and LDA exchanges are <formula id="7">$ 1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80 $</formula>, and the total weights of HF exchanges is <formula id="8">$ a_0 = 0.20 $</formula>. To construct a <computeroutput><ref refid="classlosc_1_1DFAInfo" kindref="compound">DFAInfo</ref></computeroutput> object for B3LYP functional, one should do the following <programlisting><codeline><highlight class="normal">b3lyp<sp/>=<sp/>DFAInfo(0.80,<sp/>0.20,<sp/>&quot;B3LYP&quot;)</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="59" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="59" bodyend="62"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1DFAInfo_1a1130b13c473e257da30d58c824cc9214" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const string &amp;</type>
+        <definition>const string&amp; losc::DFAInfo::name</definition>
+        <argsstring>() const </argsstring>
+        <name>name</name>
+        <briefdescription>
+<para>Return the name of the DFA. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="67" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="67" bodyend="67"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1DFAInfo_1a9b5181b2d06d1814ef3b7d3d85aa6e42" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const double &amp;</type>
+        <definition>const double&amp; losc::DFAInfo::gga_x</definition>
+        <argsstring>() const </argsstring>
+        <name>gga_x</name>
+        <briefdescription>
+<para>Return the total weights of GGA-like exchanges of the DFA. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="72" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="72" bodyend="72"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1DFAInfo_1afb4e20016a485656a14aceff006bea1d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const double &amp;</type>
+        <definition>const double&amp; losc::DFAInfo::hf_x</definition>
+        <argsstring>() const </argsstring>
+        <name>hf_x</name>
+        <briefdescription>
+<para>Return the total weights of HF exchanges of the DFA. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="77" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="77" bodyend="77"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Density functional approximation (DFA) information. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="26" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="26" bodyend="78"/>
+    <listofallmembers>
+      <member refid="classlosc_1_1DFAInfo_1a5ecf185245453970c29fe819ae4a95b5" prot="public" virt="non-virtual"><scope>losc::DFAInfo</scope><name>DFAInfo</name></member>
+      <member refid="classlosc_1_1DFAInfo_1a9b5181b2d06d1814ef3b7d3d85aa6e42" prot="public" virt="non-virtual"><scope>losc::DFAInfo</scope><name>gga_x</name></member>
+      <member refid="classlosc_1_1DFAInfo_1ac412d4a0a53c326c3bfc915f66fbe2a2" prot="private" virt="non-virtual"><scope>losc::DFAInfo</scope><name>gga_x_</name></member>
+      <member refid="classlosc_1_1DFAInfo_1afb4e20016a485656a14aceff006bea1d" prot="public" virt="non-virtual"><scope>losc::DFAInfo</scope><name>hf_x</name></member>
+      <member refid="classlosc_1_1DFAInfo_1a3345033eb56b61be1b8c20f75aa1b30a" prot="private" virt="non-virtual"><scope>losc::DFAInfo</scope><name>hf_x_</name></member>
+      <member refid="classlosc_1_1DFAInfo_1a1130b13c473e257da30d58c824cc9214" prot="public" virt="non-virtual"><scope>losc::DFAInfo</scope><name>name</name></member>
+      <member refid="classlosc_1_1DFAInfo_1aaa683c129b17a1526285f76d764529ad" prot="private" virt="non-virtual"><scope>losc::DFAInfo</scope><name>name_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

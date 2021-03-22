@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="exception_8hpp" kind="file" language="C++">
+    <compoundname>exception.hpp</compoundname>
+    <includes refid="eigen__def_8hpp" local="no">losc/eigen_def.hpp</includes>
+    <includes local="no">stdexcept</includes>
+    <includes local="no">string</includes>
+    <incdepgraph>
+      <node id="25">
+        <label>losc/eigen_def.hpp</label>
+        <link refid="eigen__def_8hpp"/>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>stdexcept</label>
+      </node>
+      <node id="28">
+        <label>string</label>
+      </node>
+      <node id="26">
+        <label>Eigen/Dense</label>
+      </node>
+      <node id="24">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/exception.hpp</label>
+        <link refid="exception.hpp"/>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classlosc_1_1exception_1_1LoscException" prot="public">losc::exception::LoscException</innerclass>
+    <innerclass refid="classlosc_1_1exception_1_1DimensionError" prot="public">losc::exception::DimensionError</innerclass>
+    <innernamespace refid="namespacelosc">losc</innernamespace>
+    <innernamespace refid="namespacelosc_1_1exception">losc::exception</innernamespace>
+    <briefdescription>
+<para>C++ interface for the LOSC exceptions. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_LOSC_EXCEPTION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_LOSC_EXCEPTION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="eigen__def_8hpp" kindref="compound">losc/eigen_def.hpp</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdexcept&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacelosc" kindref="compound">losc</ref><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18" refid="namespacelosc_1_1exception" refkind="compound"><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">exception<sp/>{</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">losc::ConstRefMat</ref>;</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" kindref="member">losc::ConstRefVec</ref>;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">losc::RefMat</ref>;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a1dedf36275248282fcc77b4cd5e892b9" kindref="member">losc::RefVec</ref>;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>std::string;</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>std::stringstream;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30" refid="classlosc_1_1exception_1_1LoscException" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classlosc_1_1exception_1_1LoscException" kindref="compound">LoscException</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>std::runtime_error<sp/>{</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>make_message(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*msg);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">protected</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>msg_;</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="42" refid="classlosc_1_1exception_1_1LoscException_1a29b9606c06302f64a43ecff72b8b4b33" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1exception_1_1LoscException_1a29b9606c06302f64a43ecff72b8b4b33" kindref="member">LoscException</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>&amp;msg)<sp/>:<sp/><ref refid="namespacestd" kindref="compound">std</ref>::runtime_error(msg)</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>make_message(msg.c_str());</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50" refid="classlosc_1_1exception_1_1LoscException_1a555c5862f5a14bfa3d22156e54b21dd3" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1exception_1_1LoscException_1a555c5862f5a14bfa3d22156e54b21dd3" kindref="member">~LoscException</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*what()<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>noexcept<sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal"><sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>msg_.c_str();<sp/>}</highlight></codeline>
+<codeline lineno="53"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="58" refid="classlosc_1_1exception_1_1DimensionError" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classlosc_1_1exception_1_1DimensionError" kindref="compound">DimensionError</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="classlosc_1_1exception_1_1LoscException" kindref="compound">LoscException</ref><sp/>{</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1exception_1_1DimensionError" kindref="compound">DimensionError</ref>(<ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>&amp;A,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>expected_row,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>expected_col,</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;msg);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1exception_1_1DimensionError" kindref="compound">DimensionError</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>&amp;msg);</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78" refid="classlosc_1_1exception_1_1DimensionError_1a9cf79fd4886e424c1ef8aa82eb8ea1bd" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classlosc_1_1exception_1_1DimensionError_1a9cf79fd4886e424c1ef8aa82eb8ea1bd" kindref="member">~DimensionError</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="79"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>exception</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="82"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>losc</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/>//<sp/>_LOSC_SRC_EXCEPTION_H_</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp"/>
+  </compounddef>
+</doxygen>

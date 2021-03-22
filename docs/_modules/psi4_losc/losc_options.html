@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>psi4_losc.losc_options &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>psi4_losc.losc_options</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for psi4_losc.losc_options</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Options to configure LOSC calculations within psi4_losc package.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Options"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.Options">[docs]</a><span class="k">class</span> <span class="nc">Options</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Options class that controls the LOSC calculations in `psi4_losc` module.</span>
+
+<span class="sd">    The options are specified by three labels:</span>
+
+<span class="sd">        - `module`: the module of the options.</span>
+<span class="sd">        - `key`: the key of the option in `module`.</span>
+<span class="sd">        - `value`: the value of the option in `module`.</span>
+
+<span class="sd">    **All `module` and `key` values are str and case-insensitive at input. The</span>
+<span class="sd">    case-insensitivity of `value` depends on the option.**</span>
+
+<span class="sd">    - **The curvature module**: `module = &quot;curvature&quot;`</span>
+
+<span class="sd">      Below lists all the valid `key`-`value` options for the curvature module.</span>
+
+<span class="sd">        - version : {2, 1}, default=2.</span>
+<span class="sd">            The version of LOSC curvature.</span>
+<span class="sd">        - v1_parameter_tau: float, default=1.2378</span>
+<span class="sd">            The parameter :math:`\\tau` in LOSC curvature version 1.</span>
+<span class="sd">            Require `version=1` to use this setting.</span>
+<span class="sd">        - v2_parameter_tau: float, default=1.2378</span>
+<span class="sd">            The parameter :math:`\\tau` in LOSC curvature version 2.</span>
+<span class="sd">            Require `version=2` to use this setting.</span>
+<span class="sd">        - v2_parameter_zeta: float, default=8.0</span>
+<span class="sd">            The parameter :math:`\\zeta` in LOSC curvature version 2.</span>
+<span class="sd">            Require `version=2` to use this setting.</span>
+<span class="sd">        - df_molecular_fragment_size: int, default=2</span>
+<span class="sd">            The size in the number of atoms to split the module. This is used</span>
+<span class="sd">            to achieve the block-wise construction of two-electron integral of</span>
+<span class="sd">            curvature with density fitting.</span>
+<span class="sd">        - df_basis: str, default=&quot;aug-cc-pvtz-ri&quot;</span>
+<span class="sd">            The basis set used in density fitting for LOSC curvature. The</span>
+<span class="sd">            name of basis set follows the rules in psi4. `df_basis` is</span>
+<span class="sd">            case-insensitive.</span>
+
+<span class="sd">    - **The localizer module**: `module = &quot;localizer&quot;`</span>
+
+<span class="sd">      Below lists all the valid `key`-`value` options for the localization module.</span>
+
+<span class="sd">        - version : {2}, default=2.</span>
+<span class="sd">            The version of LOSC localizer.</span>
+<span class="sd">        - max_iter: int, default=1000</span>
+<span class="sd">            The maximum number of iterations in localization.</span>
+<span class="sd">        - convergence: float, default=1e-10</span>
+<span class="sd">            The convergence tolerance for the localization.</span>
+<span class="sd">        - random_permutation: bool, default=True</span>
+<span class="sd">            Use the random permutation for Jacob-Sweep algorithm in the</span>
+<span class="sd">            localization or not.</span>
+<span class="sd">        - v2_parameter_gamma: float, default=0.707</span>
+<span class="sd">            The parameter :math:`\\gamma` in LOSC localizer version 2.</span>
+<span class="sd">            Require `version=2` to use this setting.</span>
+<span class="sd">        - v2_parameter_c: float, default=1000</span>
+<span class="sd">            The parameter :math:`C` in LOSC localizer version 2.</span>
+<span class="sd">            Require `version=2` to use this setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Options.__init__"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.Options.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;curvature&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;v1_parameter_tau&#39;</span><span class="p">:</span> <span class="mf">1.2378</span><span class="p">,</span>
+                <span class="s1">&#39;v2_parameter_tau&#39;</span><span class="p">:</span> <span class="mf">1.2378</span><span class="p">,</span>
+                <span class="s1">&#39;v2_parameter_zeta&#39;</span><span class="p">:</span> <span class="mf">8.0</span><span class="p">,</span>
+                <span class="s1">&#39;df_molecular_fragment_size&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;df_basis&#39;</span><span class="p">:</span> <span class="s1">&#39;aug-cc-pvtz-ri&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;localizer&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+                <span class="s1">&#39;convergence&#39;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+                <span class="s1">&#39;random_permutation&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;v2_parameter_gamma&#39;</span><span class="p">:</span> <span class="mf">0.707</span><span class="p">,</span>
+                <span class="s1">&#39;v2_parameter_c&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Options.set_param"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.Options.set_param">[docs]</a>    <span class="k">def</span> <span class="nf">set_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set an option for the LOSC calculation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        module : str</span>
+<span class="sd">            The module name of the option.</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key name of the option in option module `module`.</span>
+<span class="sd">        value :</span>
+<span class="sd">            The value name of the option in option module `module`.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Options : all valid options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Wrong module name of LOSC options: module=&quot;</span><span class="si">{module}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">module</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Wrong key to set options of LOSC: module=&quot;</span><span class="si">{module}</span><span class="s1">&quot; key=</span><span class="si">{key}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Options.set_params"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.Options.set_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set one or more options for the LOSC calculation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        options : dict {module: {key: value}}</span>
+<span class="sd">            The options dictionary.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Options : all valid options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">opts</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Wrong module name of LOSC options: module=&quot;</span><span class="si">{module}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">module</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Wrong key to set options of LOSC: module=&quot;</span><span class="si">{module}</span><span class="s1">&quot; key=</span><span class="si">{key}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="Options.get_param"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.Options.get_param">[docs]</a>    <span class="k">def</span> <span class="nf">get_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the value of an option.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        module : str</span>
+<span class="sd">            The module name of the option.</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key name of the option in option module `module`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        value:</span>
+<span class="sd">            The value of the option.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Options : all valid options and the return type of the value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unknown module or key to get the LOSC option: module=&quot;</span><span class="si">{module}</span><span class="s1">&quot; key=</span><span class="si">{key}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rst</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print all LOSC options to psi4 output file.&quot;&quot;&quot;</span>
+        <span class="n">rst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">rst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;==&gt; LOSC Settings &lt;==&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">opts</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--&gt; module=</span><span class="si">{module}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">rst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    </span><span class="si">{key}</span><span class="s1">: </span><span class="si">{val}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">rst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rst</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

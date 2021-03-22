@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="correction_8hpp" kind="file" language="C++">
+    <compoundname>correction.hpp</compoundname>
+    <includes refid="eigen__def_8hpp" local="no">losc/eigen_def.hpp</includes>
+    <includes local="no">vector</includes>
+    <includedby refid="losc_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/losc.hpp</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>losc/eigen_def.hpp</label>
+        <link refid="eigen__def_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="0">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/correction.hpp</label>
+        <link refid="correction.hpp"/>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Eigen/Dense</label>
+      </node>
+      <node id="3">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="4">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/correction.hpp</label>
+        <link refid="correction.hpp"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/losc.hpp</label>
+        <link refid="losc_8hpp"/>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacelosc">losc</innernamespace>
+    <briefdescription>
+<para>C++ interface for the correction from LOSC. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_LOSC_CORRECTION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_LOSC_CORRECTION_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="eigen__def_8hpp" kindref="compound">losc/eigen_def.hpp</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacelosc" kindref="compound">losc</ref><sp/>{</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>std::vector;</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/><ref refid="correction_8hpp_1a70cacaeb1a24172447dac12d6bf902be" kindref="member">ao_hamiltonian_correction</ref>(ConstRefMat<sp/>&amp;S,<sp/>ConstRefMat<sp/>&amp;C_lo,</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;Curvature,</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;LocalOcc);</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/><ref refid="correction_8hpp_1aec1318ccac401d8a4da9f06874d390ad" kindref="member">energy_correction</ref>(ConstRefMat<sp/>&amp;Curvature,<sp/>ConstRefMat<sp/>&amp;LocalOcc);</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight></codeline>
+<codeline lineno="121"><highlight class="normal">vector&lt;double&gt;<sp/><ref refid="correction_8hpp_1aa41ad43c2da822b197aac0e52adbe17e" kindref="member">orbital_energy_post_scf</ref>(ConstRefMat<sp/>&amp;H_dfa,<sp/>ConstRefMat<sp/>&amp;H_losc,</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;C_co);</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"></highlight></codeline>
+<codeline lineno="132"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="correction_8hpp_1a2cfadfd785ed6fa231612c73f6bacbd1" kindref="member">C_API_ao_hamiltonian_correction</ref>(ConstRefMat<sp/>&amp;S,<sp/>ConstRefMat<sp/>&amp;C_lo,</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;Curvature,</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;LocalOcc,<sp/>RefMat<sp/>H_losc);</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"></highlight></codeline>
+<codeline lineno="146"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="correction_8hpp_1a067d28c3f79f24697c9a380b2d296de4" kindref="member">C_API_orbital_energy_post_scf</ref>(ConstRefMat<sp/>&amp;H_dfa,<sp/>ConstRefMat<sp/>&amp;H_losc,</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ConstRefMat<sp/>&amp;C_co,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*eig);</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"></highlight></codeline>
+<codeline lineno="149"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>losc</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="150"><highlight class="normal"></highlight></codeline>
+<codeline lineno="151"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/correction.hpp"/>
+  </compounddef>
+</doxygen>

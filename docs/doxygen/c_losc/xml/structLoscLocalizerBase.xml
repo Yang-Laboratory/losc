@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="structLoscLocalizerBase" kind="struct" language="C++" prot="public">
+    <compoundname>LoscLocalizerBase</compoundname>
+    <includes refid="localization_8h" local="no">localization.h</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structLoscLocalizerBase_1aca3a9c52da93e57fc52a5f773576dca4" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscLocalizerBase::set_max_iter) (const LoscLocalizerBase *self, size_t max_iter)</definition>
+        <argsstring>)(const LoscLocalizerBase *self, size_t max_iter)</argsstring>
+        <name>set_max_iter</name>
+        <briefdescription>
+<para>Set the maximum iteration number for localization. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">max_iter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The maximum number of iteration. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscLocalizerBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>set<sp/>max<sp/>iteration<sp/>number<sp/>to<sp/>be<sp/>100.</highlight></codeline>
+<codeline><highlight class="normal">pbase-&gt;set_max_iter(pbase,<sp/>100);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="44" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="44" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscLocalizerBase_1ab87d4668bf48f4fabbaffedc779954c4" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscLocalizerBase::set_convergence) (const LoscLocalizerBase *self, double tol)</definition>
+        <argsstring>)(const LoscLocalizerBase *self, double tol)</argsstring>
+        <name>set_convergence</name>
+        <briefdescription>
+<para>Set the convergence of localization. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">tol</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The localization convergence tolerance. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscLocalizerBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>set<sp/>the<sp/>tolerance<sp/>to<sp/>be<sp/>1e-6.</highlight></codeline>
+<codeline><highlight class="normal">pbase-&gt;set_convergence(pbase,<sp/>1.0e-6);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="56" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscLocalizerBase_1a914ea2ad2081c4873a9014f13fe2a4c4" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscLocalizerBase::set_random_permutation) (const LoscLocalizerBase *self, bool flag)</definition>
+        <argsstring>)(const LoscLocalizerBase *self, bool flag)</argsstring>
+        <name>set_random_permutation</name>
+        <briefdescription>
+<para>Set flag for doing random permutation or not for Jacobi-Sweep algorithm. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">flag</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><computeroutput>True</computeroutput> for doing random permutation <computeroutput>False</computeroutput> otherwise. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscLocalizerBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>set<sp/>to<sp/>false.</highlight></codeline>
+<codeline><highlight class="normal">pbase-&gt;set_random_permutation(pbase,<sp/>false);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="68" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscLocalizerBase_1afe38df9a2c0c9ed648f94d849c373a5f" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscLocalizerBase::lo_U) (const LoscLocalizerBase *self, losc_matrix *L, losc_matrix *U)</definition>
+        <argsstring>)(const LoscLocalizerBase *self, losc_matrix *L, losc_matrix *U)</argsstring>
+        <name>lo_U</name>
+        <briefdescription>
+<para>Calculate the LOs and the unitary. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">L</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A matrix with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The data of <computeroutput>L</computeroutput> is ignored at entrace. At exit, it stores the LO coefficient matrix. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">U</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. At entrance, it stores a unitary matrix as the initial guess for the localization. The unitarity of the input U matrix is not verified. At exit, it is updated by the localization process. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>The dimensions of input matrices will be check. It will throw an exception if they do not match the expectation. </para></simplesect>
+<simplesect kind="note"><para>The relation between the LOs and AOs is <formula id="18">$ \displaystyle \psi_i = \sum_\mu C_{\mu i} \phi_{\mu}, $</formula> in which <formula id="19">$ \psi_i $</formula> is the LO, <formula id="20">$ C_{\mu i} $</formula> is the LO coefficient matrix and <formula id="13">$ \phi_i $</formula> is the AO. The dimension of LO coefficient matrix is <computeroutput>[nbasis, nlo]</computeroutput>. The relation between the LOs and LO basis is <formula id="21">$ \displaystyle \psi_i = \sum_j U_{\mu i} \phi_\mu, $</formula> in which <formula id="19">$ \psi_i $</formula> is the LO, <formula id="22">$ U_{\mu i} $</formula> is the U matrix and <formula id="23">$ \phi_\mu $</formula> is the LO basis. The dimension of the U matrix is <computeroutput>[nlo, nlo]</computeroutput>. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="96" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="96" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC localizer base. </para>    </briefdescription>
+    <detaileddescription>
+<para><simplesect kind="note"><para>This struct exports all the functions for LOSC localization base class. This struct servers as helper class to avoid code duplication for the implementation of C interface. There is no need for C users to create a such struct in practice. </para></simplesect>
+</para>    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="29" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="29" bodyend="97"/>
+    <listofallmembers>
+      <member refid="structLoscLocalizerBase_1afe38df9a2c0c9ed648f94d849c373a5f" prot="public" virt="non-virtual"><scope>LoscLocalizerBase</scope><name>lo_U</name></member>
+      <member refid="structLoscLocalizerBase_1ab87d4668bf48f4fabbaffedc779954c4" prot="public" virt="non-virtual"><scope>LoscLocalizerBase</scope><name>set_convergence</name></member>
+      <member refid="structLoscLocalizerBase_1aca3a9c52da93e57fc52a5f773576dca4" prot="public" virt="non-virtual"><scope>LoscLocalizerBase</scope><name>set_max_iter</name></member>
+      <member refid="structLoscLocalizerBase_1a914ea2ad2081c4873a9014f13fe2a4c4" prot="public" virt="non-virtual"><scope>LoscLocalizerBase</scope><name>set_random_permutation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

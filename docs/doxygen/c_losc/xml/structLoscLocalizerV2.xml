@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="structLoscLocalizerV2" kind="struct" language="C++" prot="public">
+    <compoundname>LoscLocalizerV2</compoundname>
+    <includes refid="localization_8h" local="no">localization.h</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structLoscLocalizerV2_1a7d1a4a1a2d8e5abc2a869c6232bab2c9" prot="public" static="no" mutable="no">
+        <type><ref refid="structLoscLocalizerBase" kindref="compound">LoscLocalizerBase</ref> *</type>
+        <definition>LoscLocalizerBase* LoscLocalizerV2::p_base</definition>
+        <argsstring></argsstring>
+        <name>p_base</name>
+        <briefdescription>
+<para>A pointer to a <ref refid="structLoscLocalizerBase" kindref="compound">LoscLocalizerBase</ref> variable. </para>        </briefdescription>
+        <detaileddescription>
+<para>Use this variable to call functions that are provided in the <ref refid="structLoscLocalizerBase" kindref="compound">LoscLocalizerBase</ref>. <simplesect kind="par"><title>Example</title><para>Demo of calling functions that provided in the <ref refid="structLoscLocalizerBase" kindref="compound">LoscLocalizerBase</ref>. Assume a variable <computeroutput>pLocalizer</computeroutput> exists with type of <computeroutput>LoscLocalizerV1 *</computeroutput>.</para></simplesect>
+<programlisting><codeline><highlight class="normal">//<sp/>Demo:<sp/>Set<sp/>maximum<sp/>iteration<sp/>number<sp/>to<sp/>be<sp/>100.</highlight></codeline>
+<codeline><highlight class="normal">pLocalizer-&gt;p_base-&gt;set_max_iter(pLocalizer,<sp/>100);</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>calculate<sp/>LOs<sp/>and<sp/>U<sp/>matrix.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>allocate<sp/>LO<sp/>coefficient<sp/>matrix<sp/>and<sp/>U<sp/>guess.</highlight></codeline>
+<codeline><highlight class="normal">losc_matrix<sp/>*L<sp/>=<sp/>losc_matrix_create(nbasis,<sp/>nlo);</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>assume<sp/>U_data<sp/>stores<sp/>a<sp/>unitary<sp/>matrix.</highlight></codeline>
+<codeline><highlight class="normal">losc_matrix<sp/>*U<sp/>=<sp/>losc_matrix_create(nlo,<sp/>nlo,<sp/>U_data);</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>calculate<sp/>LO<sp/>coefficient<sp/>matrix<sp/>and<sp/>update<sp/>U<sp/>matrix.</highlight></codeline>
+<codeline><highlight class="normal">pLocalizer-&gt;p_base-&gt;lo_U(pLocalizer-&gt;p_base,<sp/>L,<sp/>U);</highlight></codeline>
+</programlisting> <simplesect kind="see"><para><ref refid="structLoscLocalizerBase" kindref="compound">LoscLocalizerBase</ref>: see all the functions provided in the localizer base structure. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="145" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="145" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC localizer version 2. </para>    </briefdescription>
+    <detaileddescription>
+<para>LOSC localization version 2 is defined in Eq. 7 in the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528–1535). <simplesect kind="see"><para><ref refid="localization_8h_1ae4379e9a966e6a082a70c9a12ddb23a7" kindref="member">losc_localizer_v2_create()</ref>: create a <ref refid="structLoscLocalizerV2" kindref="compound">LoscLocalizerV2</ref>. </para></simplesect>
+<simplesect kind="see"><para><ref refid="localization_8h_1ae4379e9a966e6a082a70c9a12ddb23a7" kindref="member">losc_localizer_v2_create()</ref>: free a <ref refid="structLoscLocalizerV2" kindref="compound">LoscLocalizerV2</ref>. </para></simplesect>
+</para>    </detaileddescription>
+    <collaborationgraph>
+      <node id="17">
+        <label>LoscLocalizerBase</label>
+        <link refid="structLoscLocalizerBase"/>
+      </node>
+      <node id="16">
+        <label>LoscLocalizerV2</label>
+        <link refid="structLoscLocalizerV2"/>
+        <childnode refid="17" relation="usage">
+          <edgelabel>p_base</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" line="130" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/localization.h" bodystart="130" bodyend="151"/>
+    <listofallmembers>
+      <member refid="structLoscLocalizerV2_1a7d1a4a1a2d8e5abc2a869c6232bab2c9" prot="public" virt="non-virtual"><scope>LoscLocalizerV2</scope><name>p_base</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="namespacelosc_1_1utils" kind="namespace" language="C++">
+    <compoundname>losc::utils</compoundname>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="namespacelosc_1_1utils_1a35bf4b0e461907195d2f9d2eadad232d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::utils::convert_df_pmn2pii_blockwise</definition>
+        <argsstring>(const vector&lt; size_t &gt; &amp;p_index, ConstRefMat &amp;df_pmn_block, ConstRefMat &amp;C_lo, RefMat df_pii)</argsstring>
+        <name>convert_df_pmn2pii_blockwise</name>
+        <param>
+          <type>const vector&lt; size_t &gt; &amp;</type>
+          <declname>p_index</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>df_pmn_block</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>C_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>df_pii</declname>
+        </param>
+        <briefdescription>
+<para>Convert density fitting matrix three-body integral &lt;p|mn&gt; into &lt;p|ii&gt; matrix block by block. </para>        </briefdescription>
+        <detaileddescription>
+<para>i, j: LO index.<linebreak/>
+p, q: fitbasis index.<linebreak/>
+m, n: AO basis index.<linebreak/>
+ The &lt;p|mn&gt; matrix has dimension of [nfitbasis, nbasis * (nbasis + 1) / 2]. The &lt;p|mn&gt; integral is associated with one fitbasis and two AO basis. It is defined as <formula id="16">\[ \langle \phi_p | \phi_m \phi_n \rangle = \int \frac{\phi_p(\rm{r}) \phi_m(\rm{r&apos;}) \phi_n(\rm{r&apos;})}{|\rm{r} - \rm{r&apos;}|} \mbox{d} \rm{r} \mbox{d} \rm{r&apos;}, \]</formula></para><para>The &lt;p|ii&gt; matrix has dimension of [nfitbasis, nlo]. The &lt;p|ii&gt; integral is associated with one fitbasis and one LO, and it is defined as <formula id="17">\[ \langle \phi_p | \phi_i \phi_i \rangle = \int \frac{\phi_p(\rm{r}) \phi_i(\rm{r&apos;}) \phi_i(\rm{r&apos;})}{|\rm{r} - \rm{r&apos;}|} \mbox{d} \rm{r} \mbox{d} \rm{r&apos;}, \]</formula></para><para>This function convert a block (block of fitbasis indices) of &lt;p|mn&gt; matrix into &lt;p|ii&gt; matrix. The format of &lt;p|mn&gt; block is required and illustrated as the following code. <programlisting><codeline><highlight class="normal">for<sp/>(size_t<sp/>p<sp/>=<sp/>0;<sp/>p<sp/>&lt;<sp/>block_size;<sp/>++p)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>for<sp/>(size_t<sp/>m<sp/>=<sp/>0;<sp/>m<sp/>&lt;<sp/>nbasis;<sp/>++m)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>for<sp/>(size_t<sp/>n<sp/>=<sp/>0;<sp/>n<sp/>&lt;=<sp/>m;<sp/>++n)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//<sp/>set<sp/>each<sp/>element<sp/>&lt;p|mn&gt;<sp/>in<sp/>the<sp/>block<sp/>as<sp/>zero.</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>df_pmn_block(p,<sp/>m<sp/>*<sp/>(m<sp/>+<sp/>1)/2<sp/>+<sp/>n)<sp/>=<sp/>0;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+</programlisting> <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">p_index</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the corresponding fitbasis index in <computeroutput>df_pmn_block</computeroutput>. For example, the i-th row in <computeroutput>df_pmn_block</computeroutput> matrix coresponding to <computeroutput>p_index[i]</computeroutput>-th fitbasis. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_pmn_block</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>density fitting &lt;p|mn&gt; matrix block.</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">C_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs coefficient matrix under AOs with dimension of <computeroutput>[nbasis, nlo]</computeroutput>. The <computeroutput>i</computeroutput>-th column in <computeroutput>C_lo</computeroutput> matrix is the <computeroutput>i</computeroutput>-th LO. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">df_pii</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>density fitting &lt;p|ii&gt; matrix. On exit, the rows whose index store in <computeroutput>p_index</computeroutput> vector are updated. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>To build the whole &lt;p|ii&gt; matrix, you need to traverse all the &lt;p|mn&gt; blocks. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="358" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>LOSC library utils namespace. </para>    </briefdescription>
+    <detaileddescription>
+<para>Collection of helper functions and so on. </para>    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="305" column="1"/>
+  </compounddef>
+</doxygen>

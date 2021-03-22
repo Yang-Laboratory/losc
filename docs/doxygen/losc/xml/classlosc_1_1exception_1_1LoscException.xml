@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="classlosc_1_1exception_1_1LoscException" kind="class" language="C++" prot="public">
+    <compoundname>losc::exception::LoscException</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">std::runtime_error</basecompoundref>
+    <derivedcompoundref refid="classlosc_1_1exception_1_1DimensionError" prot="public" virt="non-virtual">losc::exception::DimensionError</derivedcompoundref>
+    <includes refid="exception_8hpp" local="no">exception.hpp</includes>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classlosc_1_1exception_1_1LoscException_1a1f9a28c9650d2ee5ae47545f64e69180" prot="protected" static="no" mutable="no">
+        <type>string</type>
+        <definition>string losc::exception::LoscException::msg_</definition>
+        <argsstring></argsstring>
+        <name>msg_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="35" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classlosc_1_1exception_1_1LoscException_1a32efe01af134f1fc9999e6e084d1ecba" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void losc::exception::LoscException::make_message</definition>
+        <argsstring>(const char *msg)</argsstring>
+        <name>make_message</name>
+        <param>
+          <type>const char *</type>
+          <declname>msg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="32" column="1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classlosc_1_1exception_1_1LoscException_1a29b9606c06302f64a43ecff72b8b4b33" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>losc::exception::LoscException::LoscException</definition>
+        <argsstring>(const std::string &amp;msg)</argsstring>
+        <name>LoscException</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>msg</declname>
+        </param>
+        <briefdescription>
+<para>Constructor of <ref refid="classlosc_1_1exception_1_1LoscException" kindref="compound">LoscException</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">msg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the description of error. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="42" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" bodystart="42" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1exception_1_1LoscException_1a555c5862f5a14bfa3d22156e54b21dd3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>losc::exception::LoscException::~LoscException</definition>
+        <argsstring>()</argsstring>
+        <name>~LoscException</name>
+        <briefdescription>
+<para>Deconstructor of <ref refid="classlosc_1_1exception_1_1LoscException" kindref="compound">LoscException</ref>. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="50" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" bodystart="50" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1exception_1_1LoscException_1a15634ba91f4a773190e9975cc9d4bad1" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const char *</type>
+        <definition>const char* losc::exception::LoscException::what</definition>
+        <argsstring>() const noexceptoverride</argsstring>
+        <name>what</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="52" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" bodystart="52" bodyend="52"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The base exception in LOSC. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="52">
+        <label>std::runtime_error</label>
+        <childnode refid="53" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="51">
+        <label>losc::exception::LoscException</label>
+        <link refid="classlosc_1_1exception_1_1LoscException"/>
+        <childnode refid="52" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="53">
+        <label>std::exception</label>
+      </node>
+      <node id="54">
+        <label>losc::exception::DimensionError</label>
+        <link refid="classlosc_1_1exception_1_1DimensionError"/>
+        <childnode refid="51" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="56">
+        <label>std::runtime_error</label>
+        <childnode refid="57" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="59">
+        <label>std::basic_string&lt; char &gt;</label>
+      </node>
+      <node id="55">
+        <label>losc::exception::LoscException</label>
+        <link refid="classlosc_1_1exception_1_1LoscException"/>
+        <childnode refid="56" relation="public-inheritance">
+        </childnode>
+        <childnode refid="58" relation="usage">
+          <edgelabel>msg_</edgelabel>
+        </childnode>
+      </node>
+      <node id="57">
+        <label>std::exception</label>
+      </node>
+      <node id="58">
+        <label>std::string</label>
+        <childnode refid="59" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" line="30" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/exception.hpp" bodystart="30" bodyend="53"/>
+    <listofallmembers>
+      <member refid="classlosc_1_1exception_1_1LoscException_1a29b9606c06302f64a43ecff72b8b4b33" prot="public" virt="non-virtual"><scope>losc::exception::LoscException</scope><name>LoscException</name></member>
+      <member refid="classlosc_1_1exception_1_1LoscException_1a32efe01af134f1fc9999e6e084d1ecba" prot="private" virt="non-virtual"><scope>losc::exception::LoscException</scope><name>make_message</name></member>
+      <member refid="classlosc_1_1exception_1_1LoscException_1a1f9a28c9650d2ee5ae47545f64e69180" prot="protected" virt="non-virtual"><scope>losc::exception::LoscException</scope><name>msg_</name></member>
+      <member refid="classlosc_1_1exception_1_1LoscException_1a15634ba91f4a773190e9975cc9d4bad1" prot="public" virt="non-virtual"><scope>losc::exception::LoscException</scope><name>what</name></member>
+      <member refid="classlosc_1_1exception_1_1LoscException_1a555c5862f5a14bfa3d22156e54b21dd3" prot="public" virt="non-virtual"><scope>losc::exception::LoscException</scope><name>~LoscException</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

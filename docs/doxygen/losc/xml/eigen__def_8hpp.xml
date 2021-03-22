@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="eigen__def_8hpp" kind="file" language="C++">
+    <compoundname>eigen_def.hpp</compoundname>
+    <includes local="no">Eigen/Dense</includes>
+    <includedby refid="correction_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/correction.hpp</includedby>
+    <includedby refid="curvature_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp</includedby>
+    <includedby refid="exception_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/exception.hpp</includedby>
+    <includedby refid="local__occupation_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/local_occupation.hpp</includedby>
+    <includedby refid="localization_8hpp" local="no">/home/yuncai/Documents/Server/losc/include/losc/localization.hpp</includedby>
+    <incdepgraph>
+      <node id="15">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp</label>
+        <link refid="eigen_def.hpp"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>Eigen/Dense</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="22">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/local_occupation.hpp</label>
+        <link refid="local__occupation_8hpp"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/localization.hpp</label>
+        <link refid="localization_8hpp"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp</label>
+        <link refid="eigen_def.hpp"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/correction.hpp</label>
+        <link refid="correction_8hpp"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp</label>
+        <link refid="curvature_8hpp"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/exception.hpp</label>
+        <link refid="exception_8hpp"/>
+      </node>
+      <node id="19">
+        <label>/home/yuncai/Documents/Server/losc/include/losc/losc.hpp</label>
+        <link refid="losc_8hpp"/>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacelosc">losc</innernamespace>
+    <briefdescription>
+<para>A collection of alias to <computeroutput>Eigen</computeroutput> types that used in LOSC. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_LOSC_EIGEN_DEF_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_LOSC_EIGEN_DEF_HPP_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Eigen/Dense&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacelosc" kindref="compound">losc</ref><sp/>{</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>Eigen::Map;</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>Eigen::Ref;</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref><sp/>=</highlight></codeline>
+<codeline lineno="22" refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>Eigen::Matrix&lt;double,<sp/>Eigen::Dynamic,<sp/>Eigen::Dynamic,<sp/>Eigen::RowMajor&gt;;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27" refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kindref="member">LOSCVector</ref><sp/>=<sp/>Eigen::VectorXd;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32" refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref><sp/>=<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Ref&lt;const<sp/>LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37" refid="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" kindref="member">ConstRefVec</ref><sp/>=<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Ref&lt;const<sp/>LOSCVector&gt;;</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42" refid="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" kindref="member">RefConstMat</ref><sp/>=<sp/>Ref&lt;const<sp/>LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47" refid="eigen__def_8hpp_1af53923e3150681c84270c02bf6a654b6" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1af53923e3150681c84270c02bf6a654b6" kindref="member">RefConstVec</ref><sp/>=<sp/>Ref&lt;const<sp/>LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52" refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref><sp/>=<sp/>Ref&lt;LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57" refid="eigen__def_8hpp_1a1dedf36275248282fcc77b4cd5e892b9" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a1dedf36275248282fcc77b4cd5e892b9" kindref="member">RefVec</ref><sp/>=<sp/>Ref&lt;LOSCVector&gt;;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62" refid="eigen__def_8hpp_1ad490768841d2f8f4b32c7b6a5adf8fbe" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1ad490768841d2f8f4b32c7b6a5adf8fbe" kindref="member">ConstMapMat</ref><sp/>=<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Map&lt;const<sp/>LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="67" refid="eigen__def_8hpp_1ae76eda885d00475b86de74be8e03e53a" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1ae76eda885d00475b86de74be8e03e53a" kindref="member">ConstMapVec</ref><sp/>=<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Map&lt;const<sp/>LOSCVector&gt;;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72" refid="eigen__def_8hpp_1a173b853213fea71c9cfd91fbe0de1f01" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a173b853213fea71c9cfd91fbe0de1f01" kindref="member">MapConstMat</ref><sp/>=<sp/>Map&lt;const<sp/>LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight></codeline>
+<codeline lineno="77" refid="eigen__def_8hpp_1a3001affd040a7ad0a09604de1baac44f" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a3001affd040a7ad0a09604de1baac44f" kindref="member">MapConstVec</ref><sp/>=<sp/>Map&lt;const<sp/>LOSCVector&gt;;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="82" refid="eigen__def_8hpp_1ae41af6b51eec9b509dda5d600d02266c" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1ae41af6b51eec9b509dda5d600d02266c" kindref="member">MapMat</ref><sp/>=<sp/>Map&lt;LOSCMatrix&gt;;</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87" refid="eigen__def_8hpp_1a0084d0d06d4f4d663a214587d4eaf102" refkind="member"><highlight class="keyword">using</highlight><highlight class="normal"><sp/><ref refid="eigen__def_8hpp_1a0084d0d06d4f4d663a214587d4eaf102" kindref="member">MapVec</ref><sp/>=<sp/>Map&lt;LOSCVector&gt;;</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>losc</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"></highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/eigen_def.hpp"/>
+  </compounddef>
+</doxygen>

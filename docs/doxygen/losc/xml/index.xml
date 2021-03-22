@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.11">
+  <compound refid="classlosc_1_1CurvatureBase" kind="class"><name>losc::CurvatureBase</name>
+    <member refid="classlosc_1_1CurvatureBase_1a0f3ca2b234501184ef59fcfb464dbeac" kind="function"><name>CurvatureBase</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aac32c1f367cf65842013658c854b79fc" kind="function"><name>~CurvatureBase</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kind="function"><name>kappa</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1ad95c20abcf940d90683c4aacac16e645" kind="function"><name>nlo</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aa64b6572a94e0a7e47ce8803317cbfcc" kind="function"><name>nfitbasis</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1a17d55779749cf10f99cc10c302113157" kind="function"><name>npts</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1ad8e3306bbe46bf91140ae73181eeb7dc" kind="function"><name>C_API_kappa</name></member>
+  </compound>
+  <compound refid="classlosc_1_1CurvatureV1" kind="class"><name>losc::CurvatureV1</name>
+    <member refid="classlosc_1_1CurvatureV1_1ab6044f5b3339c7817d522e8e14daa524" kind="variable"><name>cx_</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1a49f5a14de6422fe8e2ee8bbcd9daefd9" kind="variable"><name>tau_</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1a9f1e33aaa654ef785f9c7d6df961eb45" kind="function"><name>compute_kappa_J</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1a0a1e965b7f6c4925935179b775afa63e" kind="function"><name>compute_kappa_xc</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1ae1bf66b9615cb19949bdc07c87dfb900" kind="function"><name>CurvatureV1</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1aadb82fb3fc511f348724d71b378406a2" kind="function"><name>~CurvatureV1</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1a37bbc60aafb1182e8735c026214603ab" kind="function"><name>C_API_kappa</name></member>
+    <member refid="classlosc_1_1CurvatureV1_1a4b7a66583971798abe926fc77fb9701d" kind="function"><name>set_tau</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kind="function"><name>kappa</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1ad95c20abcf940d90683c4aacac16e645" kind="function"><name>nlo</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aa64b6572a94e0a7e47ce8803317cbfcc" kind="function"><name>nfitbasis</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1a17d55779749cf10f99cc10c302113157" kind="function"><name>npts</name></member>
+  </compound>
+  <compound refid="classlosc_1_1CurvatureV2" kind="class"><name>losc::CurvatureV2</name>
+    <member refid="classlosc_1_1CurvatureV2_1aeb629e0108af401f276b5f6b00c99a3a" kind="variable"><name>zeta_</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1a1873feea229d2ef6cb655c1aa5dde44a" kind="variable"><name>cx_</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1afd378a602d3644fa91b27c9076d8b72f" kind="variable"><name>tau_</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1afcff2a6aee05494b2b4d0c44ad5db480" kind="function"><name>CurvatureV2</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1af60ddee6837baa883d69ea0472e3fb5a" kind="function"><name>~CurvatureV2</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1a1a9eeb9bff051eae968242bacc082da8" kind="function"><name>C_API_kappa</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1a4e57f4bdd500f9b95ac621f99a734578" kind="function"><name>set_tau</name></member>
+    <member refid="classlosc_1_1CurvatureV2_1aad495adb035c4b85fbba127baa077295" kind="function"><name>set_zeta</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" kind="function"><name>kappa</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1ad95c20abcf940d90683c4aacac16e645" kind="function"><name>nlo</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1aa64b6572a94e0a7e47ce8803317cbfcc" kind="function"><name>nfitbasis</name></member>
+    <member refid="classlosc_1_1CurvatureBase_1a17d55779749cf10f99cc10c302113157" kind="function"><name>npts</name></member>
+  </compound>
+  <compound refid="classlosc_1_1DFAInfo" kind="class"><name>losc::DFAInfo</name>
+    <member refid="classlosc_1_1DFAInfo_1aaa683c129b17a1526285f76d764529ad" kind="variable"><name>name_</name></member>
+    <member refid="classlosc_1_1DFAInfo_1ac412d4a0a53c326c3bfc915f66fbe2a2" kind="variable"><name>gga_x_</name></member>
+    <member refid="classlosc_1_1DFAInfo_1a3345033eb56b61be1b8c20f75aa1b30a" kind="variable"><name>hf_x_</name></member>
+    <member refid="classlosc_1_1DFAInfo_1a5ecf185245453970c29fe819ae4a95b5" kind="function"><name>DFAInfo</name></member>
+    <member refid="classlosc_1_1DFAInfo_1a1130b13c473e257da30d58c824cc9214" kind="function"><name>name</name></member>
+    <member refid="classlosc_1_1DFAInfo_1a9b5181b2d06d1814ef3b7d3d85aa6e42" kind="function"><name>gga_x</name></member>
+    <member refid="classlosc_1_1DFAInfo_1afb4e20016a485656a14aceff006bea1d" kind="function"><name>hf_x</name></member>
+  </compound>
+  <compound refid="classlosc_1_1exception_1_1DimensionError" kind="class"><name>losc::exception::DimensionError</name>
+    <member refid="classlosc_1_1exception_1_1DimensionError_1aa252559827182603e6090f7f8ff95a70" kind="function"><name>DimensionError</name></member>
+    <member refid="classlosc_1_1exception_1_1DimensionError_1a7b5ef359ad190454863ad3061dd62ffb" kind="function"><name>DimensionError</name></member>
+    <member refid="classlosc_1_1exception_1_1DimensionError_1a9cf79fd4886e424c1ef8aa82eb8ea1bd" kind="function"><name>~DimensionError</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a15634ba91f4a773190e9975cc9d4bad1" kind="function"><name>what</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a1f9a28c9650d2ee5ae47545f64e69180" kind="variable"><name>msg_</name></member>
+  </compound>
+  <compound refid="classlosc_1_1LocalizerBase" kind="class"><name>losc::LocalizerBase</name>
+    <member refid="classlosc_1_1LocalizerBase_1a2fe839092247fbd128aac1772d0cd017" kind="function"><name>LocalizerBase</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a33a5199ded590d2bb6e9230df4aca3be" kind="function"><name>~LocalizerBase</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" kind="function"><name>steps</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" kind="function"><name>is_converged</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a71d327c6b83d118807d39fa0e940b79b" kind="function"><name>cost_func</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" kind="function"><name>set_max_iter</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" kind="function"><name>set_convergence</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" kind="function"><name>set_random_permutation</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ae854bd109703a7870ae73da6815bcd45" kind="function"><name>lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1acf1d88c9931d396d370d5c7405263709" kind="function"><name>lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ac15cd3a62d73749f57206486ff7c9816" kind="function"><name>C_API_lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kind="function"><name>lo</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" kind="function"><name>lo</name></member>
+  </compound>
+  <compound refid="classlosc_1_1LocalizerV2" kind="class"><name>losc::LocalizerV2</name>
+    <member refid="classlosc_1_1LocalizerV2_1ae55cd872a399cf83584572d4a5af6249" kind="variable"><name>H_ao_</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1aef14380436db4a4a0eda25d9dbf33a5d" kind="variable"><name>Dipole_ao_</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1ad0d2cbd556e10187362037b82ad00b0f" kind="variable"><name>c_</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1ab337154f24a8c81e9184d93558dea3e5" kind="variable"><name>gamma_</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1a7a5943989d39f4f39ca26121eaf7a19a" kind="function"><name>js_optimize_one_pair</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1a35b58a57a791c92b7cbf9b92925dd6dd" kind="function"><name>js_rotate_one_pair</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1aca94d948a92fedc075eac274418c2759" kind="function"><name>LocalizerV2</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1a766642cf1ebd619521568385aa88f287" kind="function"><name>~LocalizerV2</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1ad970dcc0d2471ab2b2a1baf93b7c1d00" kind="function"><name>set_gamma</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1aa61ad3d4480d58f5564f16f4a17ba3c1" kind="function"><name>set_c</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1a52c39fbde8972dbf17f5e44e5c42f1fc" kind="function"><name>cost_func</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1a0379572f42f0df56d6885218bf159ca1" kind="function"><name>lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1ad569ff0364a060eb0d80a7bb2f0db4aa" kind="function"><name>lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerV2_1acde2a2b791a29449656b0cb0614fddec" kind="function"><name>C_API_lo_U</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a5a00059c816e06439c59838d4020e3c2" kind="function"><name>steps</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a769cf44a202004c82c917fa2afb91547" kind="function"><name>is_converged</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1a0edb5a37be67e6b3f66be34c894e55e5" kind="function"><name>set_max_iter</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ae5fc98f80cdf32f695b9bc9ab450dc36" kind="function"><name>set_convergence</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1ad7e43174820c1de26a864f1e9ff59195" kind="function"><name>set_random_permutation</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1aa77b14cd89d39693bdec64474a47eb47" kind="function"><name>lo</name></member>
+    <member refid="classlosc_1_1LocalizerBase_1abf99fdf6c2b9cf5d4cd804acb3528f76" kind="function"><name>lo</name></member>
+  </compound>
+  <compound refid="classlosc_1_1exception_1_1LoscException" kind="class"><name>losc::exception::LoscException</name>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a1f9a28c9650d2ee5ae47545f64e69180" kind="variable"><name>msg_</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a32efe01af134f1fc9999e6e084d1ecba" kind="function"><name>make_message</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a29b9606c06302f64a43ecff72b8b4b33" kind="function"><name>LoscException</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a555c5862f5a14bfa3d22156e54b21dd3" kind="function"><name>~LoscException</name></member>
+    <member refid="classlosc_1_1exception_1_1LoscException_1a15634ba91f4a773190e9975cc9d4bad1" kind="function"><name>what</name></member>
+  </compound>
+  <compound refid="namespacelosc" kind="namespace"><name>losc</name>
+    <member refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kind="typedef"><name>LOSCMatrix</name></member>
+    <member refid="eigen__def_8hpp_1a3a1490bdcd5898c9cb1625533c093ff6" kind="typedef"><name>LOSCVector</name></member>
+    <member refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kind="typedef"><name>ConstRefMat</name></member>
+    <member refid="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" kind="typedef"><name>ConstRefVec</name></member>
+    <member refid="eigen__def_8hpp_1a8681ac1fa3ed4d6178352863cd1fe0d8" kind="typedef"><name>RefConstMat</name></member>
+    <member refid="eigen__def_8hpp_1af53923e3150681c84270c02bf6a654b6" kind="typedef"><name>RefConstVec</name></member>
+    <member refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kind="typedef"><name>RefMat</name></member>
+    <member refid="eigen__def_8hpp_1a1dedf36275248282fcc77b4cd5e892b9" kind="typedef"><name>RefVec</name></member>
+    <member refid="eigen__def_8hpp_1ad490768841d2f8f4b32c7b6a5adf8fbe" kind="typedef"><name>ConstMapMat</name></member>
+    <member refid="eigen__def_8hpp_1ae76eda885d00475b86de74be8e03e53a" kind="typedef"><name>ConstMapVec</name></member>
+    <member refid="eigen__def_8hpp_1a173b853213fea71c9cfd91fbe0de1f01" kind="typedef"><name>MapConstMat</name></member>
+    <member refid="eigen__def_8hpp_1a3001affd040a7ad0a09604de1baac44f" kind="typedef"><name>MapConstVec</name></member>
+    <member refid="eigen__def_8hpp_1ae41af6b51eec9b509dda5d600d02266c" kind="typedef"><name>MapMat</name></member>
+    <member refid="eigen__def_8hpp_1a0084d0d06d4f4d663a214587d4eaf102" kind="typedef"><name>MapVec</name></member>
+    <member refid="correction_8hpp_1a70cacaeb1a24172447dac12d6bf902be" kind="function"><name>ao_hamiltonian_correction</name></member>
+    <member refid="correction_8hpp_1aec1318ccac401d8a4da9f06874d390ad" kind="function"><name>energy_correction</name></member>
+    <member refid="correction_8hpp_1aa41ad43c2da822b197aac0e52adbe17e" kind="function"><name>orbital_energy_post_scf</name></member>
+    <member refid="correction_8hpp_1a2cfadfd785ed6fa231612c73f6bacbd1" kind="function"><name>C_API_ao_hamiltonian_correction</name></member>
+    <member refid="correction_8hpp_1a067d28c3f79f24697c9a380b2d296de4" kind="function"><name>C_API_orbital_energy_post_scf</name></member>
+    <member refid="local__occupation_8hpp_1a2b32509da0db9e4dda89c09457708513" kind="function"><name>local_occupation</name></member>
+    <member refid="local__occupation_8hpp_1ae8e6a700378d5952142984980b621bd3" kind="function"><name>C_API_local_occupation</name></member>
+  </compound>
+  <compound refid="namespacelosc_1_1exception" kind="namespace"><name>losc::exception</name>
+  </compound>
+  <compound refid="namespacelosc_1_1utils" kind="namespace"><name>losc::utils</name>
+    <member refid="namespacelosc_1_1utils_1a35bf4b0e461907195d2f9d2eadad232d" kind="function"><name>convert_df_pmn2pii_blockwise</name></member>
+  </compound>
+  <compound refid="namespacestd" kind="namespace"><name>std</name>
+  </compound>
+  <compound refid="correction_8hpp" kind="file"><name>correction.hpp</name>
+  </compound>
+  <compound refid="curvature_8hpp" kind="file"><name>curvature.hpp</name>
+  </compound>
+  <compound refid="eigen__def_8hpp" kind="file"><name>eigen_def.hpp</name>
+  </compound>
+  <compound refid="exception_8hpp" kind="file"><name>exception.hpp</name>
+  </compound>
+  <compound refid="local__occupation_8hpp" kind="file"><name>local_occupation.hpp</name>
+  </compound>
+  <compound refid="localization_8hpp" kind="file"><name>localization.hpp</name>
+  </compound>
+  <compound refid="losc_8hpp" kind="file"><name>losc.hpp</name>
+  </compound>
+  <compound refid="dir_d44c64559bbebec7f509842c48db8b23" kind="dir"><name>/home/yuncai/Documents/Server/losc/include</name>
+  </compound>
+  <compound refid="dir_8c79f74d3aa840a401c3995537460e38" kind="dir"><name>/home/yuncai/Documents/Server/losc/include/losc</name>
+  </compound>
+</doxygenindex>

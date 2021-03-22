@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="structLoscCurvatureBase" kind="struct" language="C++" prot="public">
+    <compoundname>LoscCurvatureBase</compoundname>
+    <includes refid="curvature_8h" local="no">curvature.h</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structLoscCurvatureBase_1a4900682372374495e2592d65438fc553" prot="public" static="no" mutable="no">
+        <type>size_t(*</type>
+        <definition>size_t(* LoscCurvatureBase::nlo) (const LoscCurvatureBase *self)</definition>
+        <argsstring>)(const LoscCurvatureBase *self)</argsstring>
+        <name>nlo</name>
+        <briefdescription>
+<para>Return the number of LOs. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>get<sp/>the<sp/>number<sp/>of<sp/>LOs.</highlight></codeline>
+<codeline><highlight class="normal">size_t<sp/>n<sp/>=<sp/>pbase-&gt;nlo(pbase);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="95" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="95" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscCurvatureBase_1a85e3641b37eec42c0456b098985a7896" prot="public" static="no" mutable="no">
+        <type>size_t(*</type>
+        <definition>size_t(* LoscCurvatureBase::nfitbasis) (const LoscCurvatureBase *self)</definition>
+        <argsstring>)(const LoscCurvatureBase *self)</argsstring>
+        <name>nfitbasis</name>
+        <briefdescription>
+<para>Return the number of nfitbasis. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>get<sp/>the<sp/>number<sp/>of<sp/>fit<sp/>basis.</highlight></codeline>
+<codeline><highlight class="normal">size_t<sp/>n<sp/>=<sp/>pbase-&gt;nfitbasis(pbase);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="106" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="106" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscCurvatureBase_1af3790a69d3506df31df50f9679ed4d4f" prot="public" static="no" mutable="no">
+        <type>size_t(*</type>
+        <definition>size_t(* LoscCurvatureBase::npts) (const LoscCurvatureBase *self)</definition>
+        <argsstring>)(const LoscCurvatureBase *self)</argsstring>
+        <name>npts</name>
+        <briefdescription>
+<para>Return the number of grid points. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>get<sp/>the<sp/>number<sp/>of<sp/>grid<sp/>points.</highlight></codeline>
+<codeline><highlight class="normal">size_t<sp/>n<sp/>=<sp/>pbase-&gt;npts(pbase);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="117" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="117" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscCurvatureBase::kappa) (const LoscCurvatureBase *self, losc_matrix *K)</definition>
+        <argsstring>)(const LoscCurvatureBase *self, losc_matrix *K)</argsstring>
+        <name>kappa</name>
+        <briefdescription>
+<para>Compute the LOSC curvature matrix with an in-out way. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">K</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>curvature matrix with dimension <computeroutput>[nlo, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>The curvature matrix should be allocated in advance with an expected dimension. Otherwise, it will throw an exception. </para></simplesect>
+<simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pbase`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureBase<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>calculate<sp/>curvature<sp/>matrix.</highlight></codeline>
+<codeline><highlight class="normal">nlo<sp/>=<sp/>pbase-&gt;nlo(pbase);</highlight></codeline>
+<codeline><highlight class="normal">losc_matrix<sp/>*K<sp/>=<sp/>losc_create_matrix(nlo,<sp/>nlo);</highlight></codeline>
+<codeline><highlight class="normal">pbase-&gt;kappa(pbase,<sp/>K);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="133" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="133" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC curvature base class. </para>    </briefdescription>
+    <detaileddescription>
+<para><simplesect kind="note"><para>This struct exports all the functions for LOSC curvature base class. This struct servers as helper class to avoid code duplication for the implementation of C interface. There is no need for C users to create a such struct in practice. </para></simplesect>
+</para>    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="80" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="80" bodyend="134"/>
+    <listofallmembers>
+      <member refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" prot="public" virt="non-virtual"><scope>LoscCurvatureBase</scope><name>kappa</name></member>
+      <member refid="structLoscCurvatureBase_1a85e3641b37eec42c0456b098985a7896" prot="public" virt="non-virtual"><scope>LoscCurvatureBase</scope><name>nfitbasis</name></member>
+      <member refid="structLoscCurvatureBase_1a4900682372374495e2592d65438fc553" prot="public" virt="non-virtual"><scope>LoscCurvatureBase</scope><name>nlo</name></member>
+      <member refid="structLoscCurvatureBase_1af3790a69d3506df31df50f9679ed4d4f" prot="public" virt="non-virtual"><scope>LoscCurvatureBase</scope><name>npts</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

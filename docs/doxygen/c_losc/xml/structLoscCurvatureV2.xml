@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="structLoscCurvatureV2" kind="struct" language="C++" prot="public">
+    <compoundname>LoscCurvatureV2</compoundname>
+    <includes refid="curvature_8h" local="no">curvature.h</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structLoscCurvatureV2_1ae477ffe64f858d0515ba3e89419ce9f8" prot="public" static="no" mutable="no">
+        <type><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref> *</type>
+        <definition>LoscCurvatureBase* LoscCurvatureV2::p_base</definition>
+        <argsstring></argsstring>
+        <name>p_base</name>
+        <briefdescription>
+<para>A pointer to a <ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref> variable. </para>        </briefdescription>
+        <detaileddescription>
+<para>Use this variable to call functions that are provided in the <ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref>. <simplesect kind="par"><title>Example</title><para>Demo of calling functions that provided in the <ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref>. Assume a variable <computeroutput>pCurvature</computeroutput> exists with type of <computeroutput><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref> *</computeroutput>.</para></simplesect>
+<programlisting><codeline><highlight class="normal">//<sp/>Demo:<sp/>get<sp/>number<sp/>of<sp/>AOs<sp/>by<sp/>calling<sp/>LoscCurvatureV1.nbasis</highlight></codeline>
+<codeline><highlight class="normal">size_t<sp/>nbasis<sp/>=<sp/>pCurvature-&gt;p_base-&gt;nbasis(pCurvature);</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>get<sp/>number<sp/>of<sp/>LOs<sp/>by<sp/>calling<sp/>LoscCurvatureV1.nlo</highlight></codeline>
+<codeline><highlight class="normal">size_t<sp/>nlo<sp/>=<sp/>pCurvature-&gt;p_base-&gt;nlo(pCurvature);</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>calculate<sp/>the<sp/>curvature<sp/>V1<sp/>matrix.</highlight></codeline>
+<codeline><highlight class="normal">losc_matrix<sp/>*K<sp/>=<sp/>losc_matrix_create(nlo,<sp/>nlo);</highlight></codeline>
+<codeline><highlight class="normal">pCurvature-&gt;p_base-&gt;kappa(pCurvature-&gt;p_base,<sp/>K);</highlight></codeline>
+</programlisting> <simplesect kind="see"><para><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref>: see all the functions provided in the curvature base structure. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="267" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="267" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscCurvatureV2_1a1fe08db02c7f27e408735107e30bcbb4" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscCurvatureV2::set_tau) (const LoscCurvatureV2 *self, double tau)</definition>
+        <argsstring>)(const LoscCurvatureV2 *self, double tau)</argsstring>
+        <name>set_tau</name>
+        <briefdescription>
+<para>Set parameter tau. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pV2`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureV2<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>set<sp/>parameter<sp/>tau<sp/>to<sp/>be<sp/>0.8.</highlight></codeline>
+<codeline><highlight class="normal">pV2-&gt;set_tau(pV2,<sp/>0.8);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="283" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="283" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structLoscCurvatureV2_1a1eb952b1b52568d6a34f22f56f70fb5b" prot="public" static="no" mutable="no">
+        <type>void(*</type>
+        <definition>void(* LoscCurvatureV2::set_zeta) (const LoscCurvatureV2 *self, double zeta)</definition>
+        <argsstring>)(const LoscCurvatureV2 *self, double zeta)</argsstring>
+        <name>set_zeta</name>
+        <briefdescription>
+<para>Set parameter zeta. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>Example</title><para><programlisting><codeline><highlight class="normal">//<sp/>Assume<sp/>`pV2`<sp/>is<sp/>a<sp/>existing<sp/>variable<sp/>with<sp/>type<sp/>`LoscCurvatureV2<sp/>*`.</highlight></codeline>
+<codeline><highlight class="normal">//<sp/>Demo:<sp/>set<sp/>parameter<sp/>zeta<sp/>to<sp/>be<sp/>0.8.</highlight></codeline>
+<codeline><highlight class="normal">pV2-&gt;set_zeta(pV2,<sp/>0.8);</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="294" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="294" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC curvature class of version 2. </para>    </briefdescription>
+    <detaileddescription>
+<para>The curvature matrix is defined as <formula id="10">$\tilde{\kappa}$</formula> in Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535). <simplesect kind="see"><para><ref refid="curvature_8h_1a0fdab291d65674e52f43d3eae8f74cd0" kindref="member">losc_curvature_v2_create()</ref>: create a LosCurvatureV2 object. </para></simplesect>
+<simplesect kind="see"><para><ref refid="curvature_8h_1a017385863d6f76e5fa3cef809f854e2d" kindref="member">losc_curvature_v2_free()</ref>: free a LosCurvatureV2 object. </para></simplesect>
+</para>    </detaileddescription>
+    <collaborationgraph>
+      <node id="11">
+        <label>LoscCurvatureV2</label>
+        <link refid="structLoscCurvatureV2"/>
+        <childnode refid="12" relation="usage">
+          <edgelabel>p_base</edgelabel>
+        </childnode>
+      </node>
+      <node id="12">
+        <label>LoscCurvatureBase</label>
+        <link refid="structLoscCurvatureBase"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="255" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="255" bodyend="295"/>
+    <listofallmembers>
+      <member refid="structLoscCurvatureV2_1ae477ffe64f858d0515ba3e89419ce9f8" prot="public" virt="non-virtual"><scope>LoscCurvatureV2</scope><name>p_base</name></member>
+      <member refid="structLoscCurvatureV2_1a1fe08db02c7f27e408735107e30bcbb4" prot="public" virt="non-virtual"><scope>LoscCurvatureV2</scope><name>set_tau</name></member>
+      <member refid="structLoscCurvatureV2_1a1eb952b1b52568d6a34f22f56f70fb5b" prot="public" virt="non-virtual"><scope>LoscCurvatureV2</scope><name>set_zeta</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

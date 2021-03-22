@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="dir_d44c64559bbebec7f509842c48db8b23" kind="dir">
+    <compoundname>/home/yuncai/Documents/Server/losc/include</compoundname>
+    <innerdir refid="dir_8c79f74d3aa840a401c3995537460e38">/home/yuncai/Documents/Server/losc/include/losc</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/"/>
+  </compounddef>
+</doxygen>

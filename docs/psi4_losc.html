@@ -1,0 +1,1330 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Use LOSC library in psi4 &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="LOSC Python library" href="py_losc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using LOSC library in psi4</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-psi4">Installing psi4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-guide">Basic Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#post-scf-losc-for-integer-system-with-aufbau-occupation">post-SCF-LOSC for integer system with aufbau occupation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scf-losc-for-integer-system-with-aufbau-occupation">SCF-LOSC for integer system with aufbau occupation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced">Advanced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configure-losc-calculations-with-options">Configure LOSC calculations with options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-energy-window-for-losc-calculation">Setting energy window for LOSC calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#systems-with-fractional-numbers-of-electrons-or-non-aufbau-occupation">Systems with fractional numbers of electrons or non-aufbau occupation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#psi4-losc-module"><strong>psi4_losc Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#full-list-of-psi4-python-api-used-in-psi4-losc-module"><strong>Full list of psi4 Python API used in psi4_losc module</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-of-psi4-losc-module"><strong>API of psi4_losc module</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#psi4-losc-scf-module"><strong>psi4_losc.scf Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#full-list-of-psi4-python-api-used-in-psi4-losc-scf-module"><strong>Full list of psi4 Python API used in psi4_losc.scf module</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-of-psi4-losc-scf-module"><strong>API of psi4_losc.scf module</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-losc-options-in-psi4-losc"><strong>Configure LOSC options in psi4_losc</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#literature"><strong>Literature</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Use LOSC library in psi4</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/psi4_losc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="use-losc-library-in-psi4">
+<h1>Use LOSC library in psi4<a class="headerlink" href="#use-losc-library-in-psi4" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> is a Python module that extends the <a class="reference external" href="https://psicode.org/">psi4</a>,
+an open-source package for quantum chemistry calculations, to perform the
+calculations of LOSC method. The <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module interacts with the <code class="docutils literal notranslate"><span class="pre">psi4</span></code>
+package via its Python interface. Using this <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module along with
+<code class="docutils literal notranslate"><span class="pre">psi4</span></code> (the <a class="reference external" href="https://psicode.org/psi4manual/master/psiapi.html">python model</a> of psi4), you can
+perform post-SCF-LOSC <a class="footnote-reference brackets" href="#losc1" id="id1">1</a> <a class="footnote-reference brackets" href="#losc2" id="id2">2</a> and SCF-LOSC <a class="footnote-reference brackets" href="#scf-losc" id="id3">3</a>
+calculations for aufbau/non-aufbau systems
+with integer/fractional numbers of electrons.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="installing-psi4">
+<h2>Installing psi4<a class="headerlink" href="#installing-psi4" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module is developed based on psi4 version <code class="docutils literal notranslate"><span class="pre">1.3.2</span></code>.
+To have stable performance, it would be better to install this version of
+psi4. Other versions of <code class="docutils literal notranslate"><span class="pre">psi4</span></code> are not tested.</p>
+</div>
+<p>To perform LOSC calculation with <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> in <code class="docutils literal notranslate"><span class="pre">psi4</span></code>, you need to
+install <code class="docutils literal notranslate"><span class="pre">psi4</span></code> package first. If never use psi4 before, you are suggested to
+just install the conda binary package of psi4:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install <span class="nv">psi4</span><span class="o">=</span><span class="m">1</span>.3.2 -c psi4
+</pre></div>
+</div>
+<p>If you want to set up psi4 from the scratch, you can get more guidance for
+the installation of psi4 from its <a class="reference external" href="https://psicode.org/psi4manual/master/external.html">documentation</a>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="basic-guide">
+<h2>Basic Guide<a class="headerlink" href="#basic-guide" title="Permalink to this headline">¶</a></h2>
+<p>LOSC can significantly eliminate the delocalization error exisiting in
+conventional density functional approximations (DFAs), such as local density
+approximations (LDA), generalized gradient approximations (GGAs) and hybrid
+functionals like B3LYP. With minimal delocalization error from LOSC-DFA
+calculations, you can expect good description of physical properties,
+such as the ionization potentials (IPs), electron affinities
+(EAs), the photoemision spectra.</p>
+<p>For most cases, you would be interested in performing LOSC calculations for
+aufbau systems (ground-state) with integer number of electrons. There are two
+ways to apply LOSC to an associated DFA:</p>
+<ol class="arabic">
+<li><p>the post-SCF-LOSC approach <a class="footnote-reference brackets" href="#losc1" id="id4">1</a> <a class="footnote-reference brackets" href="#losc2" id="id5">2</a></p>
+<blockquote>
+<div><p>Directly applying LOSC correction to the SCF-DFA calculations.
+In this approach, the total energy and orbital energies from the associated
+DFA are corrected. The electron density is not corrected from LOSC.</p>
+</div></blockquote>
+</li>
+<li><p>the SCF-LOSC approach <a class="footnote-reference brackets" href="#scf-losc" id="id6">3</a></p>
+<blockquote>
+<div><p>Using the LOSC effective Hamiltonian to correct the associated DFA
+Hamiltonian and perform the SCF calculation for LOSC-DFA.
+In this approach, the total energy, orbital energies and electron
+densities are all corrected.</p>
+</div></blockquote>
+</li>
+</ol>
+<p>To perform the calculation of LOSC via <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code>, always import following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">psi4_losc</span>
+</pre></div>
+</div>
+<p>No matter doing SCF-LOSC or post-SCF-LOSC,
+an SCF calculation for the associated DFA should be performed in advance to
+generate the corresponding converged psi4 wavefunction object.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although psi4 supports calculations with point group symmetry, LOSC
+does not support symmetry because the usage of localized orbitals. So you
+need to turn off the symmetry in psi4 calculation (set <code class="docutils literal notranslate"><span class="pre">symettr</span> <span class="pre">c1</span></code> for
+the system).</p>
+</div>
+<p>Now, taking a simple molecule, a stretched H2 molecule, as an example.
+You first calculate the SCF-DFA in psi4.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A stretched H2 molecule with 10A bond length with symmetry turned off.</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    0 1</span>
+<span class="s2">    H 0 0 0</span>
+<span class="s2">    H 10 0 0</span>
+<span class="hll"><span class="s2">    symmetry c1  # turn off symmetry</span>
+</span><span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1"># some basic setting in psi4.</span>
+<span class="n">psi4</span><span class="o">.</span><span class="n">set_options</span><span class="p">({</span><span class="s1">&#39;basis&#39;</span><span class="p">:</span> <span class="s1">&#39;6-31g&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;guess&#39;</span><span class="p">:</span> <span class="s1">&#39;core&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;reference&#39;</span><span class="p">:</span> <span class="s1">&#39;uks&#39;</span><span class="p">})</span>
+
+<span class="c1"># Here we do a b3lyp calculation and let psi4 return the wfn object.</span>
+<span class="n">E_dfa</span><span class="p">,</span> <span class="n">dfa_wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="s1">&#39;b3lyp&#39;</span><span class="p">,</span> <span class="n">return_wfn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_dfa</span><span class="p">)</span>
+
+<span class="c1"># You would see E_dfa = -0.8923613725795544</span>
+</pre></div>
+</div>
+<div class="section" id="post-scf-losc-for-integer-system-with-aufbau-occupation">
+<h3>post-SCF-LOSC for integer system with aufbau occupation<a class="headerlink" href="#post-scf-losc-for-integer-system-with-aufbau-occupation" title="Permalink to this headline">¶</a></h3>
+<p>Following the aforementioned H2 example, you can do a post-SCF-LOSC calculation
+via calling <code class="docutils literal notranslate"><span class="pre">psi4_losc.post_scf_losc()</span></code> function.
+There are two key arguments you need to specify: the first one
+is the DFA functional type, and the second one the corresponding converged
+DFA wavefunction object. <code class="docutils literal notranslate"><span class="pre">psi4_losc.post_scf_losc()</span></code> will return two
+variables: the corrected total energy and orbital energies.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># do post-SCF-LOSC-B3LYP calculation to obtain corrected total energy</span>
+</span><span class="hll"><span class="c1"># and the orbital energies.</span>
+</span><span class="hll"><span class="n">E_losc</span><span class="p">,</span> <span class="n">Orb_losc</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">post_scf_losc</span><span class="p">(</span><span class="n">psi4_losc</span><span class="o">.</span><span class="n">B3LYP</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">)</span>
+</span>
+<span class="c1"># You would see total energies:</span>
+<span class="c1"># E_losc = -0.758073589993662</span>
+<span class="c1"># E_losc - E_dfa = 0.13428778258589236</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_losc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_losc</span> <span class="o">-</span> <span class="n">E_dfa</span><span class="p">)</span>
+
+<span class="c1"># You would see all LOSC corrected orbital energies in a.u. for</span>
+<span class="c1"># both alpha and beta spin:</span>
+<span class="c1"># [array([-6.98665404, -5.54668941, 24.04349262, 24.04349294]),</span>
+<span class="c1">#  array([-6.98665404, -5.54668941, 24.04349262, 24.04349294])]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Orb_losc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="scf-losc-for-integer-system-with-aufbau-occupation">
+<h3>SCF-LOSC for integer system with aufbau occupation<a class="headerlink" href="#scf-losc-for-integer-system-with-aufbau-occupation" title="Permalink to this headline">¶</a></h3>
+<p>Following the aforementioned H2 example, you can do an SCF-LOSC calculation via
+calling <code class="docutils literal notranslate"><span class="pre">psi4_losc.scf_losc()</span></code> function. The input arguments are very similar
+to <code class="docutils literal notranslate"><span class="pre">psi4_losc.post_scf_losc()</span></code> function. But the return type is a psi4
+wavefunction object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="c1"># do SCF-LOSC-B3LYP calculation to obtain a LOSC-B3LYP wavefunction object.</span>
+</span><span class="hll"><span class="n">losc_wfn</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">scf_losc</span><span class="p">(</span><span class="n">psi4_losc</span><span class="o">.</span><span class="n">B3LYP</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">)</span>
+</span>
+<span class="c1"># You would see total energies:</span>
+<span class="c1"># E_losc = -0.7578046520485341</span>
+<span class="c1"># E_losc - E_dfa = 0.1345567205310203</span>
+<span class="n">E_losc</span> <span class="o">=</span> <span class="n">losc_wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_losc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_losc</span> <span class="o">-</span> <span class="n">E_dfa</span><span class="p">)</span>
+
+<span class="c1"># You would see all LOSC corrected orbital energies in a.u. for alpha spin.</span>
+<span class="c1"># Orb_losc = [-0.25675479 -0.20383709  0.91139381  0.91139408]</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">Orb_losc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">losc_wfn</span><span class="o">.</span><span class="n">epsilon_a</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Orb_losc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="advanced">
+<h2>Advanced<a class="headerlink" href="#advanced" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configure-losc-calculations-with-options">
+<h3>Configure LOSC calculations with options<a class="headerlink" href="#configure-losc-calculations-with-options" title="Permalink to this headline">¶</a></h3>
+<p>You can configure the options for the LOSC calculations in <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module.
+These configurations include option settings related to LOSC curvatures,
+localizations and so on. To configure the options, use the defined variable
+<code class="docutils literal notranslate"><span class="pre">psi4_losc.options</span></code>, which is an object of class
+<code class="docutils literal notranslate"><span class="pre">psi4_losc.losc_options.Options</span></code>. The basic methods of <code class="docutils literal notranslate"><span class="pre">psi4_losc.options</span></code>
+are the following</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">psi4_losc.options.get_param()</span></code></p></td>
+<td><p>get a LOSC parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">psi4_losc.options.set_param()</span></code></p></td>
+<td><p>set a LOSC parameter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">psi4_losc.options.set_params()</span></code></p></td>
+<td><p>set a number of LOSC parameters.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Following are some examples of configuring the LOSC options.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set LOSC curvature version 2.</span>
+<span class="n">psi4_losc</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">set_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># set LOSC localizer version 2.</span>
+<span class="n">psi4_losc</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">set_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># set both curvature and localizer version in one call.</span>
+<span class="n">psi4_losc</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">set_params</span><span class="p">({</span>
+                              <span class="s1">&#39;localizer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                              <span class="s1">&#39;curvature&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                             <span class="p">})</span>
+
+<span class="c1"># get LOSC curvature version.</span>
+<span class="n">version</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
+<span class="c1"># get LOSC localizer version.</span>
+<span class="n">version</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See all the supported options in <a class="reference internal" href="#psi4-losc-options-label"><span class="std std-ref">this section</span></a>.</p>
+</div>
+<div class="section" id="setting-energy-window-for-losc-calculation">
+<h3>Setting energy window for LOSC calculation<a class="headerlink" href="#setting-energy-window-for-losc-calculation" title="Permalink to this headline">¶</a></h3>
+<p>The LOSC corrections are constructed from a set of localized orbitals (LOs).
+These LOs are obtained by a unitary transformation from a set of canonical
+orbitals (COs) from the associated DFA. In default (for
+<code class="docutils literal notranslate"><span class="pre">psi4_losc.post_scf_losc</span></code> and <code class="docutils literal notranslate"><span class="pre">psi4_losc.scf_losc</span></code>), all the COs (the same
+number of basis sets) are involved
+to perform the localization. As results, LOSC corrects all the orbital energies.
+To simplify the calculation, you can only select a subset of COs to perform the
+LOSC calculation, and you should expect this simplified approach to produce
+similar results from the calculation will all COs localized.</p>
+<p><code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module accepts the selection of COs with an energy window
+(<strong>in eV</strong>) setting, that is selecting all the COs whose orbital energies are
+inside the window. To enable the window, you use the <cite>window</cite> key argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># do post-SCF-LOSC-B3LYP calculation with setting a window of -30 - 10 eV.</span>
+<span class="n">E_losc</span><span class="p">,</span> <span class="n">Orb_losc</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">post_scf_losc</span><span class="p">(</span><span class="n">psi4_losc</span><span class="o">.</span><span class="n">B3LYP</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span>
+                                           <span class="n">window</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># do SCF-LOSC-B3LYP calculation with setting a window of -30 - 10 eV.</span>
+<span class="n">losc_wfn</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">scf_losc</span><span class="p">(</span><span class="n">psi4_losc</span><span class="o">.</span><span class="n">B3LYP</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using window setting in the calculation of LOSC reduces the space of LOs and
+makes the calculation much faster. However, keep in mind that doing so
+would only produce corrections to orbital energies of the selected COs.
+<strong>The orbital energies of non-selected COs will not be touched.</strong></p>
+<p><strong>To use the window setting, you should select most of the valence orbitals.</strong>
+The usual energy window is -30 - 10 eV. Using this window
+should give you very similar results in total energy, orbital energies and
+electron density to the ones calculated from all COs localized.
+Excluding the core orbitals to the localization is a reasonble choice.
+This is because: (1) core orbitals usually are already localized, thus,
+they do not contribute the total energy correction because of the integer
+occupation number (see the LOSC energy correction formular <a class="footnote-reference brackets" href="#losc1" id="id7">1</a>);
+(2) the core orbital energies are not as much interesting as the valence
+orbital energies.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="systems-with-fractional-numbers-of-electrons-or-non-aufbau-occupation">
+<h3>Systems with fractional numbers of electrons or non-aufbau occupation<a class="headerlink" href="#systems-with-fractional-numbers-of-electrons-or-non-aufbau-occupation" title="Permalink to this headline">¶</a></h3>
+<p>Psi4 mainly supports the calculations of systems with integer number of
+electrons and aufbau occupations. However, it would be interesting to calculate
+systems with fractional number of electrons (such as study of the delocalization
+error) or non-aufbau occupation (such as <span class="math notranslate nohighlight">\(\Delta\)</span>-SCF calculations).</p>
+<p><code class="docutils literal notranslate"><span class="pre">psi4_losc.scf</span></code> module provides the extended SCF procedure to enable
+calculations for systems with fractional numbers of electrons or non-aufbau
+occupation. See <a class="reference internal" href="#psi4-losc-scf-label"><span class="std std-ref">this</span></a> for more details.</p>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="psi4-losc-module">
+<h3><strong>psi4_losc Module</strong><a class="headerlink" href="#psi4-losc-module" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="full-list-of-psi4-python-api-used-in-psi4-losc-module">
+<h4><strong>Full list of psi4 Python API used in psi4_losc module</strong><a class="headerlink" href="#full-list-of-psi4-python-api-used-in-psi4-losc-module" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The list may not be complete. The list is for the package
+developers to show the interaction between <code class="docutils literal notranslate"><span class="pre">psi4_losc</span></code> module and
+<code class="docutils literal notranslate"><span class="pre">psi4</span></code> Python API.</p>
+</div>
+<ul>
+<li><p>psi4.driver</p>
+<blockquote>
+<div><ul>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/optionshandling.html#handling-options-in-driver">driver.p4util.OptionsState</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>OptionsState.restore()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>driver.scf_wavefunction_factory()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.clean.html">psi4.core.clean()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.get_active_molecule.html">psi4.core.get_active_molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.get_option">psi4.core.get_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.set_local_option">psi4.core.set_local_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.basisset">psi4.core.BasisSet</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.nbf">nbf()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.mintshelper">psi4.core.MintsHelper</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_dipole">ao_dipole()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.wavefunction">psi4.core.Wavefunction</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.molecule">molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.S">S()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Ca">Ca()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Cb">Cb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fa">Fa()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fb">Fb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Da">Da()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Db">Db()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nalpha">nalphe()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nbeta">nbeta()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_a">epsilon_a()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_b">epsilon_b()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.energy">energy()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.basisset">basisset()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_orbs">same_a_b_orbs()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_dens">same_a_b_dens()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.hf">psi4.core.HF</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.functional">functional()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.superfunctional">psi4.core.SuperFunctional</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_x_lrc">is_x_lrc()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_c_hybrid">is_c_hybrid()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.is_meta">is_meta()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.molecule">psi4.core.Molecule</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.schoenflies_symbol">schoenflies_symbol()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.print_out">print_out()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.nuclear_repulsion_energy">nuclear_repulsion_energy()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="api-of-psi4-losc-module">
+<h4><strong>API of psi4_losc module</strong><a class="headerlink" href="#api-of-psi4-losc-module" title="Permalink to this headline">¶</a></h4>
+<dl class="py data">
+<dt id="psi4_losc.B3LYP">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">B3LYP</code><em class="property"> = &lt;py_losc.DFAInfo&gt; object: {name: B3LYP, gga_x: 0.8, hf_x: 0.2}</em><a class="headerlink" href="#psi4_losc.B3LYP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="psi4_losc.BLYP">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">BLYP</code><em class="property"> = &lt;py_losc.DFAInfo&gt; object: {name: BLYP, gga_x: 1.0, hf_x: 0.0}</em><a class="headerlink" href="#psi4_losc.BLYP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="psi4_losc.PBE">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">PBE</code><em class="property"> = &lt;py_losc.DFAInfo&gt; object: {name: PBE, gga_x: 1.0, hf_x: 0.0}</em><a class="headerlink" href="#psi4_losc.PBE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="psi4_losc.PBE0">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">PBE0</code><em class="property"> = &lt;py_losc.DFAInfo&gt; object: {name: PBE0, gga_x: 0.75, hf_x: 0.25}</em><a class="headerlink" href="#psi4_losc.PBE0" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="psi4_losc.GGA">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">GGA</code><em class="property"> = &lt;py_losc.DFAInfo&gt; object: {name: Pure GGA functional, gga_x: 1.0, hf_x: 0.0}</em><a class="headerlink" href="#psi4_losc.GGA" title="Permalink to this definition">¶</a></dt>
+<dd><p>The information of a density functional approximation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="psi4_losc.post_scf_losc">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">post_scf_losc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span></em>, <em class="sig-param"><span class="n">dfa_wfn</span></em>, <em class="sig-param"><span class="n">orbital_energy_unit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">return_losc_data</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/psi4_losc.html#post_scf_losc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.post_scf_losc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the post-SCF-LOSC calculation for the associated DFA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dfa_info</strong> (<a class="reference internal" href="py_losc.html#py_losc.DFAInfo" title="py_losc.DFAInfo"><em>py_losc.DFAInfo</em></a>) – The information of the parent DFA, including the weights of exchanges.</p></li>
+<li><p><strong>dfa_wfn</strong> (<em>psi4.core.HF</em>) – The converged wavefunction from a parent DFA.</p></li>
+<li><p><strong>orbital_energy_unit</strong> (<em>{'eV'</em><em>, </em><em>'au'}</em><em>, </em><em>default to 'eV'</em>) – <p>The units of orbital energies used to print in the output.</p>
+<ul>
+<li><p>’au’ : atomic unit, hartree.</p></li>
+<li><p>’eV’ : electronvolt.</p></li>
+</ul>
+</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – print level. 0 means print nothing. 1 means normal print level. A larger
+number means more details.</p></li>
+<li><p><strong>return_losc_data</strong> (<em>bool</em><em>, </em><em>default=false.</em>) – Return the data of LOSC or not.</p></li>
+<li><p><strong>window</strong> (<em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>optional</em>) – This variable specifies the orbital energy window in eV, which is used
+to select ALL the COs whose energies are in this window to do the LOSC
+localization. If not given, the default bahavior is to use ALL the COs
+to do localization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>energy</strong> (<em>float</em>) – The total energy from the post-SCF-LOSC-DFA calculation.</p></li>
+<li><p><strong>eig</strong> (<em>[np.array, …]</em>) – All orbital energies (same number to basis set) from post-SCF-LOSC-DFA.
+For RKS, <cite>eig</cite> only includes the alpha orbital energies. For UKS,
+<cite>eig</cite> includes both alpha and beta orbital energies in order.</p></li>
+<li><p><strong>losc_data</strong> (<em>dict</em>) – <cite>losc_data</cite> will be returned, if <cite>return_losc_data</cite> is true.
+If returned, <cite>losc_data</cite> contains the data of LOSC calculations.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="py_losc.html#py_losc.DFAInfo" title="py_losc.DFAInfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">py_losc.DFAInfo()</span></code></a></dt><dd><p>constructor of the DFA information class.</p>
+</dd>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">psi4.energy()</span></code></dt><dd><p>psi4 SCF calculator, which only supports calculations for integer systems with aufbau occupations.</p>
+</dd>
+<dt><a class="reference internal" href="#psi4_losc.scf.scf" title="psi4_losc.scf.scf"><code class="xref py py-func docutils literal notranslate"><span class="pre">psi4_losc.scf.scf()</span></code></a></dt><dd><p>psi4_losc SCF calculator (self-implemented), which supports calculations for integer/fractional systems with aufbau/non-aufbau occupations.</p>
+</dd>
+</dl>
+<p><a class="reference internal" href="#psi4_losc.post_scf_losc" title="psi4_losc.post_scf_losc"><code class="xref py py-func docutils literal notranslate"><span class="pre">post_scf_losc()</span></code></a>, <a class="reference internal" href="#psi4_losc.B3LYP" title="psi4_losc.B3LYP"><code class="xref py py-func docutils literal notranslate"><span class="pre">psi4_losc.B3LYP()</span></code></a>, <a class="reference internal" href="#psi4_losc.GGA" title="psi4_losc.GGA"><code class="xref py py-func docutils literal notranslate"><span class="pre">psi4_losc.GGA()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Ideally, we would like to extract the weights of exchanges from the psi4
+superfunctional objects. However, it looks like psi4 does not support this
+functionality very well. So we require the user take the responsibility to
+construct the <cite>py_losc.DFAInfo</cite> object manually.</p></li>
+<li><p>This function supports post-SCF-LOSC calculations for integer/fractional
+systems with aufbau/non-aufbau occupations:</p>
+<ul>
+<li><p>If you want to calculate integer system with aufbau occupations, use
+<cite>psi4.energy</cite> to get the input <cite>dfa_wfn</cite>.</p></li>
+<li><p>If you want to calculate integer/non-aufbau system or fractional system
+(either aufbau or non-aufbau occupation), use <cite>psi4_losc.scf.scf</cite> to get
+the input <cite>dfa_wfn</cite>.</p></li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="psi4_losc.scf_losc">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">scf_losc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span></em>, <em class="sig-param"><span class="n">dfa_wfn</span></em>, <em class="sig-param"><span class="n">orbital_energy_unit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/psi4_losc.html#scf_losc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.scf_losc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.</p>
+<p>This function use <cite>psi4.energy()</cite> to do the SCF procedure.
+This function only supports calculations for integer systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dfa_info</strong> (<a class="reference internal" href="py_losc.html#py_losc.DFAInfo" title="py_losc.DFAInfo"><em>py_losc.DFAInfo</em></a>) – The information of the parent DFA, including the weights of exchanges.</p></li>
+<li><p><strong>dfa_wfn</strong> (<em>psi4.core.HF</em>) – The converged wavefunction from a parent DFA.</p></li>
+<li><p><strong>orbital_energy_unit</strong> (<em>{'eV'</em><em>, </em><em>'au'}</em><em>, </em><em>default='eV'</em>) – <p>The units of orbital energies used to print in the output.</p>
+<ul>
+<li><p>’au’: atomic unit, hartree.</p></li>
+<li><p>’eV’: electronvolt.</p></li>
+</ul>
+</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – The print level to control <cite>post_scf_losc</cite> and <cite>psi4.energy</cite>.</p></li>
+<li><p><strong>window</strong> (<em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>optional</em>) – The orbital energy window in eV to select COs to do localization.
+See <cite>post_scf_losc</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>wfn</strong> – The psi4 wavefunction object that has LOSC contribution included.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>psi4.core.RHF or psi4.core.UHF</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#psi4_losc.post_scf_losc" title="psi4_losc.post_scf_losc"><code class="xref py py-func docutils literal notranslate"><span class="pre">post_scf_losc()</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The <cite>psi4.energy</cite> function is used internally to drive the SCF procedure.
+So, ideally, this function supports all the types of SCF calculations that
+are supported by psi4, such as integer/aufbau systems, MOM calculations.
+However, these are not fully tested. But for normal SCF, meaning integer
+and aufbau system, this function works fine.</p></li>
+<li><p>SCF-LOSC requires to use the DFA wfn as the initial guess. The psi4 guess
+setting for SCF will be ignored. To use DFA wfn as the initial guess,
+currently it is limited by <cite>psi4.energy</cite> interface in which directly
+passing the wfn as an argument is rejected. So, the only choice is to
+write the DFA wfn into scratch file, then let psi4 use <cite>guess read</cite> option
+to set up the initial guess. So, calling this function will generate a
+psi4 wavefunction scratch file! You need to take care of it at the exit.</p></li>
+<li><p>This function only supports calculations for ground state integer systems.</p></li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="psi4-losc-scf-module">
+<h3><strong>psi4_losc.scf Module</strong><a class="headerlink" href="#psi4-losc-scf-module" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="full-list-of-psi4-python-api-used-in-psi4-losc-scf-module">
+<h4><strong>Full list of psi4 Python API used in psi4_losc.scf module</strong><a class="headerlink" href="#full-list-of-psi4-python-api-used-in-psi4-losc-scf-module" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The list may not be complete. The list is for the package
+developers to show the interaction between <code class="docutils literal notranslate"><span class="pre">psi4_losc.scf</span></code> module and
+<code class="docutils literal notranslate"><span class="pre">psi4</span></code> Python API.</p>
+</div>
+<ul>
+<li><p>psi4.driver</p>
+<blockquote>
+<div><ul>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/optionshandling.html#handling-options-in-driver">driver.p4util.OptionsState</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>OptionsState.restore()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>driver.scf_wavefunction_factory()</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.clean.html">psi4.core.clean()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.get_active_molecule.html">psi4.core.get_active_molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.get_option">psi4.core.get_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.set_local_option">psi4.core.set_local_option()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.basisset">psi4.core.BasisSet</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.nbf">nbf()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.BasisSet.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.mintshelper">psi4.core.MintsHelper</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_dipole">ao_dipole()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.MintsHelper.ao_eri">ao_eri()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.wavefunction">psi4.core.Wavefunction</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.molecule">molecule()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Ca">Ca()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Cb">Cb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fa">Fa()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Fb">Fb()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Da">Da()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.Db">Db()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nalpha">nalphe()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.nbeta">nbeta()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_a">epsilon_a()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.epsilon_b">epsilon_b()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.energy">energy()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.basisset">basisset()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_orbs">same_a_b_orbs()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.same_a_b_dens">same_a_b_dens()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Wavefunction.build">build()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.matrix">psi4.core.Matrix</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.jk">psi4.core.JK</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.build">build()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.initialize">initialize()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.compute">compute()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_clear">C_clear()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.C_left_add">C_left_add()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.J">J()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.JK.K">K()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.hf">psi4.core.HF</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.form_Shalf">form_Shalf()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.guess">guess()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.functional">functional()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.HF.V_potential">V_potential()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.superfunctional">psi4.core.SuperFunctional</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.needs_xc">needs_xc()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.SuperFunctional.x_alpha">x_alpha()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.molecule">psi4.core.Molecule</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.schoenflies_symbol">schoenflies_symbol()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.print_out">print_out()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.Molecule.nuclear_repulsion_energy">nuclear_repulsion_energy()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/api/psi4.core.vbase">psi4.core.VBase</a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.set_D">set_D()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.compute_V">compute_V()</a></p></li>
+<li><p><a class="reference external" href="https://psicode.org/psi4manual/master/psi4api.html#psi4.core.VBase.quadrature_values">quadrature_values()</a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="api-of-psi4-losc-scf-module">
+<span id="psi4-losc-scf-label"></span><h4><strong>API of psi4_losc.scf module</strong><a class="headerlink" href="#api-of-psi4-losc-scf-module" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This module is not fully tested. Use it with caution.</p>
+</div>
+<span class="target" id="module-psi4_losc.scf"></span><p>Extended SCF procedure built on psi4 package to perform SCF-DFA and
+SCF-LOSC-DFA calculations with compabilities for fractional systems.</p>
+<dl class="py function">
+<dt id="psi4_losc.scf.scf">
+<code class="sig-prename descclassname">psi4_losc.scf.</code><code class="sig-name descname">scf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">guess_wfn</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">occ</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">orbital_energy_unit</span><span class="o">=</span><span class="default_value">'eV'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/scf.html#scf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.scf.scf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the SCF calculation for a conventional DFA. It supports the
+systems with fractional occupations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the psi4 superfunctional, including DFT functional or HF
+method. The style is the same as <cite>psi4.energy</cite> function.</p></li>
+<li><p><strong>guess_wfn</strong> (<em>psi4.core.RHF</em><em> or </em><em>psi4.core.UHF</em><em>, </em><em>default=None.</em>) – The wavefunction used to set the initial guess of the SCF calculation.
+Setting this variable will copy the coefficient matrix from <cite>guess_wfn</cite>
+as the initial SCF guess. Setting this variable will ignore the psi4
+guess setting. If you use this variable, make sure you are passing a
+reasonable guess wfn to the function. This function does not validate
+the input <cite>guess_wfn</cite>.</p></li>
+<li><p><strong>occ</strong> (<em>dict</em><em>, </em><em>default={}</em>) – <p>A dictionary that specifies the customized occupation number. The
+occupation is obtained based on the aufbau occupation number of the
+current molecule to give the final set of occupation numbers for the SCF
+calculation.</p>
+<p>The structure of the <cite>occ</cite> is:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span>
+<span class="gp">... </span>   <span class="c1"># for alpha spin</span>
+<span class="gp">... </span>   <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="mi">0</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>      <span class="c1"># the 1st orbital (0-based)</span>
+<span class="gp">... </span>        <span class="s1">&#39;homo&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="c1"># HOMO</span>
+<span class="gp">... </span>        <span class="s1">&#39;lumo&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="c1"># LUMO</span>
+<span class="gp">... </span>   <span class="p">},</span>
+<span class="gp">... </span>   <span class="c1"># for beta spin</span>
+<span class="gp">... </span>   <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="mi">2</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>      <span class="c1"># the 3rd orbital (0-based)</span>
+<span class="gp">... </span>   <span class="p">},</span>
+<span class="gp">... </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>All the integer index for orbitals is 0-based. The str index for
+orbitals should be {‘homo’, ‘lumo’}, and are case-insensitive.
+All the occupation numbers should be in range of [0, 1].</p>
+</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default to 1</em>) – <p>Print level to the psi4 output file.</p>
+<ul>
+<li><p>0 means print nothing.</p></li>
+<li><p>1 means normal print level.</p></li>
+<li><p>A larger number means more details.</p></li>
+</ul>
+</p></li>
+<li><p><strong>orbital_energy_unit</strong> (<em>{'eV'</em><em>, </em><em>'au'}</em><em>, </em><em>default='eV'</em>) – <p>The units of orbital energies used to print in the output.</p>
+<ul>
+<li><p>’au’: atomic unit, hartree.</p></li>
+<li><p>’eV’: electronvolt.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>wfn</strong> – The SCF wavefunction.
+- Following members in the returned wfn object are updated:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>wfn.S()</cite>: AO overlap matrix.</p></li>
+<li><p><cite>wfn.H()</cite>: Core matrix.</p></li>
+<li><p><cite>wfn.Ca()</cite>, <cite>wfn.Cb()</cite>: CO coefficient matrix.</p></li>
+<li><p><cite>wfn.Fa()</cite>, <cite>wfn.Fb()</cite>: Fock matrix.</p></li>
+<li><p><cite>wfn.Da()</cite>, <cite>wfn.Db()</cite>: density matrix.</p></li>
+<li><p><cite>wfn.Va()</cite>, <cite>wfn.Vb()</cite>: DFA (just the DFA, if it is LOSC-DFA) Vxc
+matrix.</p></li>
+<li><p><cite>wfn.epsilon_a()</cite>, wfn.epsilon_b()`: orbital energies.</p></li>
+<li><p><cite>wfn.energy()</cite>: total energy.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><p>psi4.core.RHF or psi4.core.UHF</p>
+<blockquote>
+<div><p>Other members are not touched. Accessing and using other members
+in the returned wfn may be a undefined behavior.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>The input argument <cite>occ</cite> is added as a new attribute to the returned
+wfn object as <cite>wfn.losc_data[‘occ’] = occ</cite>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The option settings are handeld by psi4 SCF module.</p></li>
+<li><p>There are double memory cost for all the updated matrices/vectors in
+the returned wfn (such as C, D, F matrices): one is for the allocation in
+the python code, the other one is for the allocation in psi4.core C++
+code. At return, matrices/vectors will be copied from the python side to
+the psi4 C++ side code. This is limited by the psi4.core interface. We
+have to pay the price.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<p>A simple example to run an SCF calculation for a system with fractional
+number of electrons and non-aufbau occupation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">psi4_losc.scf</span>
+
+<span class="c1"># Create H2 molecule with charge=0 and mult=1.</span>
+<span class="c1"># The aufbau occupation numbers for H2 are:</span>
+<span class="c1"># alpha occ: 1, 0, 0, 0, ...</span>
+<span class="c1"># beta occ:  1, 0, 0, 0, ...</span>
+<span class="n">H2</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    0 1</span>
+<span class="s1">    H 0 0 0</span>
+<span class="s1">    H 1 0 0</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="n">psi4</span><span class="o">.</span><span class="n">set_options</span><span class="p">({</span><span class="s1">&#39;basis&#39;</span><span class="p">:</span> <span class="s1">&#39;3-21g&#39;</span><span class="p">})</span>
+
+<span class="c1"># A customized occupation setting that gives:</span>
+<span class="c1"># alpha occ: 0.5, 0, 0, 0, ...</span>
+<span class="c1"># beta occ:  1,   0, 0, 0.7, ...</span>
+<span class="n">customized_occ</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;homo&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="c1"># update HOMO occ to be 0.5</span>
+    <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>     <span class="c1"># update 4-th orbital occ to be 0.7</span>
+    <span class="p">}</span>
+
+<span class="c1"># Do SCF-B3LYP calculation with the customized occupation.</span>
+<span class="n">psi4_losc</span><span class="o">.</span><span class="n">scf</span><span class="o">.</span><span class="n">scf</span><span class="p">(</span><span class="s1">&#39;b3lyp&#39;</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="n">customized_occ</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="psi4_losc.scf.scf_losc">
+<code class="sig-prename descclassname">psi4_losc.scf.</code><code class="sig-name descname">scf_losc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dfa_info</span></em>, <em class="sig-param"><span class="n">dfa_wfn</span></em>, <em class="sig-param"><span class="n">orbital_energy_unit</span><span class="o">=</span><span class="default_value">'eV'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/scf.html#scf_losc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.scf.scf_losc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dfa_info</strong> (<a class="reference internal" href="py_losc.html#py_losc.DFAInfo" title="py_losc.DFAInfo"><em>py_losc.DFAInfo</em></a>) – The information of the parent DFA, including the weights of exchanges.</p></li>
+<li><p><strong>dfa_wfn</strong> (<em>psi4.core.HF like psi4 object</em>) – The converged wavefunction from a parent DFA.</p></li>
+<li><p><strong>orbital_energy_unit</strong> (<em>{'eV'</em><em>, </em><em>'au'}</em><em>, </em><em>default='eV'</em>) – <p>The units of orbital energies used to print in the output.</p>
+<ul>
+<li><p>’au’: atomic unit, hartree.</p></li>
+<li><p>’eV’: electronvolt.</p></li>
+</ul>
+</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – <p>print level.</p>
+<ul>
+<li><p>0 means print nothing.</p></li>
+<li><p>1 means normal print level.</p></li>
+<li><p>A larger number means more details.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>wfn</strong> – The wavefunction for the SCF-LOSC calculation.</p>
+<ul>
+<li><p>Following members in the returned wfn object are calculated:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>wfn.S()</cite>: AO overlap matrix.</p></li>
+<li><p><cite>wfn.H()</cite>: Core matrix.</p></li>
+<li><p><cite>wfn.Ca()</cite>, <cite>wfn.Cb()</cite>: CO coefficient matrix.</p></li>
+<li><p><cite>wfn.Fa()</cite>, <cite>wfn.Fb()</cite>: Fock matrix.</p></li>
+<li><p><cite>wfn.Da()</cite>, <cite>wfn.Db()</cite>: density matrix.</p></li>
+<li><p><cite>wfn.Va()</cite>, <cite>wfn.Vb()</cite>: DFA (just the DFA, if it is LOSC-DFA) Vxc
+matrix.</p></li>
+<li><p><cite>wfn.epsilon_a()</cite>, wfn.epsilon_b()`: orbital energies.</p></li>
+<li><p><cite>wfn.energy()</cite>: total energy.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Accessing and using other members in the returned wfn is a undefined
+behavior.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>psi4.core.RHF or psi4.core.UHF</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="py_losc.html#py_losc.DFAInfo" title="py_losc.DFAInfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">py_losc.DFAInfo()</span></code></a></dt><dd><p>constructor of the DFA information class.</p>
+</dd>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">psi4.energy()</span></code></dt><dd><p>return a DFA SCF wavefunction. psi4.energy() only supports calculations for integer systems with aufbau occupations.</p>
+</dd>
+<dt><a class="reference internal" href="#psi4_losc.scf.scf" title="psi4_losc.scf.scf"><code class="xref py py-func docutils literal notranslate"><span class="pre">scf()</span></code></a></dt><dd><p>return a DFA SCF wavefunction. <cite>psi4_losc.scf.scf()</cite> supports calculations for integer/fractional systems with aufbau/non-aufbau occupations.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The option settings are handled by psi4 SCF module.</p></li>
+<li><p>There are double memory cost for all the updated matrices/vectors in
+the returned wfn (such as C, D, F matrices): one is for the allocation in
+the python code, the other one is for the allocation in psi4.core C++
+code. At return, matrices/vectors will be copied from the python side to
+the psi4 C++ side code. This is limited by the psi4 core interface. We
+have to pay the price.</p></li>
+<li><p>This function supports SCF-LOSC (frozen-LO) calculations for
+integer/fractional systems with aufbau/non-aufbau occupations:</p>
+<ul>
+<li><p>If you want to calculate integer system with aufbau occupations, use
+<cite>psi4.energy</cite> or <cite>scf</cite> to generate the input <cite>dfa_wfn</cite>.</p></li>
+<li><p>If you want to calculate integer system with non-aufbau occupation, or
+fractional system with aufbau/non-aufbau occupations, use
+<cite>scf</cite> to generate the input <cite>dfa_wfn</cite>.</p></li>
+</ul>
+</li>
+</ul>
+<p class="rubric">Examples</p>
+<p>A simple example to run an SCF-LOSC calculation for a system with fractional
+number of electrons and non-aufbau occupation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">psi4_losc</span>    <span class="c1"># for psi4_losc.B3LYP</span>
+<span class="kn">import</span> <span class="nn">psi4_losc.scf</span>
+
+<span class="c1"># Create H2 molecule with charge=0 and mult=1.</span>
+<span class="n">H2</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    0 1</span>
+<span class="s1">    H 0 0 0</span>
+<span class="s1">    H 1 0 0</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="n">psi4</span><span class="o">.</span><span class="n">set_options</span><span class="p">({</span><span class="s1">&#39;basis&#39;</span><span class="p">:</span> <span class="s1">&#39;3-21g&#39;</span><span class="p">})</span>
+
+<span class="c1"># Specify an non-aufbau and fractional occupation.</span>
+<span class="n">customized_occ</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;homo&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="c1"># update HOMO occ to be 0.5</span>
+    <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>     <span class="c1"># update 4-th orbital occ to be 0.7</span>
+    <span class="p">}</span>
+
+<span class="c1"># First, do SCF-B3LYP calculation with the customized occupation.</span>
+<span class="c1"># alpha occ: 0.5, 0, 0, 0, ...</span>
+<span class="c1"># beta occ:  1,   0, 0, 0.7, ...</span>
+<span class="n">dfa_wfn</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">scf</span><span class="o">.</span><span class="n">scf</span><span class="p">(</span><span class="s1">&#39;b3lyp&#39;</span><span class="p">,</span> <span class="n">occ</span><span class="o">=</span><span class="n">customized_occ</span><span class="p">)</span>
+
+<span class="c1"># Second, do SCF-LOSC-B3LYP calculation with the customized occupation.</span>
+<span class="n">losc_wfn</span> <span class="o">=</span> <span class="n">psi4_losc</span><span class="o">.</span><span class="n">scf</span><span class="o">.</span><span class="n">scf_losc</span><span class="p">(</span><span class="n">psi4_losc</span><span class="o">.</span><span class="n">B3LYP</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="configure-losc-options-in-psi4-losc">
+<span id="psi4-losc-options-label"></span><h3><strong>Configure LOSC options in psi4_losc</strong><a class="headerlink" href="#configure-losc-options-in-psi4-losc" title="Permalink to this headline">¶</a></h3>
+<p>The configuration of LOSC calculation for <cite>psi4_losc</cite> module is controlled
+by <cite>psi4_losc.options</cite> variable. These configurations include the adjustments
+to the LOSC curvature, and localizations. The details are shown below.</p>
+<dl class="py data">
+<dt id="psi4_losc.options">
+<code class="sig-prename descclassname">psi4_losc.</code><code class="sig-name descname">options</code><em class="property"> = &lt;psi4_losc.losc_options.Options object&gt;</em><a class="headerlink" href="#psi4_losc.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Options class object that controls the LOSC calculations in <cite>psi4_losc</cite>
+module.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#psi4_losc.losc_options.Options" title="psi4_losc.losc_options.Options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi4_losc.losc_options.Options</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="psi4_losc.losc_options.Options">
+<em class="property">class </em><code class="sig-prename descclassname">psi4_losc.losc_options.</code><code class="sig-name descname">Options</code><a class="reference internal" href="_modules/psi4_losc/losc_options.html#Options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.losc_options.Options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Options class that controls the LOSC calculations in <cite>psi4_losc</cite> module.</p>
+<p>The options are specified by three labels:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>module</cite>: the module of the options.</p></li>
+<li><p><cite>key</cite>: the key of the option in <cite>module</cite>.</p></li>
+<li><p><cite>value</cite>: the value of the option in <cite>module</cite>.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>All `module` and `key` values are str and case-insensitive at input. The
+case-insensitivity of `value` depends on the option.</strong></p>
+<ul>
+<li><p><strong>The curvature module</strong>: <cite>module = “curvature”</cite></p>
+<p>Below lists all the valid <cite>key</cite>-<cite>value</cite> options for the curvature module.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>version<span class="classifier">{2, 1}, default=2.</span></dt><dd><p>The version of LOSC curvature.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>v1_parameter_tau: float, default=1.2378</dt><dd><p>The parameter <span class="math notranslate nohighlight">\(\tau\)</span> in LOSC curvature version 1.
+Require <cite>version=1</cite> to use this setting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>v2_parameter_tau: float, default=1.2378</dt><dd><p>The parameter <span class="math notranslate nohighlight">\(\tau\)</span> in LOSC curvature version 2.
+Require <cite>version=2</cite> to use this setting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>v2_parameter_zeta: float, default=8.0</dt><dd><p>The parameter <span class="math notranslate nohighlight">\(\zeta\)</span> in LOSC curvature version 2.
+Require <cite>version=2</cite> to use this setting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>df_molecular_fragment_size: int, default=2</dt><dd><p>The size in the number of atoms to split the module. This is used
+to achieve the block-wise construction of two-electron integral of
+curvature with density fitting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>df_basis: str, default=”aug-cc-pvtz-ri”</dt><dd><p>The basis set used in density fitting for LOSC curvature. The
+name of basis set follows the rules in psi4. <cite>df_basis</cite> is
+case-insensitive.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>The localizer module</strong>: <cite>module = “localizer”</cite></p>
+<p>Below lists all the valid <cite>key</cite>-<cite>value</cite> options for the localization module.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>version<span class="classifier">{2}, default=2.</span></dt><dd><p>The version of LOSC localizer.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>max_iter: int, default=1000</dt><dd><p>The maximum number of iterations in localization.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>convergence: float, default=1e-10</dt><dd><p>The convergence tolerance for the localization.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>random_permutation: bool, default=True</dt><dd><p>Use the random permutation for Jacob-Sweep algorithm in the
+localization or not.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>v2_parameter_gamma: float, default=0.707</dt><dd><p>The parameter <span class="math notranslate nohighlight">\(\gamma\)</span> in LOSC localizer version 2.
+Require <cite>version=2</cite> to use this setting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>v2_parameter_c: float, default=1000</dt><dd><p>The parameter <span class="math notranslate nohighlight">\(C\)</span> in LOSC localizer version 2.
+Require <cite>version=2</cite> to use this setting.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<dl class="py method">
+<dt id="psi4_losc.losc_options.Options.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/losc_options.html#Options.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.losc_options.Options.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="psi4_losc.losc_options.Options.get_param">
+<code class="sig-name descname">get_param</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/losc_options.html#Options.get_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.losc_options.Options.get_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of an option.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> (<em>str</em>) – The module name of the option.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The key name of the option in option module <cite>module</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The value of the option.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>value</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#psi4_losc.losc_options.Options" title="psi4_losc.losc_options.Options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Options()</span></code></a></dt><dd><p>all valid options and the return type of the value.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="psi4_losc.losc_options.Options.set_param">
+<code class="sig-name descname">set_param</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/losc_options.html#Options.set_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.losc_options.Options.set_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set an option for the LOSC calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> (<em>str</em>) – The module name of the option.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The key name of the option in option module <cite>module</cite>.</p></li>
+<li><p><strong>value</strong> – The value name of the option in option module <cite>module</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#psi4_losc.losc_options.Options" title="psi4_losc.losc_options.Options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Options()</span></code></a></dt><dd><p>all valid options.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="psi4_losc.losc_options.Options.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psi4_losc/losc_options.html#Options.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psi4_losc.losc_options.Options.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set one or more options for the LOSC calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>options</strong> (<em>dict {module: {key: value}}</em>) – The options dictionary.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#psi4_losc.losc_options.Options" title="psi4_losc.losc_options.Options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Options()</span></code></a></dt><dd><p>all valid options.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="literature">
+<h3><strong>Literature</strong><a class="headerlink" href="#literature" title="Permalink to this headline">¶</a></h3>
+<dl class="footnote brackets">
+<dt class="label" id="losc1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>,<a href="#id7">3</a>)</span></dt>
+<dd><p>Li, C.; Zheng, X.; Su, N. Q.; Yang, W. Localized Orbital Scaling
+Correction for System- atic Elimination of Delocalization Error in
+Density Functional Approximations.
+<a class="reference external" href="https://doi.org/10.1093/nsr/nwx111">Natl. Sci. Rev. 2018, 5, 203−215. 203-215.</a></p>
+</dd>
+<dt class="label" id="losc2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id5">2</a>)</span></dt>
+<dd><p>Su, N. Q.; Mahler, A.; Yang, W. Preserving Symmetry and
+Degeneracy in the Localized Orbital Scaling Correction Approach. J.
+<a class="reference external" href="https://doi.org/10.1021/acs.jpclett.9b03888">Phys. Chem. Lett. 2020, 11, 1528−1535.</a></p>
+</dd>
+<dt class="label" id="scf-losc"><span class="brackets">3</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><p>Mei, Y.; Chen, Z.; Yang, W.
+Self-Consistent Calculation of the Localized Orbital Scaling Correction
+for Correct Electron Densities and Energy-Level Alignments in Density
+Functional Theory.
+<a class="reference external" href="https://doi.org/10.1021/acs.jpclett.0c03133">J. Phys. Chem. Lett. 2020, 11, 23, 10269–10277.</a></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="py_losc.html" class="btn btn-neutral float-left" title="LOSC Python library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

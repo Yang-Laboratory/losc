@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="losc_8h" kind="file" language="C++">
+    <compoundname>losc.h</compoundname>
+    <includes refid="matrix_8h" local="no">c_losc/matrix.h</includes>
+    <includes refid="correction_8h" local="no">c_losc/correction.h</includes>
+    <includes refid="curvature_8h" local="no">c_losc/curvature.h</includes>
+    <includes refid="local__occupation_8h" local="no">c_losc/local_occupation.h</includes>
+    <includes refid="localization_8h" local="no">c_losc/localization.h</includes>
+    <incdepgraph>
+      <node id="20">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</label>
+        <link refid="losc.h"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>c_losc/localization.h</label>
+        <link refid="localization_8h"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>stddef.h</label>
+      </node>
+      <node id="25">
+        <label>c_losc/local_occupation.h</label>
+        <link refid="local__occupation_8h"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>c_losc/matrix.h</label>
+        <link refid="matrix_8h"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>c_losc/curvature.h</label>
+        <link refid="curvature_8h"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>c_losc/correction.h</label>
+        <link refid="correction_8h"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <briefdescription>
+<para>C interface for localized orbital scaling correction (LOSC) library. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_C_LOSC_LOSC_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_C_LOSC_LOSC_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="matrix_8h" kindref="compound">c_losc/matrix.h</ref>&gt;</highlight><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>brings<sp/>the<sp/>interface<sp/>of<sp/>matrix.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="correction_8h" kindref="compound">c_losc/correction.h</ref>&gt;</highlight><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>brings<sp/>the<sp/>interface<sp/>of<sp/>corrections.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="curvature_8h" kindref="compound">c_losc/curvature.h</ref>&gt;</highlight><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>brings<sp/>the<sp/>interface<sp/>of<sp/>curvature.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="local__occupation_8h" kindref="compound">c_losc/local_occupation.h</ref>&gt;</highlight><highlight class="normal"><sp/></highlight><highlight class="comment">//<sp/>This<sp/>brings<sp/>the<sp/>interface<sp/>of<sp/>local<sp/>occupation.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="localization_8h" kindref="compound">c_losc/localization.h</ref>&gt;</highlight><highlight class="normal"><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>brings<sp/>the<sp/>interface<sp/>of<sp/>localization.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/losc.h"/>
+  </compounddef>
+</doxygen>

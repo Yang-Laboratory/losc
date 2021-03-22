@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="dir_381de07644c13531ab49759878f1b148" kind="dir">
+    <compoundname>/home/yuncai/Documents/Server/losc/include/c_losc</compoundname>
+    <innerfile refid="correction_8h">correction.h</innerfile>
+    <innerfile refid="curvature_8h">curvature.h</innerfile>
+    <innerfile refid="local__occupation_8h">local_occupation.h</innerfile>
+    <innerfile refid="localization_8h">localization.h</innerfile>
+    <innerfile refid="losc_8h">losc.h</innerfile>
+    <innerfile refid="matrix_8h">matrix.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/"/>
+  </compounddef>
+</doxygen>

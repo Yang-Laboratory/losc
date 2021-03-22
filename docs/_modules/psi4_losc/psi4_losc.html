@@ -1,0 +1,660 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>psi4_losc.psi4_losc &mdash; Localized Orbital Scaling Correction Library 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Localized Orbital Scaling Correction Library
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../losc.html">LOSC C++ library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_losc.html">LOSC C library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../py_losc.html">LOSC Python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../psi4_losc.html">Using LOSC library in psi4</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Localized Orbital Scaling Correction Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>psi4_losc.psi4_losc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for psi4_losc.psi4_losc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Extension to enable psi4 package to support post-SCF-LOSC and SCF-LOSC</span>
+<span class="sd">calculations for ground state integer systems.</span>
+
+<span class="sd">See Also</span>
+<span class="sd">--------</span>
+<span class="sd">scf.py : including self-implemented SCF procedures to perform calculations of</span>
+<span class="sd">    fractional systems with aufbau or non-aufbau configurations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">py_losc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">psi4_losc</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">qcelemental</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">psi4_losc</span> <span class="kn">import</span> <span class="n">options</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for B3LYP functional.</span>
+<span class="n">B3LYP</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;B3LYP&#39;</span><span class="p">)</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for SVWN functional.</span>
+<span class="n">SVWN</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SVWN&#39;</span><span class="p">)</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for BLYP functional.</span>
+<span class="n">BLYP</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;BLYP&#39;</span><span class="p">)</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for PBE functional.</span>
+<span class="n">PBE</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;PBE&#39;</span><span class="p">)</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for pure GGA type functional.</span>
+<span class="n">GGA</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Pure GGA functional&#39;</span><span class="p">)</span>
+
+<span class="c1">#: `py_losc.DFAInfo` object for PBE0 functional.</span>
+<span class="n">PBE0</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">DFAInfo</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">&#39;PBE0&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_dfa_wfn</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">):</span>
+    <span class="s2">&quot;Validate the input dfa wavefunction for the LOSC calculation.&quot;</span>
+    <span class="c1"># check type</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">HF</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Not a psi4.core.HF object.&#39;</span><span class="p">)</span>
+    <span class="c1"># check symmetry</span>
+    <span class="k">if</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">molecule</span><span class="p">()</span><span class="o">.</span><span class="n">schoenflies_symbol</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;c1&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;LOSC only supports C1 symmetry&#39;</span><span class="p">)</span>
+    <span class="c1"># check spin</span>
+    <span class="n">is_rks</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;REFERENCE&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RKS&#39;</span><span class="p">,</span> <span class="s1">&#39;RHF&#39;</span><span class="p">]</span>
+    <span class="n">is_rks_wfn</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">same_a_b_orbs</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">same_a_b_dens</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">is_rks</span> <span class="o">!=</span> <span class="n">is_rks_wfn</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Reference in passed wfn is different to psi4 reference setting.&#39;</span><span class="p">)</span>
+    <span class="c1"># check super functional</span>
+    <span class="n">supfunc</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">functional</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">is_x_lrc</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Current LOSC does not support range-separated exchange functional.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">is_c_hybrid</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Sorry, LOSC does not support double hybrid functional.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">supfunc</span><span class="o">.</span><span class="n">is_meta</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Sorry, LOSC does not support meta-GGA.&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="post_scf_losc"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.post_scf_losc">[docs]</a><span class="k">def</span> <span class="nf">post_scf_losc</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span>
+                  <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">return_losc_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the post-SCF-LOSC calculation for the associated DFA.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dfa_info : py_losc.DFAInfo</span>
+<span class="sd">        The information of the parent DFA, including the weights of exchanges.</span>
+<span class="sd">    dfa_wfn : psi4.core.HF</span>
+<span class="sd">        The converged wavefunction from a parent DFA.</span>
+<span class="sd">    orbital_energy_unit : {&#39;eV&#39;, &#39;au&#39;}, default to &#39;eV&#39;</span>
+<span class="sd">        The units of orbital energies used to print in the output.</span>
+
+<span class="sd">        - &#39;au&#39; : atomic unit, hartree.</span>
+<span class="sd">        - &#39;eV&#39; : electronvolt.</span>
+<span class="sd">    verbose : int, default=1</span>
+<span class="sd">        print level. 0 means print nothing. 1 means normal print level. A larger</span>
+<span class="sd">        number means more details.</span>
+<span class="sd">    return_losc_data : bool, default=false.</span>
+<span class="sd">        Return the data of LOSC or not.</span>
+<span class="sd">    window : [float, float], optional</span>
+<span class="sd">        This variable specifies the orbital energy window in eV, which is used</span>
+<span class="sd">        to select ALL the COs whose energies are in this window to do the LOSC</span>
+<span class="sd">        localization. If not given, the default bahavior is to use ALL the COs</span>
+<span class="sd">        to do localization.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    energy : float</span>
+<span class="sd">        The total energy from the post-SCF-LOSC-DFA calculation.</span>
+<span class="sd">    eig : [np.array, ...]</span>
+<span class="sd">        All orbital energies (same number to basis set) from post-SCF-LOSC-DFA.</span>
+<span class="sd">        For RKS, `eig` only includes the alpha orbital energies. For UKS,</span>
+<span class="sd">        `eig` includes both alpha and beta orbital energies in order.</span>
+<span class="sd">    losc_data : dict</span>
+<span class="sd">        `losc_data` will be returned, if `return_losc_data` is true.</span>
+<span class="sd">        If returned, `losc_data` contains the data of LOSC calculations.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    py_losc.DFAInfo : constructor of the DFA information class.</span>
+<span class="sd">    psi4.energy : psi4 SCF calculator, which only supports calculations for</span>
+<span class="sd">        integer systems with aufbau occupations.</span>
+<span class="sd">    psi4_losc.scf.scf: psi4_losc SCF calculator (self-implemented), which</span>
+<span class="sd">        supports calculations for integer/fractional systems with</span>
+<span class="sd">        aufbau/non-aufbau occupations.</span>
+<span class="sd">    post_scf_losc</span>
+<span class="sd">    psi4_losc.B3LYP, psi4_losc.GGA</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Ideally, we would like to extract the weights of exchanges from the psi4</span>
+<span class="sd">      superfunctional objects. However, it looks like psi4 does not support this</span>
+<span class="sd">      functionality very well. So we require the user take the responsibility to</span>
+<span class="sd">      construct the `py_losc.DFAInfo` object manually.</span>
+
+<span class="sd">    - This function supports post-SCF-LOSC calculations for integer/fractional</span>
+<span class="sd">      systems with aufbau/non-aufbau occupations:</span>
+
+<span class="sd">      - If you want to calculate integer system with aufbau occupations, use</span>
+<span class="sd">        `psi4.energy` to get the input `dfa_wfn`.</span>
+<span class="sd">      - If you want to calculate integer/non-aufbau system or fractional system</span>
+<span class="sd">        (either aufbau or non-aufbau occupation), use `psi4_losc.scf.scf` to get</span>
+<span class="sd">        the input `dfa_wfn`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># sanity-check of input dfa wfn.</span>
+    <span class="n">_validate_dfa_wfn</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;au&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Invalid input for &quot;orbital_energy_unit&quot;. Choices are [&quot;eV&quot;, &quot;au&quot;].&#39;</span><span class="p">)</span>
+
+    <span class="n">local_print</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">init_local_print</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="c1"># print header</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;--------------------------------&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;          post-SCF-LOSC&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;          by Yuncai Mei&quot;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;--------------------------------&quot;</span><span class="p">)</span>
+
+    <span class="n">is_rks</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">same_a_b_orbs</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">same_a_b_dens</span><span class="p">()</span>
+    <span class="n">nspin</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_rks</span> <span class="k">else</span> <span class="mi">2</span>
+
+    <span class="c1"># Need real number of electrons. Cannot rely on `wfn.nalpha()` and</span>
+    <span class="c1"># `wfn.nbeta()`, because `post_scf_losc()` can support fractional systems.</span>
+    <span class="n">occ</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">):</span>
+        <span class="n">occ</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;occ&#39;</span><span class="p">]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">occ_val</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">form_occ</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">occ</span><span class="p">)</span>
+    <span class="n">nelec</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">occ_val</span><span class="p">]</span>
+
+    <span class="c1"># map needed matrices to DFA wfn.</span>
+    <span class="n">mintshelper</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MintsHelper</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">basisset</span><span class="p">())</span>
+    <span class="n">C_co</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Ca</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Cb</span><span class="p">())]</span>
+    <span class="n">H_ao</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Fa</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Fb</span><span class="p">())]</span>
+    <span class="n">D_ao</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mintshelper</span><span class="o">.</span><span class="n">ao_dipole</span><span class="p">()]</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">S</span><span class="p">())</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Da</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">Db</span><span class="p">())]</span>
+
+    <span class="c1"># ====&gt; !!! Start of LOSC !!! &lt;====</span>
+    <span class="c1"># Print all losc settings.</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{options}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ==&gt; LOSC localization &lt;==</span>
+    <span class="k">def</span> <span class="nf">select_CO</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the CO index bounds.&quot;&quot;&quot;</span>
+        <span class="n">eig</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_a</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_b</span><span class="p">())][</span><span class="n">spin</span><span class="p">]</span>
+        <span class="n">nbf</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">basisset</span><span class="p">()</span><span class="o">.</span><span class="n">nbf</span><span class="p">()</span>
+        <span class="c1"># return all COs.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">window</span> <span class="ow">or</span> <span class="n">nelec</span><span class="p">[</span><span class="n">spin</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="c1"># select COs</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid LOSC window: wrong size of window.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid LOS window: left bound &gt;= right bound.&#39;</span><span class="p">)</span>
+        <span class="n">idx_start</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">hartree2ev</span> <span class="o">&gt;=</span> <span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eig</span><span class="p">)),</span> <span class="p">[</span><span class="n">nbf</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx_end</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">hartree2ev</span> <span class="o">&gt;=</span> <span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eig</span><span class="p">)),</span> <span class="p">[</span><span class="n">nbf</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">idx_end</span> <span class="o">-</span> <span class="n">idx_start</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;LOSC window is too tight. No COs selected to do LOSC localization.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span><span class="p">)</span>
+
+    <span class="c1"># Get selected COs index from the window setting.</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">==&gt; LOSC Localization Window &lt;==&#39;</span><span class="p">)</span>
+    <span class="n">selected_co_idx</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">select_CO</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">idx</span><span class="p">:</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;localization COs index (spin=</span><span class="si">{s}</span><span class="s1">): ALL COs&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">local_print</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;localization COs index (spin=</span><span class="si">{s}</span><span class="s1">): [</span><span class="si">{idx[0]}</span><span class="s1">, </span><span class="si">{idx[1]}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">selected_co_idx</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">C_lo</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="c1"># Get selected COs.</span>
+        <span class="k">if</span> <span class="n">selected_co_idx</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span>
+            <span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span> <span class="o">=</span> <span class="n">selected_co_idx</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+            <span class="n">C_co_used</span> <span class="o">=</span> <span class="n">C_co</span><span class="p">[</span><span class="n">s</span><span class="p">][:,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C_co_used</span> <span class="o">=</span> <span class="n">C_co</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+        <span class="c1"># create losc localizer object</span>
+        <span class="n">localizer_version</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">localizer_version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">localizer</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">LocalizerV2</span><span class="p">(</span><span class="n">C_co_used</span><span class="p">,</span> <span class="n">H_ao</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">D_ao</span><span class="p">)</span>
+            <span class="n">localizer</span><span class="o">.</span><span class="n">set_c</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;v2_parameter_c&#39;</span><span class="p">))</span>
+            <span class="n">localizer</span><span class="o">.</span><span class="n">set_gamma</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;v2_parameter_gamma&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detect non-supporting localization version: version=</span><span class="si">{localizer_version}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="n">localizer</span><span class="o">.</span><span class="n">set_max_iter</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;max_iter&#39;</span><span class="p">))</span>
+        <span class="n">localizer</span><span class="o">.</span><span class="n">set_convergence</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;convergence&#39;</span><span class="p">))</span>
+        <span class="n">localizer</span><span class="o">.</span><span class="n">set_random_permutation</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;localizer&#39;</span><span class="p">,</span> <span class="s1">&#39;random_permutation&#39;</span><span class="p">))</span>
+        <span class="c1"># compute LOs</span>
+        <span class="n">C_lo</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">U</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">localizer</span><span class="o">.</span><span class="n">lo_U</span><span class="p">()</span>
+
+        <span class="c1"># print localization status</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;    ==&gt; Localization status for spin: </span><span class="si">{s}</span><span class="s1"> &lt;==&#39;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;    iteration steps: {localizer.steps()}&#39;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;    cost function value: {localizer.cost_func(C_lo[s])}&#39;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;    convergence: {&quot;True&quot; if localizer.is_converged() else &quot;False, Warning!!!&quot;}&#39;</span><span class="p">)</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ==&gt; LOSC curvature matrix &lt;==</span>
+    <span class="c1"># build matrices related to density fitting</span>
+    <span class="n">df_pii</span><span class="p">,</span> <span class="n">df_Vpq_inv</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">form_df_matrix</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">C_lo</span><span class="p">)</span>
+
+    <span class="c1"># build weights of grid points</span>
+    <span class="n">grid_w</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">form_grid_w</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">)</span>
+
+    <span class="c1"># build values of LOs on grid points</span>
+    <span class="n">grid_lo</span> <span class="o">=</span> <span class="p">[</span><span class="n">utils</span><span class="o">.</span><span class="n">form_grid_lo</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">C_lo_</span><span class="p">)</span> <span class="k">for</span> <span class="n">C_lo_</span> <span class="ow">in</span> <span class="n">C_lo</span><span class="p">]</span>
+
+    <span class="c1"># build LOSC curvature matrices</span>
+    <span class="n">curvature</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="c1"># build losc curvature matrix</span>
+        <span class="n">curvature_version</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">curvature_version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">curvature_helper</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">CurvatureV2</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">df_pii</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                                                   <span class="n">df_Vpq_inv</span><span class="p">,</span> <span class="n">grid_lo</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                                                   <span class="n">grid_w</span><span class="p">)</span>
+            <span class="n">curvature_helper</span><span class="o">.</span><span class="n">set_tau</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;v2_parameter_tau&#39;</span><span class="p">))</span>
+            <span class="n">curvature_helper</span><span class="o">.</span><span class="n">set_zeta</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;v2_parameter_zeta&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">curvature</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">curvature_helper</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">CurvatureV1</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">df_pii</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                                                   <span class="n">df_Vpq_inv</span><span class="p">,</span> <span class="n">grid_lo</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                                                   <span class="n">grid_w</span><span class="p">)</span>
+            <span class="n">curvature_helper</span><span class="o">.</span><span class="n">set_tau</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;curvature&#39;</span><span class="p">,</span> <span class="s1">&#39;v1_parameter_tau&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detect un-supported curvature version: version=</span><span class="si">{curvature_version}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO: add curvature setting options.</span>
+        <span class="n">curvature</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">curvature_helper</span><span class="o">.</span><span class="n">kappa</span><span class="p">()</span>
+
+    <span class="c1"># ==&gt; LOSC local occupation matrix &lt;==</span>
+    <span class="n">local_occ</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="c1"># build losc local occupation matrix</span>
+        <span class="n">local_occ</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">local_occupation</span><span class="p">(</span><span class="n">C_lo</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+
+    <span class="c1"># ==&gt; print matrix into psi4 output file &lt;==</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">==&gt; Details of Matrices in LOSC &lt;==&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">CO coefficient matrix.T: spin=</span><span class="si">{s}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">print_full_matrix</span><span class="p">(</span><span class="n">C_co</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">LO coefficient matrix.T: spin=</span><span class="si">{s}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">print_full_matrix</span><span class="p">(</span><span class="n">C_lo</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">LO U matrix: spin=</span><span class="si">{s}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">print_full_matrix</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Curvature: spin=</span><span class="si">{s}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">print_sym_matrix</span><span class="p">(</span><span class="n">curvature</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+            <span class="n">local_print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Local Occupation matrix: spin=</span><span class="si">{s}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">print_sym_matrix</span><span class="p">(</span><span class="n">local_occ</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+
+    <span class="c1"># ==&gt; LOSC corrections &lt;==</span>
+    <span class="n">H_losc</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="n">E_losc</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="n">losc_eigs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nspin</span>
+    <span class="n">eig_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="o">==</span> <span class="s1">&#39;au&#39;</span> <span class="k">else</span> <span class="n">constants</span><span class="o">.</span><span class="n">hartree2ev</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+        <span class="c1"># build losc effective Hamiltonian matrix</span>
+        <span class="n">H_losc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">ao_hamiltonian_correction</span><span class="p">(</span>
+            <span class="n">S</span><span class="p">,</span> <span class="n">C_lo</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">curvature</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">local_occ</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+        <span class="c1"># calculate losc energy correction</span>
+        <span class="n">E_losc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">py_losc</span><span class="o">.</span><span class="n">energy_correction</span><span class="p">(</span><span class="n">curvature</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">local_occ</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+        <span class="c1"># calculate corrected orbital energy from LOSC.</span>
+        <span class="n">losc_eigs</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">py_losc</span><span class="o">.</span><span class="n">orbital_energy_post_scf</span><span class="p">(</span>
+            <span class="n">H_ao</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">H_losc</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">C_co</span><span class="p">[</span><span class="n">s</span><span class="p">]))</span> <span class="o">*</span> <span class="n">eig_factor</span>
+
+    <span class="n">E_losc_tot</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">E_losc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">is_rks</span> <span class="k">else</span> <span class="nb">sum</span><span class="p">(</span><span class="n">E_losc</span><span class="p">)</span>
+    <span class="n">E_losc_dfa_tot</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span> <span class="o">+</span> <span class="n">E_losc_tot</span>
+    <span class="c1"># ====&gt; !!! End of LOSC !!! &lt;====</span>
+
+    <span class="c1"># ==&gt; pack LOSC data into dict &lt;==</span>
+    <span class="n">dfa_eigs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">epsilon_a</span><span class="p">())</span> <span class="o">*</span> <span class="n">eig_factor</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="o">.</span><span class="n">epsilon_b</span><span class="p">())</span> <span class="o">*</span> <span class="n">eig_factor</span><span class="p">]</span>
+    <span class="n">occ</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">):</span>
+        <span class="n">occ</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">losc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;occ&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">losc_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;occ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">occ</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;post-SCF-LOSC&#39;</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;orbital_energy_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">orbital_energy_unit</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;nspin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nspin</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;curvature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curvature</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;C_lo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">C_lo</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;dfa_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;dfa_orbital_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa_eigs</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_losc_tot</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_dfa_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_losc_tot</span> <span class="o">+</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_dfa_orbital_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">losc_eigs</span>
+
+    <span class="c1"># ==&gt; Print energies to output &lt;==</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">print_total_energies</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">losc_data</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">print_orbital_energies</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">losc_data</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_losc_data</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">E_losc_dfa_tot</span><span class="p">,</span> <span class="n">losc_eigs</span><span class="p">,</span> <span class="n">losc_data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">E_losc_dfa_tot</span><span class="p">,</span> <span class="n">losc_eigs</span></div>
+
+
+<div class="viewcode-block" id="scf_losc"><a class="viewcode-back" href="../../psi4_losc.html#psi4_losc.scf_losc">[docs]</a><span class="k">def</span> <span class="nf">scf_losc</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+             <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the SCF-LOSC (frozen-LO) calculation based on a DFA wavefunction.</span>
+
+<span class="sd">    This function use `psi4.energy()` to do the SCF procedure.</span>
+<span class="sd">    This function only supports calculations for integer systems.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dfa_info : py_losc.DFAInfo</span>
+<span class="sd">        The information of the parent DFA, including the weights of exchanges.</span>
+<span class="sd">    dfa_wfn : psi4.core.HF</span>
+<span class="sd">        The converged wavefunction from a parent DFA.</span>
+<span class="sd">    orbital_energy_unit : {&#39;eV&#39;, &#39;au&#39;}, default=&#39;eV&#39;</span>
+<span class="sd">        The units of orbital energies used to print in the output.</span>
+
+<span class="sd">        - &#39;au&#39;: atomic unit, hartree.</span>
+<span class="sd">        - &#39;eV&#39;: electronvolt.</span>
+<span class="sd">    verbose : int, default=1</span>
+<span class="sd">        The print level to control `post_scf_losc` and `psi4.energy`.</span>
+<span class="sd">    window : [float, float], optional</span>
+<span class="sd">        The orbital energy window in eV to select COs to do localization.</span>
+<span class="sd">        See `post_scf_losc`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wfn : psi4.core.RHF or psi4.core.UHF</span>
+<span class="sd">        The psi4 wavefunction object that has LOSC contribution included.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    post_scf_losc</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The `psi4.energy` function is used internally to drive the SCF procedure.</span>
+<span class="sd">      So, ideally, this function supports all the types of SCF calculations that</span>
+<span class="sd">      are supported by psi4, such as integer/aufbau systems, MOM calculations.</span>
+<span class="sd">      However, these are not fully tested. But for normal SCF, meaning integer</span>
+<span class="sd">      and aufbau system, this function works fine.</span>
+
+<span class="sd">    - SCF-LOSC requires to use the DFA wfn as the initial guess. The psi4 guess</span>
+<span class="sd">      setting for SCF will be ignored. To use DFA wfn as the initial guess,</span>
+<span class="sd">      currently it is limited by `psi4.energy` interface in which directly</span>
+<span class="sd">      passing the wfn as an argument is rejected. So, the only choice is to</span>
+<span class="sd">      write the DFA wfn into scratch file, then let psi4 use `guess read` option</span>
+<span class="sd">      to set up the initial guess. So, calling this function will generate a</span>
+<span class="sd">      psi4 wavefunction scratch file! You need to take care of it at the exit.</span>
+
+
+<span class="sd">    - This function only supports calculations for ground state integer systems.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># sanity-check of input dfa wfn.</span>
+    <span class="n">_validate_dfa_wfn</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;au&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s1">&#39;Invalid input for &quot;orbital_energy_unit&quot;. Choices are [&quot;eV&quot;, &quot;au&quot;].&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check if the user tries to customize the occupation number.</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dfa_wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;occ&#39;</span> <span class="ow">in</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">losc_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Customizing occupation number is allowed.&#39;</span><span class="p">)</span>
+
+    <span class="n">local_print</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">init_local_print</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># Do post-SCF-LOSC to build curvature and LO.</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">losc_data</span> <span class="o">=</span> <span class="n">post_scf_losc</span><span class="p">(</span><span class="n">dfa_info</span><span class="p">,</span> <span class="n">dfa_wfn</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                                    <span class="n">return_losc_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">orbital_energy_unit</span><span class="o">=</span><span class="n">orbital_energy_unit</span><span class="p">,</span>
+                                    <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="c1"># Do SCF-LOSC.</span>
+    <span class="c1"># Trying to use ref_wfn keyword in psi4.energy(ref_wfn=dfa_wfn) will cause</span>
+    <span class="c1"># an error. This issue may be solved in later version of psi4. Currently,</span>
+    <span class="c1"># the way to let psi4 use a ref_wfn as initial guess is to save the wfn</span>
+    <span class="c1"># into a file then use psi4 `guess read` option.</span>
+    <span class="n">optstash</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">p4util</span><span class="o">.</span><span class="n">OptionsState</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;GUESS&#39;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;PRINT&#39;</span><span class="p">])</span>
+
+    <span class="c1"># update local settings.</span>
+    <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">set_local_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;GUESS&#39;</span><span class="p">,</span> <span class="s1">&#39;READ&#39;</span><span class="p">)</span>
+    <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">set_local_option</span><span class="p">(</span><span class="s1">&#39;SCF&#39;</span><span class="p">,</span> <span class="s1">&#39;PRINT&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># No idea what does 180 mean. Anyways, this is the just the scratch file</span>
+    <span class="c1"># naming conversion in psi4. The wfn file is binary in which the wfn</span>
+    <span class="c1"># data is represented as python dict and saved by calling `numpy.save()`.</span>
+    <span class="c1"># Calling `wfn.get_scratch_filename()` may not return the full file name</span>
+    <span class="c1"># with an suffix of `.npy`. So we need to manually check it. Again, this</span>
+    <span class="c1"># is just the convension in psi4.</span>
+    <span class="n">ref_wfn_file</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">get_scratch_filename</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ref_wfn_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.npy&#39;</span><span class="p">):</span>
+        <span class="n">ref_wfn_file</span> <span class="o">+=</span> <span class="s1">&#39;.npy&#39;</span>
+    <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">ref_wfn_file</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Notice: psi4 guess setting is ignored for the SCF-LOSC calculation.&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;The wfn from the associated DFA is ALWAYS used as the initial guess.&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;File of DFA wfn: </span><span class="si">{ref_wfn_file}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">local_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">dfa_name</span> <span class="o">=</span> <span class="n">dfa_wfn</span><span class="o">.</span><span class="n">functional</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">dfa_name</span><span class="p">,</span> <span class="n">losc_data</span><span class="o">=</span><span class="n">losc_data</span><span class="p">,</span> <span class="n">return_wfn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">eig_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">orbital_energy_unit</span> <span class="o">==</span> <span class="s1">&#39;au&#39;</span> <span class="k">else</span> <span class="n">constants</span><span class="o">.</span><span class="n">hartree2ev</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SCF-LOSC&#39;</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;dfa_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span> <span class="o">-</span> <span class="n">wfn</span><span class="o">.</span><span class="n">get_energies</span><span class="p">(</span><span class="s1">&#39;LOSC energy&#39;</span><span class="p">)</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">get_energies</span><span class="p">(</span><span class="s1">&#39;LOSC energy&#39;</span><span class="p">)</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_dfa_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+    <span class="n">losc_data</span><span class="p">[</span><span class="s1">&#39;losc_dfa_orbital_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_a</span><span class="p">())</span> <span class="o">*</span> <span class="n">eig_factor</span><span class="p">,</span>
+                                            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">epsilon_b</span><span class="p">())</span> <span class="o">*</span> <span class="n">eig_factor</span><span class="p">]</span>
+
+    <span class="c1"># ==&gt; Print energies in LOSC style &lt;==</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">print_total_energies</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">losc_data</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">print_orbital_energies</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">wfn</span><span class="p">,</span> <span class="n">losc_data</span><span class="p">)</span>
+
+    <span class="c1"># Remove dynamical attributes created for LOSC.</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">):</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="s1">&#39;losc_data&#39;</span><span class="p">)</span>
+
+    <span class="n">optstash</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wfn</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yuncai Mei.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="curvature_8h" kind="file" language="C++">
+    <compoundname>curvature.h</compoundname>
+    <includes refid="matrix_8h" local="no">c_losc/matrix.h</includes>
+    <includes local="no">stddef.h</includes>
+    <includedby refid="losc_8h" local="no">/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</includedby>
+    <incdepgraph>
+      <node id="7">
+        <label>stddef.h</label>
+      </node>
+      <node id="6">
+        <label>c_losc/matrix.h</label>
+        <link refid="matrix_8h"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h</label>
+        <link refid="curvature.h"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="9">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/losc.h</label>
+        <link refid="losc_8h"/>
+      </node>
+      <node id="8">
+        <label>/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h</label>
+        <link refid="curvature.h"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structLoscCurvatureBase" prot="public">LoscCurvatureBase</innerclass>
+    <innerclass refid="structLoscCurvatureV1" prot="public">LoscCurvatureV1</innerclass>
+    <innerclass refid="structLoscCurvatureV2" prot="public">LoscCurvatureV2</innerclass>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="curvature_8h_1aac161e97c99cde467b4b76e1e7b1386e" prot="public" static="no">
+        <name>losc_dfa_info_free</name>
+        <param><defname>ptr</defname></param>
+        <initializer>_losc_DFAInfo_free(&amp;(ptr))</initializer>
+        <briefdescription>
+<para>Free a LoscDFAInfo struct. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a pointer with type <computeroutput>LoscDFAInfo *</computeroutput>. At exit, <computeroutput>ptr</computeroutput> is set to null. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="63" column="9" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="63" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="curvature_8h_1a2aff30e298f0252a3c2bdedaf4ca1e35" prot="public" static="no">
+        <name>losc_curvature_v1_free</name>
+        <param><defname>ptr</defname></param>
+        <initializer>_losc_curvature_v1_free(&amp;(ptr))</initializer>
+        <briefdescription>
+<para>Free a struct <ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a pointer with type <computeroutput><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref> *</computeroutput>. At exit, <computeroutput>ptr</computeroutput> is set to null. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="238" column="9" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="238" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="curvature_8h_1a017385863d6f76e5fa3cef809f854e2d" prot="public" static="no">
+        <name>losc_curvature_v2_free</name>
+        <param><defname>ptr</defname></param>
+        <initializer>_losc_curvature_v2_free(&amp;(ptr))</initializer>
+        <briefdescription>
+<para>Free a struct <ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a pointer with type <computeroutput><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref> *</computeroutput>. At exit, <computeroutput>ptr</computeroutput> is set to null. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="314" column="9" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="314" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" prot="public" static="no">
+        <type>struct <ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref></type>
+        <definition>typedef struct LoscDFAInfo LoscDFAInfo</definition>
+        <argsstring></argsstring>
+        <name>LoscDFAInfo</name>
+        <briefdescription>
+<para>The DFA information. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>This is a incomplete declaration. You can not create a LoscDFAInfo variable by youself. </para></simplesect>
+<simplesect kind="see"><para><ref refid="curvature_8h_1a0d2c1f71095f4601fab58490cf386005" kindref="member">losc_dfa_info_create()</ref>: create a <ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref> </para></simplesect>
+<simplesect kind="see"><para><ref refid="curvature_8h_1aac161e97c99cde467b4b76e1e7b1386e" kindref="member">losc_dfa_info_free()</ref>: free a <ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="101" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="curvature_8h_1aca776544f0e58421421a682c484725fa" prot="public" static="no">
+        <type>struct <ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref></type>
+        <definition>typedef struct LoscCurvatureBase  LoscCurvatureBase</definition>
+        <argsstring></argsstring>
+        <name>LoscCurvatureBase</name>
+        <briefdescription>
+<para>The C interface for LOSC curvature base class. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>This struct exports all the functions for LOSC curvature base class. This struct servers as helper class to avoid code duplication for the implementation of C interface. There is no need for C users to create a such struct in practice. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="134" column="1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="curvature_8h_1a2c64ce74e5c1e87285685db8f97f0cb2" prot="public" static="no">
+        <type>struct <ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref></type>
+        <definition>typedef struct LoscCurvatureV1  LoscCurvatureV1</definition>
+        <argsstring></argsstring>
+        <name>LoscCurvatureV1</name>
+        <briefdescription>
+<para>The C interface for LOSC curvature class of version 1. </para>        </briefdescription>
+        <detaileddescription>
+<para>Curvature version 1 is defined as <formula id="7">$ \kappa $</formula> in Eq. 3 in the original LOSC paper (<ulink url="https://doi.org/10.1093/nsr/nwx11">https://doi.org/10.1093/nsr/nwx11</ulink>). <simplesect kind="see"><para><ref refid="curvature_8h_1a7ffd173b20f088e1aa048916781bd062" kindref="member">losc_curvature_v1_create()</ref>: create a LosCurvatureV1 object. </para></simplesect>
+<simplesect kind="see"><para><ref refid="curvature_8h_1a2aff30e298f0252a3c2bdedaf4ca1e35" kindref="member">losc_curvature_v1_free()</ref>: free a LosCurvatureV1 object. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="197" column="1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="curvature_8h_1af722251fe22de24673de50f6864e0f5b" prot="public" static="no">
+        <type>struct <ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref></type>
+        <definition>typedef struct LoscCurvatureV2  LoscCurvatureV2</definition>
+        <argsstring></argsstring>
+        <name>LoscCurvatureV2</name>
+        <briefdescription>
+<para>The C interface for LOSC curvature class of version 2. </para>        </briefdescription>
+        <detaileddescription>
+<para>The curvature matrix is defined as <formula id="10">$\tilde{\kappa}$</formula> in Eq. 8 of the LOSC2 paper (J. Phys. Chem. Lett. 2020, 11, 4, 1528-1535). <simplesect kind="see"><para><ref refid="curvature_8h_1a0fdab291d65674e52f43d3eae8f74cd0" kindref="member">losc_curvature_v2_create()</ref>: create a LosCurvatureV2 object. </para></simplesect>
+<simplesect kind="see"><para><ref refid="curvature_8h_1a017385863d6f76e5fa3cef809f854e2d" kindref="member">losc_curvature_v2_free()</ref>: free a LosCurvatureV2 object. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="295" column="1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="curvature_8h_1a0d2c1f71095f4601fab58490cf386005" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref> *</type>
+        <definition>LoscDFAInfo* losc_dfa_info_create</definition>
+        <argsstring>(double gga_x, double hf_x, const char *name)</argsstring>
+        <name>losc_dfa_info_create</name>
+        <param>
+          <type>double</type>
+          <declname>gga_x</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>hf_x</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+<para>Create a struct LoscDFAInfo. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">gga_x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The total weights of all GGA and LDA type exchanges. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">hf_x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The total weights of HF exchanges. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The name of the DFA. Default to an empty string. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="par"><title>Example</title><para>Taking B3LYP functional as an example. The B3LYP functional is <formula id="1">\[ E^{\rm{B3LYP}}_{\rm{xc}} = E^{\rm{LDA}}_{\rm{x}} + a_0 (E^{\rm{HF}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) + a_x (E^{\rm{GGA}}_{\rm{x}} - E^{\rm{LDA}}_{\rm{x}}) + E^{\rm{LDA}}_{\rm{c}} + a_c (E^{\rm{GGA}}_{\rm{c}} - E^{\rm{LDA}}_{\rm{c}}), \]</formula> in which exchanges end with suffix <computeroutput>_x</computeroutput> and correlations end with suffix <computeroutput>_c</computeroutput>, <formula id="2">$ a_0=0.20 $</formula>, <formula id="3">$ a_x=0.72 $</formula> and <formula id="4">$ a_c=0.81 $</formula>. Only the exchanges are considered and the correlations are ignored. The GGA and LDA exchanges are viewed as the same type. Therefore, the total weights of GGA and LDA exchanges are <formula id="5">$ 1 - a_0 + a_x \times (1 - 1) = 1 - a_0 = 0.80 $</formula>, and the total weights of HF exchanges is <formula id="6">$ a_0 = 0.20 $</formula>. To construct a <computeroutput>DFAInfo</computeroutput> object for B3LYP functional, one should do the following <programlisting><codeline><highlight class="normal">b3lyp<sp/>=<sp/>losc_dfa_info_create(0.80,<sp/>0.20,<sp/>&quot;B3LYP&quot;)</highlight></codeline>
+</programlisting> </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="56" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="curvature_8h_1a7ffd173b20f088e1aa048916781bd062" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref> *</type>
+        <definition>LoscCurvatureV1* losc_curvature_v1_create</definition>
+        <argsstring>(const LoscDFAInfo *dfa, const losc_matrix *df_pii, const losc_matrix *df_Vpq_inv, const losc_matrix *grid_lo, const double *grid_weight)</argsstring>
+        <name>losc_curvature_v1_create</name>
+        <param>
+          <type>const <ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref> *</type>
+          <declname>dfa</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>df_pii</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>df_Vpq_inv</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>grid_lo</declname>
+        </param>
+        <param>
+          <type>const double *</type>
+          <declname>grid_weight</declname>
+        </param>
+        <briefdescription>
+<para>Create a struct <ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type of DFA. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_pii</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Three-body integral <formula id="8">$ \langle p |ii \rangle $</formula> used in density fitting. Index <computeroutput>p</computeroutput> is for fitbasis and index <computeroutput>i</computeroutput> is for LOs. The dimension of <computeroutput>df_pii</computeroutput> is <computeroutput>[nfitbasis, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_Vpq_inv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Inverse of <formula id="9">$ \langle p | 1/\mathbf{r} | q \rangle $</formula> matrix used in density fitting. Index <computeroutput>p</computeroutput> and <computeroutput>q</computeroutput> are for LOs. The dimension of <computeroutput>df_Vpq_inv</computeroutput> is <computeroutput>[nfitbasis, nfitbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs&apos; value on grid points with dimension of <computeroutput>[npts, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Coefficient vector for numerical integral on grid with size of <computeroutput>npts</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a struct <ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref> and return the pointer.</para></simplesect>
+<simplesect kind="note"><para>This function requires all the matrices are allocated in advance. This could be memory consuming. For example, the <computeroutput>grid_lo</computeroutput> matrix can be very large. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="227" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="curvature_8h_1a0fdab291d65674e52f43d3eae8f74cd0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref> *</type>
+        <definition>LoscCurvatureV2* losc_curvature_v2_create</definition>
+        <argsstring>(const LoscDFAInfo *dfa, const losc_matrix *df_pii, const losc_matrix *df_Vpq_inv, const losc_matrix *grid_lo, const double *grid_weight)</argsstring>
+        <name>losc_curvature_v2_create</name>
+        <param>
+          <type>const <ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref> *</type>
+          <declname>dfa</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>df_pii</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>df_Vpq_inv</declname>
+        </param>
+        <param>
+          <type>const losc_matrix *</type>
+          <declname>grid_lo</declname>
+        </param>
+        <param>
+          <type>const double *</type>
+          <declname>grid_weight</declname>
+        </param>
+        <briefdescription>
+<para>Constructor of <ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type of DFA. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_pii</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Three-body integral <formula id="8">$ \langle p |ii \rangle $</formula> used in density fitting. Index <computeroutput>p</computeroutput> is for fitbasis and index <computeroutput>i</computeroutput> is for LOs. The dimension of <computeroutput>df_pii</computeroutput> is <computeroutput>[nfitbasis, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_Vpq_inv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Inverse of <formula id="9">$ \langle p | 1/\mathbf{r} | q \rangle $</formula> matrix used in density fitting. Index <computeroutput>p</computeroutput> and <computeroutput>q</computeroutput> are for LOs. The dimension of <computeroutput>df_Vpq_inv</computeroutput> is <computeroutput>[nfitbasis, nfitbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs&apos; value on grid points with dimension of <computeroutput>[npts, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Coefficient vector for numerical integral on grid with size of <computeroutput>npts</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Create a struct <ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref> and return the pointer.</para></simplesect>
+<simplesect kind="note"><para>This function requires all the matrices are allocated in advance. This could be memory consuming. For example, the <computeroutput>grid_lo</computeroutput> matrix can be very large. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h" line="303" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>The C interface for LOSC curvature matrix. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="6"><highlight class="preprocessor">#ifndef<sp/>_LOSC_INCLUDE_C_LOSC_CURVATURE_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LOSC_INCLUDE_C_LOSC_CURVATURE_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="matrix_8h" kindref="compound">c_losc/matrix.h</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="comment">//<sp/>==&gt;<sp/>Interface<sp/>for<sp/>`losc::DFAInfo`</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27" refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" refkind="member"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref><sp/><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref>;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref><sp/>*<ref refid="curvature_8h_1a0d2c1f71095f4601fab58490cf386005" kindref="member">losc_dfa_info_create</ref>(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>gga_x,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>hf_x,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*name);</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63" refid="curvature_8h_1aac161e97c99cde467b4b76e1e7b1386e" refkind="member"><highlight class="preprocessor">#define<sp/>losc_dfa_info_free(ptr)<sp/>_losc_DFAInfo_free(&amp;(ptr))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>_losc_dfa_info_free(<ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref><sp/>**pptr_m);</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"></highlight><highlight class="comment">//<sp/>==&gt;<sp/>Interface<sp/>for<sp/>`losc::CurvatureBase`</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>incomplete<sp/>struct<sp/>in<sp/>C-side<sp/>that<sp/>is<sp/>`losc::CurvatureBase`<sp/>in<sp/>C++<sp/>side.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">_LoscCurvatureBase<sp/>_LoscCurvatureBase;</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight></codeline>
+<codeline lineno="80" refid="structLoscCurvatureBase" refkind="compound"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>{</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>points<sp/>to<sp/>a<sp/>real<sp/>`losc::CurvatureBase`<sp/>object.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/>_LoscCurvatureBase<sp/>*_p_base;</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>List<sp/>interface<sp/>of<sp/>methods<sp/>exposed<sp/>to<sp/>C<sp/>users<sp/>bellow.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="95" refid="structLoscCurvatureBase_1a4900682372374495e2592d65438fc553" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>size_t<sp/>(*<ref refid="structLoscCurvatureBase_1a4900682372374495e2592d65438fc553" kindref="member">nlo</ref>)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"></highlight></codeline>
+<codeline lineno="106" refid="structLoscCurvatureBase_1a85e3641b37eec42c0456b098985a7896" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>size_t<sp/>(*<ref refid="structLoscCurvatureBase_1a85e3641b37eec42c0456b098985a7896" kindref="member">nfitbasis</ref>)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"></highlight></codeline>
+<codeline lineno="117" refid="structLoscCurvatureBase_1af3790a69d3506df31df50f9679ed4d4f" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>size_t<sp/>(*<ref refid="structLoscCurvatureBase_1af3790a69d3506df31df50f9679ed4d4f" kindref="member">npts</ref>)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"></highlight></codeline>
+<codeline lineno="133" refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>void<sp/>(*<ref refid="structLoscCurvatureBase_1a0c9ba1e45d74aada45c48e71d7514e52" kindref="member">kappa</ref>)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">,<sp/>losc_matrix<sp/>*K);</highlight></codeline>
+<codeline lineno="134"><highlight class="normal">}<sp/><ref refid="curvature_8h_1aca776544f0e58421421a682c484725fa" kindref="member">LoscCurvatureBase</ref>;</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"></highlight></codeline>
+<codeline lineno="136"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="137"><highlight class="normal"></highlight><highlight class="comment">//<sp/>==&gt;<sp/>Interface<sp/>for<sp/>`losc::CurvatureV1`</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="138"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="140"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>incomplete<sp/>struct<sp/>in<sp/>C-side<sp/>that<sp/>is<sp/>`losc::CurvatureV1`<sp/>in<sp/>C++-side.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="141"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">_LoscCurvatureV1<sp/>_LoscCurvatureV1;</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"></highlight></codeline>
+<codeline lineno="167" refid="structLoscCurvatureV1" refkind="compound"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref><sp/>{</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>points<sp/>to<sp/>a<sp/>real<sp/>`losc::CurvatureV1`<sp/>object.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/>_LoscCurvatureV1<sp/>*_p_v1;</highlight></codeline>
+<codeline lineno="170"><highlight class="normal"></highlight></codeline>
+<codeline lineno="179" refid="structLoscCurvatureV1_1a0f3dc840dd991c49a1b70b4c5e908e8d" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*<ref refid="structLoscCurvatureV1_1a0f3dc840dd991c49a1b70b4c5e908e8d" kindref="member">p_base</ref>;</highlight></codeline>
+<codeline lineno="180"><highlight class="normal"></highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Note:</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="182"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>If<sp/>`losc::CurvatureV1`<sp/>has<sp/>new<sp/>public<sp/>functions<sp/>(new<sp/>functions<sp/>added<sp/>in</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>`losc::CurvatureV1`<sp/>not<sp/>in<sp/>its<sp/>base<sp/>class)<sp/>in<sp/>the<sp/>future,<sp/>add<sp/>the</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>corresponding<sp/>C<sp/>interface<sp/>with<sp/>new<sp/>function<sp/>pointers<sp/>below.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="185"><highlight class="normal"></highlight></codeline>
+<codeline lineno="196" refid="structLoscCurvatureV1_1aa7f66feac18f102e1b68e0b09e24c154" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>void<sp/>(*set_tau)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>tau);</highlight></codeline>
+<codeline lineno="197"><highlight class="normal">}<sp/><ref refid="curvature_8h_1a2c64ce74e5c1e87285685db8f97f0cb2" kindref="member">LoscCurvatureV1</ref>;</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"></highlight></codeline>
+<codeline lineno="227"><highlight class="normal"><ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref><sp/>*<ref refid="curvature_8h_1a7ffd173b20f088e1aa048916781bd062" kindref="member">losc_curvature_v1_create</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref><sp/>*dfa,</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*df_pii,</highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*df_Vpq_inv,</highlight></codeline>
+<codeline lineno="230"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*grid_lo,</highlight></codeline>
+<codeline lineno="231"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*grid_weight);</highlight></codeline>
+<codeline lineno="232"><highlight class="normal"></highlight></codeline>
+<codeline lineno="238" refid="curvature_8h_1a2aff30e298f0252a3c2bdedaf4ca1e35" refkind="member"><highlight class="preprocessor">#define<sp/>losc_curvature_v1_free(ptr)<sp/>_losc_curvature_v1_free(&amp;(ptr))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*_losc_curvature_v1_free(<ref refid="structLoscCurvatureV1" kindref="compound">LoscCurvatureV1</ref><sp/>**pptr_self);</highlight></codeline>
+<codeline lineno="240"><highlight class="normal"></highlight></codeline>
+<codeline lineno="241"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="242"><highlight class="normal"></highlight><highlight class="comment">//<sp/>==&gt;<sp/>Interface<sp/>for<sp/>`losc::CurvatureV1`</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="243"><highlight class="normal"></highlight><highlight class="comment">//**********************************************</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="244"><highlight class="normal"></highlight></codeline>
+<codeline lineno="245"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>incomplete<sp/>struct<sp/>in<sp/>C-side<sp/>that<sp/>is<sp/>`losc::CurvatureV2`<sp/>in<sp/>C++-side.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="246"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">_LoscCurvatureV2<sp/>_LoscCurvatureV2;</highlight></codeline>
+<codeline lineno="247"><highlight class="normal"></highlight></codeline>
+<codeline lineno="255" refid="structLoscCurvatureV2" refkind="compound"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref><sp/>{</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>points<sp/>to<sp/>a<sp/>real<sp/>`losc::CurvatureV2`<sp/>object.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/><sp/><sp/>_LoscCurvatureV2<sp/>*_p_v2;</highlight></codeline>
+<codeline lineno="258"><highlight class="normal"></highlight></codeline>
+<codeline lineno="267" refid="structLoscCurvatureV2_1ae477ffe64f858d0515ba3e89419ce9f8" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structLoscCurvatureBase" kindref="compound">LoscCurvatureBase</ref><sp/>*<ref refid="structLoscCurvatureV2_1ae477ffe64f858d0515ba3e89419ce9f8" kindref="member">p_base</ref>;</highlight></codeline>
+<codeline lineno="268"><highlight class="normal"></highlight></codeline>
+<codeline lineno="269"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Note</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="270"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>If<sp/>`losc::CurvatureV2`<sp/>has<sp/>new<sp/>public<sp/>functions<sp/>(new<sp/>functions<sp/>added<sp/>in</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="271"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>`losc::CurvatureV2`<sp/>not<sp/>in<sp/>its<sp/>base<sp/>class)<sp/>in<sp/>the<sp/>future,<sp/>add<sp/>the</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="272"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>corresponding<sp/>C<sp/>interface<sp/>with<sp/>new<sp/>function<sp/>pointers<sp/>below.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="273"><highlight class="normal"></highlight></codeline>
+<codeline lineno="283" refid="structLoscCurvatureV2_1a1fe08db02c7f27e408735107e30bcbb4" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>void<sp/>(*set_tau)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>tau);</highlight></codeline>
+<codeline lineno="284"><highlight class="normal"></highlight></codeline>
+<codeline lineno="294" refid="structLoscCurvatureV2_1a1eb952b1b52568d6a34f22f56f70fb5b" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>void<sp/>(*set_zeta)(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref><sp/>*</highlight><highlight class="keyword">self</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>zeta);</highlight></codeline>
+<codeline lineno="295"><highlight class="normal">}<sp/><ref refid="curvature_8h_1af722251fe22de24673de50f6864e0f5b" kindref="member">LoscCurvatureV2</ref>;</highlight></codeline>
+<codeline lineno="296"><highlight class="normal"></highlight></codeline>
+<codeline lineno="303"><highlight class="normal"><ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref><sp/>*<ref refid="curvature_8h_1a0fdab291d65674e52f43d3eae8f74cd0" kindref="member">losc_curvature_v2_create</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="curvature_8h_1ad94a79b7e044989f887ec6f40ca5ac5b" kindref="member">LoscDFAInfo</ref><sp/>*dfa,</highlight></codeline>
+<codeline lineno="304"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*df_pii,</highlight></codeline>
+<codeline lineno="305"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*df_Vpq_inv,</highlight></codeline>
+<codeline lineno="306"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>losc_matrix<sp/>*grid_lo,</highlight></codeline>
+<codeline lineno="307"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*grid_weight);</highlight></codeline>
+<codeline lineno="308"><highlight class="normal"></highlight></codeline>
+<codeline lineno="314" refid="curvature_8h_1a017385863d6f76e5fa3cef809f854e2d" refkind="member"><highlight class="preprocessor">#define<sp/>losc_curvature_v2_free(ptr)<sp/>_losc_curvature_v2_free(&amp;(ptr))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="315"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*_losc_curvature_v2_free(<ref refid="structLoscCurvatureV2" kindref="compound">LoscCurvatureV2</ref><sp/>**pptr_self);</highlight></codeline>
+<codeline lineno="316"><highlight class="normal"></highlight></codeline>
+<codeline lineno="317"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="318"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="319"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="320"><highlight class="normal"></highlight></codeline>
+<codeline lineno="321"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/yuncai/Documents/Server/losc/include/c_losc/curvature.h"/>
+  </compounddef>
+</doxygen>

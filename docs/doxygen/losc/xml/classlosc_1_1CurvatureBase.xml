@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="classlosc_1_1CurvatureBase" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>losc::CurvatureBase</compoundname>
+    <derivedcompoundref refid="classlosc_1_1CurvatureV1" prot="public" virt="non-virtual">losc::CurvatureV1</derivedcompoundref>
+    <derivedcompoundref refid="classlosc_1_1CurvatureV2" prot="public" virt="non-virtual">losc::CurvatureV2</derivedcompoundref>
+    <includes refid="curvature_8hpp" local="no">curvature.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1a0f3ca2b234501184ef59fcfb464dbeac" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>losc::CurvatureBase::CurvatureBase</definition>
+        <argsstring>(const DFAInfo &amp;dfa, ConstRefMat &amp;df_pii, ConstRefMat &amp;df_Vpq_inv, ConstRefMat &amp;grid_lo, ConstRefVec &amp;grid_weight)</argsstring>
+        <name>CurvatureBase</name>
+        <param>
+          <type>const <ref refid="classlosc_1_1DFAInfo" kindref="compound">DFAInfo</ref> &amp;</type>
+          <declname>dfa</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>df_pii</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>df_Vpq_inv</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a6d6bb030582607dca15153e77d2d8a31" kindref="member">ConstRefMat</ref> &amp;</type>
+          <declname>grid_lo</declname>
+        </param>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1aa9404848a7bc6db97fbe02bd334cb027" kindref="member">ConstRefVec</ref> &amp;</type>
+          <declname>grid_weight</declname>
+        </param>
+        <briefdescription>
+<para>Constructor of <ref refid="classlosc_1_1CurvatureBase" kindref="compound">CurvatureBase</ref>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">dfa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type of DFA. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_pii</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Three-body integral <formula id="9">$ \langle p |ii \rangle $</formula> used in density fitting. Index <computeroutput>p</computeroutput> is for fitbasis and index <computeroutput>i</computeroutput> is for LOs. The dimension of <computeroutput>df_pii</computeroutput> is <computeroutput>[nfitbasis, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">df_Vpq_inv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Inverse of <formula id="10">$ \langle p | 1/\mathbf{r} | q \rangle $</formula> matrix used in density fitting. Index <computeroutput>p</computeroutput> and <computeroutput>q</computeroutput> are for LOs. The dimension of <computeroutput>df_Vpq_inv</computeroutput> is <computeroutput>[nfitbasis, nfitbasis]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_lo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>LOs&apos; value on grid points with dimension of <computeroutput>[npts, nlo]</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">grid_weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Coefficient vector for numerical integral on grid with size of <computeroutput>npts</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This constructor requires all the matrices are allocated in advance. This could be memory consuming. For example, the <computeroutput>grid_lo</computeroutput> matrix can be very large. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="133" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1aac32c1f367cf65842013658c854b79fc" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>losc::CurvatureBase::~CurvatureBase</definition>
+        <argsstring>()</argsstring>
+        <name>~CurvatureBase</name>
+        <briefdescription>
+<para>Deconstructor of <ref refid="classlosc_1_1CurvatureBase" kindref="compound">CurvatureBase</ref>. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="140" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="140" bodyend="140"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="virtual">
+        <type><ref refid="eigen__def_8hpp_1a8287b6d37c6f5e026858f3fbdafacd32" kindref="member">LOSCMatrix</ref></type>
+        <definition>virtual LOSCMatrix losc::CurvatureBase::kappa</definition>
+        <argsstring>() const </argsstring>
+        <name>kappa</name>
+        <briefdescription>
+<para>Compute the LOSC curvature matrix. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>the LOSC curvature matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput>. </para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="151" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="151" bodyend="156"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1ad95c20abcf940d90683c4aacac16e645" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc::CurvatureBase::nlo</definition>
+        <argsstring>() const </argsstring>
+        <name>nlo</name>
+        <briefdescription>
+<para>Return number of LOs. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="161" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="161" bodyend="161"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1aa64b6572a94e0a7e47ce8803317cbfcc" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc::CurvatureBase::nfitbasis</definition>
+        <argsstring>() const </argsstring>
+        <name>nfitbasis</name>
+        <briefdescription>
+<para>Return number of fit basis. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="166" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="166" bodyend="166"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1a17d55779749cf10f99cc10c302113157" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t losc::CurvatureBase::npts</definition>
+        <argsstring>() const </argsstring>
+        <name>npts</name>
+        <briefdescription>
+<para>Return number of grid points. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="171" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="171" bodyend="171"/>
+      </memberdef>
+      <memberdef kind="function" id="classlosc_1_1CurvatureBase_1ad8e3306bbe46bf91140ae73181eeb7dc" prot="public" static="no" const="yes" explicit="no" inline="no" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void losc::CurvatureBase::C_API_kappa</definition>
+        <argsstring>(RefMat K) const =0</argsstring>
+        <name>C_API_kappa</name>
+        <reimplementedby refid="classlosc_1_1CurvatureV1_1a37bbc60aafb1182e8735c026214603ab">C_API_kappa</reimplementedby>
+        <reimplementedby refid="classlosc_1_1CurvatureV2_1a1a9eeb9bff051eae968242bacc082da8">C_API_kappa</reimplementedby>
+        <param>
+          <type><ref refid="eigen__def_8hpp_1a40f96aa28a459452c394e9b32eebdead" kindref="member">RefMat</ref></type>
+          <declname>K</declname>
+        </param>
+        <briefdescription>
+<para>The C interface to compute the LOSC curvature matrix in place. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">K</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a matrix with dimension of <computeroutput>[nlo, nlo]</computeroutput> at the input. At exit, it is updated and stores the LOSC curvature matrix. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="183" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Base class for LOSC curvature. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="20">
+        <label>losc::CurvatureBase</label>
+        <link refid="classlosc_1_1CurvatureBase"/>
+      </node>
+      <node id="21">
+        <label>losc::CurvatureV1</label>
+        <link refid="classlosc_1_1CurvatureV1"/>
+        <childnode refid="20" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>losc::CurvatureV2</label>
+        <link refid="classlosc_1_1CurvatureV2"/>
+        <childnode refid="20" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" line="83" column="1" bodyfile="/home/yuncai/Documents/Server/losc/include/losc/curvature.hpp" bodystart="83" bodyend="184"/>
+    <listofallmembers>
+      <member refid="classlosc_1_1CurvatureBase_1ad8e3306bbe46bf91140ae73181eeb7dc" prot="public" virt="pure-virtual"><scope>losc::CurvatureBase</scope><name>C_API_kappa</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1a0f3ca2b234501184ef59fcfb464dbeac" prot="public" virt="non-virtual"><scope>losc::CurvatureBase</scope><name>CurvatureBase</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1aeb55a7843e84c47043e964599e3121c4" prot="public" virt="virtual"><scope>losc::CurvatureBase</scope><name>kappa</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1aa64b6572a94e0a7e47ce8803317cbfcc" prot="public" virt="non-virtual"><scope>losc::CurvatureBase</scope><name>nfitbasis</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1ad95c20abcf940d90683c4aacac16e645" prot="public" virt="non-virtual"><scope>losc::CurvatureBase</scope><name>nlo</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1a17d55779749cf10f99cc10c302113157" prot="public" virt="non-virtual"><scope>losc::CurvatureBase</scope><name>npts</name></member>
+      <member refid="classlosc_1_1CurvatureBase_1aac32c1f367cf65842013658c854b79fc" prot="public" virt="non-virtual"><scope>losc::CurvatureBase</scope><name>~CurvatureBase</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
