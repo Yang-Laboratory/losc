@@ -179,8 +179,40 @@ Configure LOSC calculations with options
 
 You can configure the options for the LOSC calculations in ``psi4_losc`` module.
 These configurations include option settings related to LOSC curvatures,
-localizations and so on. See details in :ref:`this section
-<psi4_losc__options_label>`.
+localizations and so on. To configure the options, use the defined variable
+``psi4_losc.options``, which is an object of class
+``psi4_losc.losc_options.Options``. The basic methods of ``psi4_losc.options``
+are the following
+
+==================================   ====================
+Method                               Description
+==================================   ====================
+``psi4_losc.options.get_param()``    get a LOSC parameter.
+``psi4_losc.options.set_param()``    set a LOSC parameter.
+``psi4_losc.options.set_params()``   set a number of LOSC parameters.
+==================================   ====================
+
+Following are some examples of configuring the LOSC options.
+
+
+.. code-block:: python
+
+   # set LOSC curvature version 2.
+   psi4_losc.options.set_param('curvature', 'version', 2)
+   # set LOSC localizer version 2.
+   psi4_losc.options.set_param('localizer', 'version', 2)
+   # set both curvature and localizer version in one call.
+   psi4_losc.options.set_params({
+                                 'localizer': {'version': 2},
+                                 'curvature': {'version': 2},
+                                })
+
+   # get LOSC curvature version.
+   version = psi4_losc.options.get_param('curvature', 'version')
+   # get LOSC localizer version.
+   version = psi4_losc.options.get_param('localizer', 'version')
+
+See all the supported options in :ref:`this section <psi4_losc__options_label>`.
 
 
 Setting energy window for LOSC calculation
