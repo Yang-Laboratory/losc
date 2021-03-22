@@ -108,7 +108,7 @@ You first calculate the SCF-DFA in psi4.
     E_dfa, dfa_wfn = psi4.energy('b3lyp', return_wfn=True)
     print(E_dfa)
 
-    # You would see E_dfa = -0.5765567776548441
+    # You would see E_dfa = -0.8923613725795544
 
 post-SCF-LOSC for integer system with aufbau occupation
 -------------------------------------------------------
@@ -123,21 +123,21 @@ variables: the corrected total energy and orbital energies.
 .. code-block:: python
    :emphasize-lines: 1-3
 
-    # do post-SCF-LOSC-B3LYP calculation to obtain corrected total energy
-    # and the orbital energies.
-    E_losc, Orb_losc = psi4_losc.post_scf_losc(psi4_losc.B3LYP, dfa_wfn)
+   # do post-SCF-LOSC-B3LYP calculation to obtain corrected total energy
+   # and the orbital energies.
+   E_losc, Orb_losc = psi4_losc.post_scf_losc(psi4_losc.B3LYP, dfa_wfn)
 
-    # You would see total energies:
-    # E_losc = -0.758073589993662
-    # E_losc - E_dfa = 0.13428778258589236
-    print(E_losc)
-    print(E_losc - E_dfa)
+   # You would see total energies:
+   # E_losc = -0.758073589993662
+   # E_losc - E_dfa = 0.13428778258589236
+   print(E_losc)
+   print(E_losc - E_dfa)
 
-    # You would see all LOSC corrected orbital energies in a.u. for
-    # both alpha and beta spin:
-    # [array([-6.98665404, -5.54668941, 24.04349262, 24.04349294]),
-    #  array([-6.98665404, -5.54668941, 24.04349262, 24.04349294])]
-    print(Orb_losc)
+   # You would see all LOSC corrected orbital energies in a.u. for
+   # both alpha and beta spin:
+   # [array([-6.98665404, -5.54668941, 24.04349262, 24.04349294]),
+   #  array([-6.98665404, -5.54668941, 24.04349262, 24.04349294])]
+   print(Orb_losc)
 
 
 SCF-LOSC for integer system with aufbau occupation
@@ -151,21 +151,21 @@ wavefunction object.
 .. code-block:: python
    :emphasize-lines: 1-2
 
-    # do SCF-LOSC-B3LYP calculation to obtain a LOSC-B3LYP wavefunction object.
-    losc_wfn = psi4_losc.scf_losc(psi4_losc.B3LYP, dfa_wfn)
+   # do SCF-LOSC-B3LYP calculation to obtain a LOSC-B3LYP wavefunction object.
+   losc_wfn = psi4_losc.scf_losc(psi4_losc.B3LYP, dfa_wfn)
 
-    # You would see total energies:
-    # E_losc = xxx
-    # E_losc - E_dfa = xxx
-    E_losc = losc_wfn.energy()
-    print(E_losc)
-    print(E_losc - E_dfa)
+   # You would see total energies:
+   # E_losc = -0.7578046520485341
+   # E_losc - E_dfa = 0.1345567205310203
+   E_losc = losc_wfn.energy()
+   print(E_losc)
+   print(E_losc - E_dfa)
 
-    # You would see all LOSC corrected orbital energies in a.u. for alpha spin.
-    #  xxx
-    import numpy as np
-    Orb_losc = np.asarray(losc_wfn.epsilon_a())
-    print(Orb_losc)
+   # You would see all LOSC corrected orbital energies in a.u. for alpha spin.
+   # Orb_losc = [-0.25675479 -0.20383709  0.91139381  0.91139408]
+   import numpy as np
+   Orb_losc = np.asarray(losc_wfn.epsilon_a())
+   print(Orb_losc)
 
 
 ---------------------
