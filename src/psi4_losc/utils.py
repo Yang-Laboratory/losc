@@ -90,8 +90,10 @@ def print_orbital_energies(verbose_level, wfn, losc_data, print_level=1,
         local_print(print_level, "{:<5s}  {:<8s}  {:>14s} {:>14s}"
                     .format("Index", "Occ", f"DFA ({orbital_energy_unit})",
                             f"LOSC ({orbital_energy_unit})"))
-        for i in range(nbf):
-            orbE = dfa_eigs[s][i]
+        if nbf != (dfa_eigs[s].shape)[0]:
+            local_print(print_level, f"Warning: spin={s} the number of basis is NOT equal to the number of orbitals!")
+        for i, orbE in enumerate(dfa_eigs[s]):
+            #orbE = dfa_eigs[s][i]
             if orbital_energy_unit != 'eV':
                 orbE *= constants.hartree2ev
             if not window or (window[0] <= orbE <= window[1]):
