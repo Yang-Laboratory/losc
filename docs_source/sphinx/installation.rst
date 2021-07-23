@@ -29,7 +29,7 @@ Dependencies and tools
       ``psi4_losc`` module.
 
 - There is no need to build the documentation by yourself. You can find the
-  `online documentation <https://miocbb.github.io/losc>`_. However, if you
+  `online documentation <https://yang-laboratory.github.io/losc>`_. However, if you
   insist to generate the documentation that is corresponding to your local
   version of the source code, you need the following dependencies and tools:
 
@@ -43,15 +43,15 @@ Compile from the source code
 ----------------------------
 
 #. you can obtain the source code from `the github repository
-   <https://github.com/Miocbb/losc>`_ via ``git clone``:
+   <https://github.com/Yang-Laboratory/losc>`_ via ``git clone``:
 
    .. code-block:: bash
 
-        >>> git clone https://github.com/Miocbb/losc.git
+        >>> git clone https://github.com/Yang-Laboratory/losc
 
    Doing so requires you to have ``git`` installed in your system. If you do
    not have access to ``git``, you can download the archive of the source
-   code from the `the github repository <https://github.com/Miocbb/losc>`_,
+   code from the `the github repository <https://github.com/Yang-Laboratory/losc>`_,
    and extract the source manually.
 
 #. Navigate to the top level directory of the source code
