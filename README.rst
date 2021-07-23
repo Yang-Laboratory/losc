@@ -25,7 +25,7 @@ What does this Project do?
 Manual and Documentation
 ========================
 
-The manual and documentation are available at https://miocbb.github.io/losc.
+The manual and documentation are available at https://yang-laboratory.github.io/losc/.
 Refer to the website for the instructions of installation and usage.
 
 References of LOSC
