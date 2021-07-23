@@ -19,7 +19,7 @@ What does this Project do?
 
 - This project provides the implementation of LOSC method in an open-source
   quantum chemistry package, `psi4 <https://psicode.org>`_, with its
-  Python interface. If you are a user of pis4, you can directly use this
+  Python interface. If you are a user of psi4, you can directly use this
   library with psi4 to perform LOSC calculations.
 
 Manual and Documentation
