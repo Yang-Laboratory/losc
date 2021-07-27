@@ -53,8 +53,9 @@ def _validate_inp(mf):
 
     # check functional
     if mf.omega != None:
-        raise Exception("Sorry, LOSC does not support range-separated functional.") 
-    
+        raise Exception(
+            "Sorry, LOSC does not support range-separated functional.")
+
 
 def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
                   return_losc_data=False, window=None):
@@ -133,8 +134,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     losc_data : dict
         losc_data will be returned if `return_losc_data` is True. `losc_data`
         contains the data of LOSC calculations.
-
-
     """
     #########################################################################
     # step 1: sanity-check of input dfa wfn and other parameters            #
@@ -161,7 +160,7 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
         nspin = 1
     else:
         nspin = 2
-    
+
     #########################################################################
     # step 2: build occupation matrix                                       #
     #########################################################################
@@ -170,16 +169,16 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
         occ = {}
     _, _, occ_val = utils.form_occ(mf, occ)
     nelec = [sum(x) for x in occ_val]
-    
+
     #########################################################################
     # step 3: map needed matrices                                           #
     #########################################################################
 
     # step 3.1: CO coefficients
     if nspin == 1:
-        C_co = [np.asarray(mf.mo_coeff), np.asarray(mf.mo_coeff)] 
+        C_co = [np.asarray(mf.mo_coeff), np.asarray(mf.mo_coeff)]
     else:
-        C_co = [np.asarray(mf.mo_coeff[0]), np.asarray(mf.mo_coeff[1])] 
+        C_co = [np.asarray(mf.mo_coeff[0]), np.asarray(mf.mo_coeff[1])]
 
     # step 3.2: Fock matrix
     if nspin == 1:
@@ -198,19 +197,19 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     if nspin == 1:
         total_D = mf.make_rdm1(mf.mo_coeff, mf.mo_occ)
         alpha_D = [0.5 * val for val in total_D]
-        D = [np.asarray(alpha_D), np.asarray(alpha_D)] 
+        D = [np.asarray(alpha_D), np.asarray(alpha_D)]
     else:
         D = [
             np.asarray(mf.make_rdm1(mf.mo_coeff, mf.mo_occ)[0]),
             np.asarray(mf.make_rdm1(mf.mo_coeff, mf.mo_occ)[1]),
         ]
 
-
     #########################################################################
     # step 4: LOSC localization                                             #
     #########################################################################
     #local_print(1, f'{options}')
     # step 4.1: select COs
+
     def select_CO(mf, spin, window):
         """Select COs to do the LOSC localization"""
         if isinstance(mf, pyscf.dft.rks.RKS):
@@ -296,7 +295,7 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
         local_print(1, '##################################')
         local_print(1, f' ==> iteration steps:      {localizer.steps()}')
         local_print(
-            1, f' ==> cost function value: {localizer.cost_func(C_lo[s])}' 
+            1, f' ==> cost function value: {localizer.cost_func(C_lo[s])}'
         )
         if localizer.is_converged():
             local_print(
@@ -307,7 +306,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
                 1, ' ==> convergence:          False, WARNING!!!'
             )
 
-    
     #########################################################################
     # step 5: compute LOSC curvature matrix                                 #
     #########################################################################
@@ -404,7 +402,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     E_losc_tot = 2 * E_losc[0] if nspin == 1 else sum(E_losc)
     E_losc_dfa_tot = mf.e_tot + E_losc_tot
 
-
     #########################################################################
     # step 8: pack LOSC data into dict & print energies to output           #
     #########################################################################
@@ -445,11 +442,11 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     utils.print_total_energies(1, mf.mol, losc_data)
     utils.print_orbital_energies(1, mf, losc_data, window=window)
 
-
     if return_losc_data:
         return E_losc_dfa_tot, losc_eigs, losc_data
     else:
         return E_losc_dfa_tot, losc_eigs
+
 
 def scf_losc(dfa_info, mf, losc_data=None, occ=None,
              orbital_energy_unit='eV', newton=False, verbose=5, window=None):
@@ -469,6 +466,7 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
         - 'au': atomic unit, hartree.
 
     newton : bool
+        Whether use Newton method to speed up the convergence or not.
 
     verbose : int, default=5
         The print level to control `post_scf_losc` and PySCF SCF calculation.
@@ -497,7 +495,7 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
     # step 2: do post-scf-losc to build curvature and LOs.                  #
     #########################################################################
     _, _, losc_data = post_scf_losc(
-        dfa_info, mf, orbital_energy_unit=orbital_energy_unit, 
+        dfa_info, mf, orbital_energy_unit=orbital_energy_unit,
         verbose=verbose, occ=occ, return_losc_data=True, window=window
     )
 
@@ -509,7 +507,7 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
     loscmf = utils.generate_loscmf(mf, losc_data=losc_data)
     loscmf.init_guess = mf.chkfile
     if newton == True:
-        loscmf = loscmf.newton() 
+        loscmf = loscmf.newton()
     loscmf.kernel()
 
     #########################################################################
@@ -522,10 +520,10 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
     nspin = losc_data['nspin']
     if nspin == 1:
         losc_data['losc_dfa_orbital_energy'] = [loscmf.mo_energy * eig_factor]
-    else: 
+    else:
         losc_data['losc_dfa_orbital_energy'] = loscmf.mo_energy * eig_factor
 
     utils.print_total_energies(verbose, loscmf.mol, losc_data)
-    utils.print_orbital_energies(verbose, loscmf, losc_data) 
+    utils.print_orbital_energies(verbose, loscmf, losc_data)
 
     return loscmf

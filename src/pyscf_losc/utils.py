@@ -2,6 +2,7 @@ import pyscf
 import numpy as np
 import py_losc
 
+
 def _local_print(print_level, verbose_level, mol, *args):
     """Print arguments to PySCF output file if verbose_level >= print_level.
 
@@ -17,6 +18,7 @@ def _local_print(print_level, verbose_level, mol, *args):
         t = [f'{i}' for i in args]
         pyscf.lib.logger.info(mol, f' {" ".join(t)}')
 
+
 def init_local_print(verbose_level, mol):
     """Create a local printer and set its verbose level
 
@@ -25,7 +27,7 @@ def init_local_print(verbose_level, mol):
     verbose_level : int
         The verbose level.
     mol: pyscf.gto.mol.Mole
-    
+
     Returns
     -------
     local_print : function(print_level, *args)
@@ -41,7 +43,8 @@ def init_local_print(verbose_level, mol):
 
     return local_print
 
-def print_total_energies(verbose_level, mol, losc_data,  
+
+def print_total_energies(verbose_level, mol, losc_data,
                          print_level=1):
     """Print total energies. Default print_level=1.
     """
@@ -57,6 +60,7 @@ def print_total_energies(verbose_level, mol, losc_data,
             losc_data['losc_dfa_energy']
         )
     )
+
 
 def print_orbital_energies(verbose_level, mf, losc_data, print_level=1,
                            window=None):
@@ -101,6 +105,8 @@ def print_orbital_energies(verbose_level, mf, losc_data, print_level=1,
                         dfa_eigs[s][i], losc_eigs[s][i]
                     )
                 )
+
+
 def print_full_matrix(mat, mol, line_limit=5):
     """Print matrix into PySCF output.
     """
@@ -109,6 +115,8 @@ def print_full_matrix(mat, mol, line_limit=5):
     for i in range(row):
         pyscf.lib.logger.info(mol, f'    {i}:')
         pyscf.lib.logger.info(mol, f' {mat[i]}')
+
+
 def print_sym_matrix(mat, mol, line_limit=5):
     """Print matrix into PySCF output
     """
@@ -119,6 +127,7 @@ def print_sym_matrix(mat, mol, line_limit=5):
         pyscf.lib.logger.info(mol, f' {mat[i][:i+1]}')
 
     pass
+
 
 def form_occ(mf, occ={}):
     """Form the occupation number of a given pyscf.dft.rks.RKS or 
@@ -159,14 +168,13 @@ def form_occ(mf, occ={}):
     occ_val : [[float, ...], [float, ...]]
         The occupation number of non-zero occupied orbitals.
     """
-    
+
     # step 1: build aufbau occupation based on mf.
-    # If mf is a pyscf.dft.rks.RKS object, mf.mo_occ is a one-dimensional 
+    # If mf is a pyscf.dft.rks.RKS object, mf.mo_occ is a one-dimensional
     # numpy.array object. [float ...]
     # If mf is a pyscf.dft.uks.UKS object, mf.mo_occ is a two-dimensional
     # numpy.array object. [[float ...]
     #                      [float ...]]
-
     nelec = mf.mol.nelec
     rst_occ = [{i: 1 for i in range(n)} for n in nelec]
 
@@ -216,7 +224,7 @@ def form_occ(mf, occ={}):
                 )
             # update the occ number
             rst_occ[s][orb_i] = occ_i
-    
+
     occ_idx = []
     occ_val = []
     for d in rst_occ:
@@ -238,8 +246,6 @@ def form_occ(mf, occ={}):
     nocc = tuple(len(x) for x in occ_idx)
 
     return nocc, occ_idx, occ_val
-
-
 
 
 def form_df_matrix(mf, C_lo, df_basis='augccpvtzri'):
@@ -264,14 +270,14 @@ def form_df_matrix(mf, C_lo, df_basis='augccpvtzri'):
     auxmol = pyscf.df.addons.make_auxmol(mf.mol, df_basis)
     # step 2: compute df_pii
     # step 2.1: compute 3-center-2-electron ao integrals <fitbasis|lo, lo>.
-    df_pmn = pyscf.df.incore.aux_e1(mf.mol, auxmol, intor='int3c2e', 
+    df_pmn = pyscf.df.incore.aux_e1(mf.mol, auxmol, intor='int3c2e',
                                     aosym='s1', comp=None, out=None)
     #########################################################################
     # In PySCF, this matrix is stored in an anti-intuitive way. The first   #
     # index is AO, the second index is fitbasis, and the third index is AO. #
     # No idea why the matrix is strored like this.                          #
     #########################################################################
-    # step 2.2: transform from AO to LO. 
+    # step 2.2: transform from AO to LO.
     df_pii = [
         np.zeros((auxmol.nao_nr(), C_lo[s].shape[1])) for s in range(nspin)
     ]
@@ -281,11 +287,12 @@ def form_df_matrix(mf, C_lo, df_basis='augccpvtzri'):
         )
 
     # step 3: compute df_Vpq_inv.
-    df_Vpq = pyscf.df.incore.fill_2c2e(mf.mol, auxmol, intor='int2c2e', 
+    df_Vpq = pyscf.df.incore.fill_2c2e(mf.mol, auxmol, intor='int2c2e',
                                        comp=None, hermi=1, out=None)
     df_Vpq_inv = np.linalg.inv(df_Vpq)
 
     return df_pii, df_Vpq_inv
+
 
 def generate_loscmf(mf, losc_data=None):
     """This function is used to generate an instance of SCF class in 
@@ -330,7 +337,7 @@ def generate_loscmf(mf, losc_data=None):
         E_losc = [0]
 
         def get_fock(self, h1e=None, s1e=None, vhf=None, dm=None, cycle=-1,
-                     diis=None, diis_start_cycle=None, 
+                     diis=None, diis_start_cycle=None,
                      level_shift_factor=None, damp_factor=None):
             ''' overwrite Fock matrix
             '''
@@ -340,16 +347,18 @@ def generate_loscmf(mf, losc_data=None):
             if nspin == 1:
                 total_D = mf.make_rdm1(loscmf.mo_coeff, loscmf.mo_occ)
                 alpha_D = [0.5 * val for val in total_D]
-                D = [np.asarray(alpha_D), np.asarray(alpha_D)] 
+                D = [np.asarray(alpha_D), np.asarray(alpha_D)]
             else:
                 D = [
-                    np.asarray(loscmf.make_rdm1(loscmf.mo_coeff, loscmf.mo_occ)[0]),
-                    np.asarray(loscmf.make_rdm1(loscmf.mo_coeff, loscmf.mo_occ)[1])
+                    np.asarray(loscmf.make_rdm1(
+                        loscmf.mo_coeff, loscmf.mo_occ)[0]),
+                    np.asarray(loscmf.make_rdm1(
+                        loscmf.mo_coeff, loscmf.mo_occ)[1])
                 ]
             # Fock matrix
             if nspin == 1:
                 F = [
-                    np.asarray(original_get_fock()), 
+                    np.asarray(original_get_fock()),
                     np.asarray(original_get_fock())]
             else:
                 F = [
@@ -372,6 +381,7 @@ def generate_loscmf(mf, losc_data=None):
             if nspin == 1:
                 E_losc[0] *= 2
             return F
+
         def energy_tot(self, dm=None, h1e=None, vhf=None):
             E_dfa = original_energy_tot()
             E_tot = E_dfa + E_losc[0]
@@ -381,8 +391,6 @@ def generate_loscmf(mf, losc_data=None):
         loscmf.energy_tot = energy_tot
 
     return loscmf
-
-
 
 
 def form_grid_lo(mf, C_lo):
@@ -413,15 +421,15 @@ def form_grid_lo(mf, C_lo):
     # step 2: read grid coordinates mf.grids.coords
     grid_coords = mf.grids.coords
     npts = grid_coords.shape[0]
-    # step 3: use pyscf.dft.numint.eval_ao(mf.mol, coords, ...) to evaluate 
+    # step 3: use pyscf.dft.numint.eval_ao(mf.mol, coords, ...) to evaluate
     #         AO function values on the given grids.
     grid_ao = pyscf.dft.numint.eval_ao(mf.mol, grid_coords)
-    # This will return a 2D array of shape (npts, nao), where npts is the 
+    # This will return a 2D array of shape (npts, nao), where npts is the
     # number of grids and nao is the number of AOs.
 
     # step 4: use C_lo to convert AO values in step 3 to LO values.
     nlo = C_lo.shape[1]
     grid_lo = np.zeros((npts, nlo))
     grid_lo = grid_ao.dot(C_lo)
-    
+
     return grid_lo
