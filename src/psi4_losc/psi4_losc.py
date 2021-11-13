@@ -247,7 +247,7 @@ def post_scf_losc(dfa_info, dfa_wfn, orbital_energy_unit='eV',
                                                    grid_w)
             curvature_helper.set_tau(options.get_param('curvature', 'v2_parameter_tau'))
             curvature_helper.set_zeta(options.get_param('curvature', 'v2_parameter_zeta'))
-        elif curvature == 1:
+        elif curvature_version == 1:
             curvature_helper = py_losc.CurvatureV1(dfa_info, df_pii[s],
                                                    df_Vpq_inv, grid_lo[s],
                                                    grid_w)
