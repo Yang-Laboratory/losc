@@ -43,15 +43,15 @@ Compile from the source code
 ----------------------------
 
 #. you can obtain the source code from `the github repository
-   <https://github.com/Miocbb/losc>`_ via ``git clone``:
+   <https://github.com/Yang-Laboratory/losc>`_ via ``git clone``:
 
    .. code-block:: bash
 
-        >>> git clone https://github.com/Miocbb/losc.git
+        >>> git clone https://github.com/Yang-Laboratory/losc.git
 
    Doing so requires you to have ``git`` installed in your system. If you do
    not have access to ``git``, you can download the archive of the source
-   code from the `the github repository <https://github.com/Miocbb/losc>`_,
+   code from the `the github repository <https://github.com/Yang-Laboratory/losc>`_,
    and extract the source manually.
 
 #. Navigate to the top level directory of the source code
