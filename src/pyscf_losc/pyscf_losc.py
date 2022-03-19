@@ -6,7 +6,6 @@ from pyscf import gto, scf
 from pyscf_losc import utils
 from pyscf_losc import options
 
-
 #############################################################################
 # For the starting PySCF SCF calculation, save the .chk file. Initial guess #
 # for the SCF-LOSC calculation will be generated based on the file.         #
