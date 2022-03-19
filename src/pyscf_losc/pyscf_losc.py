@@ -53,7 +53,8 @@ def _validate_inp(mf):
 
     # check functional
     if mf.omega != None:
-        raise Exception("Sorry, LOSC does not support range-separated functional.") 
+        raise Exception("Sorry, LOSC does not support range-separated \
+            functional.") 
     
 
 def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
@@ -133,9 +134,8 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     losc_data : dict
         losc_data will be returned if `return_losc_data` is True. `losc_data`
         contains the data of LOSC calculations.
-
-
     """
+
     #########################################################################
     # step 1: sanity-check of input dfa wfn and other parameters            #
     #########################################################################
@@ -204,7 +204,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
             np.asarray(mf.make_rdm1(mf.mo_coeff, mf.mo_occ)[0]),
             np.asarray(mf.make_rdm1(mf.mo_coeff, mf.mo_occ)[1]),
         ]
-
 
     #########################################################################
     # step 4: LOSC localization                                             #
@@ -305,7 +304,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
             local_print(
                 1, ' ==> convergence:          False, WARNING!!!'
             )
-
     
     #########################################################################
     # step 5: compute LOSC curvature matrix                                 #
@@ -354,6 +352,7 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
     local_occ = [None] * nspin
     for s in range(nspin):
         local_occ[s] = py_losc.local_occupation(C_lo[s], S, D[s])
+
     # print matrix into PySCF output file
     local_print(3, '##################################')
     local_print(3, '#   Details of Matrices in LOSC  #')
@@ -468,7 +467,8 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
         - 'au': atomic unit, hartree.
 
     newton : bool
-
+        Whether turn on the PySCF buiild-in newton method to do the SCF 
+        calculation or not.
     verbose : int, default=5
         The print level to control `post_scf_losc` and PySCF SCF calculation.
     window : [float, float], optional
@@ -504,9 +504,9 @@ def scf_losc(dfa_info, mf, losc_data=None, occ=None,
     # step 3: perform SCF-LOSC.                                             #
     #########################################################################
     # see utils.generate_loscmf()
-    print(mf)
     loscmf = utils.generate_loscmf(mf, losc_data=losc_data)
     loscmf.init_guess = mf.chkfile
+    loscmf.converged = False
     if newton == True:
         loscmf = loscmf.newton() 
     loscmf.kernel()

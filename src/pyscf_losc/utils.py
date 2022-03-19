@@ -2,6 +2,7 @@ import pyscf
 import numpy as np
 import py_losc
 
+
 def _local_print(print_level, verbose_level, mol, *args):
     """Print arguments to PySCF output file if verbose_level >= print_level.
 
@@ -17,6 +18,7 @@ def _local_print(print_level, verbose_level, mol, *args):
         t = [f'{i}' for i in args]
         pyscf.lib.logger.info(mol, f' {" ".join(t)}')
 
+
 def init_local_print(verbose_level, mol):
     """Create a local printer and set its verbose level
 
@@ -31,6 +33,7 @@ def init_local_print(verbose_level, mol):
     local_print : function(print_level, *args)
         A printer with setting verbose level to be `verbose_level`.
     """
+
     def local_print(print_level, *args):
         """ Print arguments into PySCF output file when verbose level >= 
         print level.
@@ -40,6 +43,7 @@ def init_local_print(verbose_level, mol):
         _local_print(print_level, verbose_level, mol, *args)
 
     return local_print
+
 
 def print_total_energies(verbose_level, mol, losc_data,  
                          print_level=1):
@@ -57,6 +61,7 @@ def print_total_energies(verbose_level, mol, losc_data,
             losc_data['losc_dfa_energy']
         )
     )
+
 
 def print_orbital_energies(verbose_level, mf, losc_data, print_level=1,
                            window=None):
@@ -95,12 +100,14 @@ def print_orbital_energies(verbose_level, mf, losc_data, print_level=1,
                 orb *= constants.hartree2ev
             if not window or (window[0] <= orbE <= window[1]):
                 local_print(
-                    l, "{:<5d}  {:<8.5f} {:>14.6f}  {:>14.6f}"
+                    l, "{:<5d}  {:<8.5f} {:>14.6f}  {:>14.10f}"
                     .format(
                         i, occ_idx_val[s].get(i, 0),
                         dfa_eigs[s][i], losc_eigs[s][i]
                     )
                 )
+
+
 def print_full_matrix(mat, mol, line_limit=5):
     """Print matrix into PySCF output.
     """
@@ -109,6 +116,8 @@ def print_full_matrix(mat, mol, line_limit=5):
     for i in range(row):
         pyscf.lib.logger.info(mol, f'    {i}:')
         pyscf.lib.logger.info(mol, f' {mat[i]}')
+
+
 def print_sym_matrix(mat, mol, line_limit=5):
     """Print matrix into PySCF output
     """
@@ -119,6 +128,7 @@ def print_sym_matrix(mat, mol, line_limit=5):
         pyscf.lib.logger.info(mol, f' {mat[i][:i+1]}')
 
     pass
+
 
 def form_occ(mf, occ={}):
     """Form the occupation number of a given pyscf.dft.rks.RKS or 
@@ -240,8 +250,6 @@ def form_occ(mf, occ={}):
     return nocc, occ_idx, occ_val
 
 
-
-
 def form_df_matrix(mf, C_lo, df_basis='augccpvtzri'):
     """Build density fitting related matrices, df_pii, df_Vpq_inv
 
@@ -286,6 +294,7 @@ def form_df_matrix(mf, C_lo, df_basis='augccpvtzri'):
     df_Vpq_inv = np.linalg.inv(df_Vpq)
 
     return df_pii, df_Vpq_inv
+
 
 def generate_loscmf(mf, losc_data=None):
     """This function is used to generate an instance of SCF class in 
@@ -372,6 +381,7 @@ def generate_loscmf(mf, losc_data=None):
             if nspin == 1:
                 E_losc[0] *= 2
             return F
+
         def energy_tot(self, dm=None, h1e=None, vhf=None):
             E_dfa = original_energy_tot()
             E_tot = E_dfa + E_losc[0]
@@ -381,8 +391,6 @@ def generate_loscmf(mf, losc_data=None):
         loscmf.energy_tot = energy_tot
 
     return loscmf
-
-
 
 
 def form_grid_lo(mf, C_lo):
@@ -413,6 +421,7 @@ def form_grid_lo(mf, C_lo):
     # step 2: read grid coordinates mf.grids.coords
     grid_coords = mf.grids.coords
     npts = grid_coords.shape[0]
+
     # step 3: use pyscf.dft.numint.eval_ao(mf.mol, coords, ...) to evaluate 
     #         AO function values on the given grids.
     grid_ao = pyscf.dft.numint.eval_ao(mf.mol, grid_coords)
