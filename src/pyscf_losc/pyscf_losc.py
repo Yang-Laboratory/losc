@@ -3,8 +3,8 @@ import py_losc
 import numpy as np
 from numpy import reshape
 from pyscf import gto, scf
-import utils
-import losc_options
+from pyscf_losc import utils
+from pyscf_losc import options
 
 #############################################################################
 # For the starting PySCF SCF calculation, save the .chk file. Initial guess #
@@ -261,7 +261,6 @@ def post_scf_losc(dfa_info, mf, orbital_energy_unit='eV', verbose=1, occ=None,
         select_CO_idx[s] = idx
 
     # step 4.2: create losc localizer object
-    options = losc_options.Options()
     C_lo = [None] * nspin
     U = [None] * nspin
     for s in range(nspin):

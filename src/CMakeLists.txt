@@ -9,3 +9,7 @@ add_subdirectory(py_losc)
 
 # psi4 losc library
 add_subdirectory(psi4_losc)
+
+# pyscf losc library
+add_subdirectory(pyscf_losc)
+
